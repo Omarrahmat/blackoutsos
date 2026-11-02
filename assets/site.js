@@ -40,7 +40,7 @@
       .catch(function () {});
   }
 
-  function gbp(p) { return '£' + (p / 100).toFixed(p % 100 ? 2 : 0); }
+  function gbp(p) { return window.BSOS_CUR ? window.BSOS_CUR.money(p) : '£' + (p / 100).toFixed(p % 100 ? 2 : 0); }
   function read() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
   function write(b) { try { localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} renderCount(); }
   function count(b) { var n = 0; for (var k in b) n += b[k]; return n; }
@@ -113,24 +113,28 @@
       codes.forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = names[c]; sel.appendChild(o); });
       sel.value = shipCountry();
       if (!sel.value) sel.value = 'GB';
-      sel.addEventListener('change', function () { try { localStorage.setItem(SHIP_KEY, sel.value); } catch (e) {} renderBasket(); });
+      sel.addEventListener('change', function () { try { localStorage.setItem(SHIP_KEY, sel.value); } catch (e) {} if (window.BSOS_CUR) window.BSOS_CUR.setCountry(sel.value); renderBasket(); });
     }
     var cc = sel.value; var q = shipQuote(cc, b); if (!q) return;
     var cost = document.querySelector('[data-ship-cost]'), label = document.querySelector('[data-ship-label]'), note = document.querySelector('[data-ship-note]'), sub = document.querySelector('[data-basket-sub]'), tot = document.querySelector('[data-basket-total]');
-    var t = total(b);
-    if (sub) sub.textContent = gbp(t);
+    var C = window.BSOS_CUR, lt = 0;
+    for (var k in b) if (CATALOGUE[k]) lt += (C ? C.local(CATALOGUE[k].price) : CATALOGUE[k].price / 100) * b[k];
+    var ls = C ? C.local(q.standard) : q.standard / 100;
+    var f = function (a) { return C ? C.fmt(a) : '£' + a.toFixed(a % 1 ? 2 : 0); };
+    if (sub) sub.textContent = f(lt);
     if (label) label.textContent = 'Tracked delivery, ' + q.days;
-    if (cost) cost.textContent = q.standard ? gbp(q.standard) : 'Free';
-    if (tot) tot.textContent = gbp(t + q.standard);
+    if (cost) cost.textContent = q.standard ? f(ls) : 'Free';
+    if (tot) tot.textContent = f(lt + ls);
     if (note) note.textContent = (cc === 'GB'
       ? 'Free tracked UK delivery, or next working day for ' + gbp(q.express) + ' at checkout. Assembled to order and dispatched within three working days.'
-      : 'Tracked delivery to ' + G.names[cc] + ' from the UK, ' + q.days + '; express ' + q.express_days + ' for ' + gbp(q.express) + ' at checkout. Prices are in pounds sterling and exclude any import duty or tax your country charges, which the courier collects on delivery. Stripe shows the total in your own currency.')
+      : 'Tracked delivery to ' + G.names[cc] + ' from the UK, ' + q.days + '; express ' + q.express_days + ' for ' + gbp(q.express) + ' at checkout. Prices are in your currency and exclude any import duty or tax your country charges, which the courier collects on delivery.')
       + ' Payment is taken on Stripe\'s secure page: cards, Apple Pay and Google Pay.';
   }
 
 
   // Delivery line for the visitor's own country (product pages and the homepage)
   function shipLines(cc) {
+    shipLines.last = cc;
     var S = window.BSOS_SHIP, G = window.BSOS_GEO; if (!S || !G || !cc) return;
     var name = G.names[cc] || cc; var line, hero;
     if (S.noShip.indexOf(cc) >= 0) { line = 'inc. UK VAT · we can\'t deliver to ' + name + ' yet'; hero = 'Assembled in the UK. We can\'t deliver to ' + name + ' yet — email us.'; }
@@ -141,6 +145,7 @@
     document.querySelectorAll('[data-ship-line]').forEach(function (el) { el.textContent = line; });
     document.querySelectorAll('[data-ship-line-hero]').forEach(function (el) { el.textContent = hero; });
   }
+  document.addEventListener('bsos:currency', function () { renderBasket(); var c = shipLines.last; if (c) shipLines(c); });
   document.addEventListener('bsos:loc', function (e) { var cc = e.detail && e.detail.country; try { var v = localStorage.getItem(SHIP_KEY); if (v) cc = v; } catch (x) {} shipLines(cc); });
 
   function renderBasket() {
@@ -158,7 +163,7 @@
         + '<span class="tag" style="background:' + p.colour + '"></span>'
         + '<a href="' + p.url + '" style="flex:1 1 200px;min-width:0"><strong>' + p.name + '</strong><br><span class="muted small">' + p.variant + ' · ' + gbp(p.price) + '</span></a>'
         + '<div class="qty"><button type="button" aria-label="Remove one" data-dec>−</button><span>' + b[k] + '</span><button type="button" aria-label="Add one" data-inc>+</button></div>'
-        + '<strong style="min-width:70px;text-align:right">' + gbp(p.price * b[k]) + '</strong>'
+        + '<strong style="min-width:70px;text-align:right">' + (window.BSOS_CUR ? window.BSOS_CUR.fmt(window.BSOS_CUR.local(p.price) * b[k]) : gbp(p.price * b[k])) + '</strong>'
         + '<button type="button" class="pill sm" data-remove>Remove</button></div>';
     });
     box.innerHTML = html;
@@ -187,7 +192,7 @@
       btn.disabled = true; btn.textContent = 'Taking you to secure checkout…';
       var msg = document.querySelector('[data-checkout-msg]');
       var sel = document.querySelector('[data-ship-country]');
-      post('/checkout', { items: items, country: sel ? sel.value : shipCountry(), base: location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') })
+      post('/checkout', { items: items, currency: window.BSOS_CUR ? window.BSOS_CUR.current() : 'GBP', country: sel ? sel.value : shipCountry(), base: location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') })
         .then(function (res) {
           if (res.ok && res.data && res.data.url) { location.href = res.data.url; return; }
           btn.disabled = false; btn.textContent = 'Checkout';

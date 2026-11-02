@@ -22,7 +22,7 @@ BAGS = {
         (BLACK, "hygiene and tools", ["Hand sanitiser, wet wipes", "Toilet roll, tissues, toothbrush", "Sanitary pads, bin and ziplock bags", "Multi-tool, non-locking, carry-legal in most countries", "Duct tape, paracord 10 m, cable ties", "Ferro rod, pen, waterproof notepad", "Document pouch, contacts card, map"]),
         (LID, "light, power, signal", ["Head torch, 200–300 lumens", "Lithium batteries, 10-year", "Wind-up and solar radio, USB out", "Power bank 10,000 mAh and cable", "Whistle on a lanyard, and one in the strap buckle", "Glow sticks, 2", "Contents, rotation and first-hour cards"]),
     ],
-    you_add="What you add: your medication, copies of your ID, £50 to £100 in small notes, and a change of clothes. The document pouch and medication pouch are labelled and waiting.",
+    you_add="What you add: your medication, copies of your ID, some cash in small notes, and a change of clothes. The document pouch and medication pouch are labelled and waiting.",
     build_title="Expedition build. Everyday face.",
     build_text="No visible MOLLE, no camouflage, no bright branding. The same materials as a mountaineering pack, in a bag you can carry through a station without anyone looking twice.",
     build=[("Shell", "500D Cordura, TPU laminated"), ("Seams", "Taped, bar-tacked anchors"), ("Zips", "YKK AquaGuard, storm flaps"), ("Hardware", "Duraflex, black"), ("Base", "1000D, TPU coated"),

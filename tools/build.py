@@ -14,6 +14,7 @@ UPDATED = datetime.date.today().strftime("%B %Y")
 FAVICON = "data:image/svg+xml," + H.escape("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='#0a0a0a'/><g fill='#ededed'><rect x='10' y='29' width='5' height='6' rx='1'/><rect x='17' y='29' width='5' height='6' rx='1'/><rect x='24' y='29' width='5' height='6' rx='1'/><rect x='33' y='29' width='9' height='6' rx='1'/><rect x='44' y='29' width='9' height='6' rx='1'/></g></svg>", quote=True)
 
 def gbp(p): return "£" + (f"{p/100:.2f}" if p % 100 else f"{p//100}")
+def px(p): return f'<span data-gbp="{p}">{gbp(p)}</span>'
 
 def morse():
     d = '<i></i>' * 3; l = '<i class="l"></i>' * 3
@@ -78,6 +79,8 @@ def footer(r):
 </footer>
 <script src="{r}assets/geo.js"></script>
 <script src="{r}assets/shipping.js"></script>
+<script>window.BSOS_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3VzdGp0eGptamxndWt6Y2ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMzI1MjcsImV4cCI6MjEwODcwODUyN30.Y_gKh0rs7HVI6rf3z8mmCAh-LcT-cTqJypqawbkdw7w"</script>
+<script src="{r}assets/currency.js"></script>
 <script src="{r}assets/site.js"></script>
 <script src="{r}assets/alerts.js" defer></script>
 </body>
@@ -134,7 +137,7 @@ def bag_card(slug, r):
 <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="display" style="font-size:30px">{b['name']}</span><span class="tag" style="background:{b['colour']}"></span></div>
 <p class="p small">{b['card']}</p>
 </a>
-<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto"><span style="font-size:20px;font-weight:600">{gbp(b['price'])}</span>{cta}</div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto"><span style="font-size:20px;font-weight:600">{px(b['price'])}</span>{cta}</div>
 <a href="{r}bags/{slug}.html" class="muted small" style="align-self:flex-start;border-bottom:1px solid var(--line3)">What's inside →</a>
 </div>"""
 
@@ -223,7 +226,7 @@ def range_page():
     rows = ""
     for s in ORDER:
         b = BAGS[s]
-        rows += f'<tr><td><span style="display:inline-flex;align-items:center;gap:8px"><span class="tag" style="background:{b["colour"]}"></span><a href="{s}.html"><strong>{b["name"]}</strong></a></span></td><td>{b["who"]}</td><td>{b["specs"][1]}</td><td>{b["specs"][2]}</td><td>{b["specs"][3]}</td><td>{gbp(b["price"])}</td></tr>'
+        rows += f'<tr><td><span style="display:inline-flex;align-items:center;gap:8px"><span class="tag" style="background:{b["colour"]}"></span><a href="{s}.html"><strong>{b["name"]}</strong></a></span></td><td>{b["who"]}</td><td>{b["specs"][1]}</td><td>{b["specs"][2]}</td><td>{b["specs"][3]}</td><td>{px(b["price"])}</td></tr>'
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <div class="crumbs"><a href="../index.html">Home</a><span>/</span><span class="here">Bags</span></div>
@@ -263,7 +266,7 @@ def product(slug):
     def rows(rs): return "".join(f'<div class="row"><span>{k}</span><span>{v}</span></div>' for k, v in rs)
     rotation = "".join(f'<div class="row"><span>{k}</span><span>{v}</span></div>' for k, v in b["rotation"])
     faq = "".join(f'<div class="faq"><p>{q}</p><p class="p small">{a}</p></div>' for q, a in b["faq"])
-    pairs = "".join(f'<a class="card" href="{p}.html" style="flex:1 1 300px;flex-direction:row;justify-content:space-between;align-items:center;gap:20px"><span class="stack" style="gap:6px"><span class="display" style="font-size:30px">{BAGS[p]["name"]}</span><span class="p small">{line} {gbp(BAGS[p]["price"])}</span></span><span class="tag" style="background:{BAGS[p]["colour"]}"></span></a>' for p, line in b["pairs"])
+    pairs = "".join(f'<a class="card" href="{p}.html" style="flex:1 1 300px;flex-direction:row;justify-content:space-between;align-items:center;gap:20px"><span class="stack" style="gap:6px"><span class="display" style="font-size:30px">{BAGS[p]["name"]}</span><span class="p small">{line} {px(BAGS[p]["price"])}</span></span><span class="tag" style="background:{BAGS[p]["colour"]}"></span></a>' for p, line in b["pairs"])
     notes = "".join(f'<p>{n}</p>' for n in b["notes"])
     schema = json.dumps({"@context": "https://schema.org", "@type": "Product", "name": f"Blackout SOS {b['name']}", "description": b["card"], "brand": {"@type": "Brand", "name": "Blackout SOS"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": f"{b['price']/100:.2f}", "availability": "https://schema.org/InStock" if b.get("available") else "https://schema.org/OutOfStock", "url": f"{SITE}/bags/{slug}.html"}})
     body = f"""
@@ -273,11 +276,11 @@ def product(slug):
 <div class="stack" style="flex:1 1 420px;gap:24px">
 <div class="stack" style="gap:10px"><div class="eyebrow" style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:10px;height:10px;background:{b['colour']}"></span>{b['who']} · {b['colour_name']} tag</div><h1 class="h1" style="font-size:clamp(56px,7vw,96px)">{b['name']}</h1><p class="lede" style="font-size:17px">{b['lede']}</p></div>
 <div class="muted small" style="display:flex;flex-wrap:wrap;gap:8px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0">{"".join(f"<span>{s}</span>" for s in b["specs"])}</div>
-<div style="display:flex;align-items:baseline;gap:14px"><span class="price">{gbp(b['price'])}</span><span class="muted small" data-ship-line>inc. UK VAT · free UK delivery · ships worldwide</span></div>
+<div style="display:flex;align-items:baseline;gap:14px"><span class="price">{px(b['price'])}</span><span class="muted small" data-ship-line>inc. UK VAT · free UK delivery · ships worldwide</span></div>
 <form class="stack" style="gap:14px" data-product="{b['sku']}">
 {variants}
 <div data-avail="{b['sku']}" data-when="in" data-follow-variant hidden style="display:contents">
-<button type="submit" class="pill solid" style="height:58px;font-size:16px">Add to basket — {gbp(b['price'])}</button>
+<button type="submit" class="pill solid" style="height:58px;font-size:16px">Add to basket &nbsp;—&nbsp;{px(b['price'])}</button>
 <p class="p small">Write-on name card included: add names with your own pen. Nothing to personalise, nothing to wait for.</p>
 </div>
 </form>
@@ -533,7 +536,7 @@ def about():
 
 def delivery():
     from shipping import ZONES, RATES, BANDS
-    gb = lambda pence: "Free" if pence == 0 else f"£{pence/100:.2f}".replace(".00", "").replace(".95", ".95")
+    gb = lambda pence: "Free" if pence == 0 else f'<span data-gbp="{pence}">£{pence/100:.2f}</span>'
     band_names = ["One bag (up to 4 kg)", "Two bags (up to 8 kg)", "Family set or the Unit (up to 14 kg)", "Larger orders (up to 30 kg)"]
     rows = ""
     for z, d in ZONES.items():
@@ -598,7 +601,7 @@ def terms():
 <section class="section top"><div class="wrap stack" style="gap:20px;max-width:800px"><p class="eyebrow">Terms</p><h1 class="h1">The plain version.</h1>
 <div class="stack body" style="gap:14px">
 <p><strong>Who you are buying from.</strong> Blackout SOS, London, United Kingdom. The registered company name, number and address will be shown here from the day the shop opens for orders. Email hello@blackoutsos.com.</p>
-<p><strong>Prices and payment.</strong> Prices are in pounds sterling and include UK VAT; UK delivery is free and delivery elsewhere is shown before you pay. Your card is charged in your own currency at Stripe's rate. Orders outside the UK may attract import duty or tax in the destination country, collected by the courier. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
+<p><strong>Prices and payment.</strong> Prices are shown and charged in your local currency for most countries (otherwise in US dollars), converted from our pound-sterling prices at the day's exchange rate, and include UK VAT for UK orders. UK delivery is free and delivery elsewhere is shown before you pay. Orders outside the UK may attract import duty or tax in the destination country, collected by the courier. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
 <p><strong>Delivery.</strong> Dispatched within three working days of your order, tracked, to the UK and to most countries worldwide; delivery times are on the delivery page. Risk passes to you on delivery.</p>
 <p><strong>Cancelling and returning.</strong> You may cancel within 14 days of receiving your order for any reason and return it at your cost for a full refund, provided seals are intact; sealed food, hygiene and first-aid items that have been unsealed cannot be returned for hygiene reasons. We extend this to 30 days for unopened bags. Faulty goods are repaired, replaced or refunded as the Consumer Rights Act 2015 requires.</p>
 <p><strong>What the bag is, and isn't.</strong> Our bags and guides are general preparedness products and advice. They are not a substitute for the emergency services or official instructions, and we don't guarantee any outcome in an emergency. You are responsible for checking the contents against your own medical, dietary and legal needs, keeping the rotation dates, and adding your own medication and documents.</p>
@@ -671,7 +674,7 @@ def us_hub():
 <section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · National Weather Service</p><h2 class="h2">Serious warnings in force in <span data-alerts-place>the United States</span></h2><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div><a class="pill" href="../alerts.html" style="align-self:flex-start">All warnings, any state</a></div></section>
 <section class="section"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">The 72-hour kit, US version</p><h2 class="h2">What the official checklist asks for.</h2><p class="p">From Ready.gov's basic disaster supplies kit, with what our bags already carry. In an emergency call 911; for official alerts keep Wireless Emergency Alerts switched on and follow your state and county emergency management.</p></div><div class="stack" style="flex:2 1 520px;gap:0;border-top:1px solid var(--line2)">{kit}</div></div></section>
 <section class="section band" id="states"><div class="wrap stack" style="gap:20px"><p class="eyebrow">By state</p><h2 class="h2">Your state's hazards and live warnings.</h2><div class="grid" style="gap:12px">{states}</div></div></section>
-<section class="section"><div class="wrap stack" style="gap:12px;max-width:760px"><p class="eyebrow">Delivery to the US</p><p class="body">Every bag is assembled in the UK and sent tracked: 5 to 9 working days, or 2 to 4 by express, from £29.95 for one bag. Prices are in pounds; your card shows dollars. US import duty and any courier fee are collected on delivery. <a href="../delivery-returns.html" style="border-bottom:1px solid var(--muted)">Delivery and duties</a>.</p></div></section>
+<section class="section"><div class="wrap stack" style="gap:12px;max-width:760px"><p class="eyebrow">Delivery to the US</p><p class="body">Every bag is assembled in the UK and sent tracked: 5 to 9 working days, or 2 to 4 by express, from <span data-gbp="2995">£29.95</span> for one bag, priced in dollars. US import duty and any courier fee are collected on delivery. <a href="../delivery-returns.html" style="border-bottom:1px solid var(--muted)">Delivery and duties</a>.</p></div></section>
 """
     page("us/index.html", "Emergency go bags and 72-hour kits in the United States — Blackout SOS", "What FEMA and Ready.gov ask every US household to keep for 72 hours, live National Weather Service warnings by state, and go bags shipped to the US.", body, lang="en-US", loc=("US", ""))
 
@@ -717,7 +720,7 @@ def world_country(c, n, num, wname, wurl, hazards):
 <section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · {wname}</p><h2 class="h2">Warnings in force in <span data-alerts-place>{n}</span></h2><p class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</p><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div><p class="p small">The national service is the authority: <a href="{wurl}" target="_blank" rel="noopener" style="border-bottom:1px solid var(--line3)">{wname}</a>.</p></div></section>
 <section class="section"><div class="wrap split" style="gap:40px">
 <div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">What {n} plans for</p><h2 class="h2">The main hazards.</h2><ul class="body" style="margin:0;padding-left:20px">{hz}</ul></div>
-<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Three days of water (about 3 litres per person per day for drinking, more for washing), food that needs no cooking, light, warmth, first aid, a week of medicines, copies of documents, some cash and a plan for the family and pets. Our bags carry what travels with you: one bag per person, one colour per bag.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/index.html">See the bags</a><a class="pill" href="../delivery-returns.html">Delivery to {n}</a></div><p class="p small">Prices are in pounds; your card shows your own currency. Any import tax is collected on delivery.</p></div>
+<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Three days of water (about 3 litres per person per day for drinking, more for washing), food that needs no cooking, light, warmth, first aid, a week of medicines, copies of documents, some cash and a plan for the family and pets. Our bags carry what travels with you: one bag per person, one colour per bag.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/index.html">See the bags</a><a class="pill" href="../delivery-returns.html">Delivery to {n}</a></div><p class="p small">Prices are shown in your own currency. Any import tax is collected on delivery.</p></div>
 </div></section>
 <section class="section band" id="email"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">One email when a serious warning is issued in {n}.</h2></div>
 <form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe"><input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes"><label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label><button type="submit" class="pill solid">Email me serious warnings</button><p class="p small ok" data-done hidden>You're on the list.</p></form></div></section>

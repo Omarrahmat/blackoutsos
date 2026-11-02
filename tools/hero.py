@@ -40,8 +40,8 @@ def hero_html(r="", art=None, bags=None, gbp=None):
     items = ""
     for s in order:
         b = bags[s]
-        items += f"""<a href="{r}bags/{s}.html" style="--h:{heights[s]}" aria-label="{b['name']}, {b['who']}, {gbp(b['price'])}"><span class="fig">{art(s)}<span class="mirror" aria-hidden="true">{art(s)}</span><span class="cap"><span class="nm"><span class="tag" style="background:{b['colour']}"></span>{b['name']}</span><span class="pr">{b['who']} · {gbp(b['price'])}</span></span></span></a>"""
-    strip = "".join(f'<a href="{r}bags/{s2}.html"><span class="tag" style="background:{bags[s2]["colour"]}"></span><span class="nm">{bags[s2]["name"]}</span><span class="pr">{bags[s2]["who"]} · {gbp(bags[s2]["price"])}</span></a>' for s2 in order)
+        items += f"""<a href="{r}bags/{s}.html" style="--h:{heights[s]}" aria-label="{b['name']}, {b['who']}, {gbp(b['price'])}"><span class="fig">{art(s)}<span class="mirror" aria-hidden="true">{art(s)}</span><span class="cap"><span class="nm"><span class="tag" style="background:{b['colour']}"></span>{b['name']}</span><span class="pr">{b['who']} · <span data-gbp="{b['price']}">{gbp(b['price'])}</span></span></span></span></a>"""
+    strip = "".join(f'<a href="{r}bags/{s2}.html"><span class="tag" style="background:{bags[s2]["colour"]}"></span><span class="nm">{bags[s2]["name"]}</span><span class="pr">{bags[s2]["who"]} · <span data-gbp="{bags[s2]["price"]}">{gbp(bags[s2]["price"])}</span></span></a>' for s2 in order)
     return f"""
 <section class="hero" aria-label="Blackout SOS go bags">
 <div class="wrap hero-top">
@@ -50,8 +50,8 @@ def hero_html(r="", art=None, bags=None, gbp=None):
 <h1 class="h1">A 72-hour go bag for every person in your house.</h1>
 </div>
 <div class="stack" style="gap:18px;flex:0 1 420px">
-<p class="lede">Five bags, one colour each, from £89. Packed in the UK with 15-year rations, waterproof, vegan and made without nuts. <span data-ship-line-hero>Free UK delivery, worldwide shipping, dispatched in three working days.</span></p>
-<div class="hero-ctas"><a class="pill solid" href="{r}bags/index.html">Shop the range</a><a class="pill" href="{r}bags/operator.html">The Operator, £199</a></div>
+<p class="lede">Five bags, one colour each, from <span data-gbp="8900">£89</span>. Packed in the UK with 15-year rations, waterproof, vegan and made without nuts. <span data-ship-line-hero>Free UK delivery, worldwide shipping, dispatched in three working days.</span></p>
+<div class="hero-ctas"><a class="pill solid" href="{r}bags/index.html">Shop the range</a><a class="pill" href="{r}bags/operator.html">The Operator,&nbsp;<span data-gbp="19900">£199</span></a></div>
 </div>
 </div>
 <div class="studio">
