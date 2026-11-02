@@ -470,16 +470,16 @@ def refills():
 
 def organisations():
     segs = [("Offices and workplaces", "A bag at every desk or on every floor, written into your business-continuity and duty-of-care plans. When the building loses power, nobody has to improvise."),
-            ("Schools and universities", "Grab bags for classrooms and halls of residence, a Unit for every evacuation point, and refills scheduled around the academic year."),
+            ("Schools and universities", "Grab bags for classrooms and halls of residence, a Unit for every evacuation point, and expiry reminders timed around the academic year."),
             ("Hotels and hospitality", "A discreet bag per room or per floor and a team bag at reception, so guests are looked after when the lights go out."),
             ("Property and residential", "Bags for every apartment, concierge and building manager, with a rotation schedule we run so the kit is live when the building isn't."),
             ("Care, health and support providers", "Bags for residents, clients and the staff who look after them, packed for the people you support, with the emergency-plan wording written for you."),
-            ("Charities and NGOs", "Volume pricing for the communities you serve, co-branded warning alerts, and one bag donated for every twenty sold."),
+            ("Charities and NGOs", "Volume pricing for the communities you serve, and one bag donated for every twenty sold."),
             ("Animal rescue and rehoming", "A Scout with every adoption, so the dog or cat goes home with its own bag."),
-            ("Corporate gifting", "A gift that says you care whether your people get home safely. Custom name cards and a note from you in every bag.")]
+            ("Corporate gifting", "A gift that says you care whether your people get home safely, sent to one address or straight to each person's door.")]
     seg_html = "".join(f'<div class="card" style="flex:1 1 280px"><h3 class="h4 sans" style="font-weight:600">{n}</h3><p class="p">{d}</p></div>' for n, d in segs)
     offer = [("From 10 bags", "Volume pricing on every bag, mixed as you like across the range."), ("Invoice terms", "30-day terms for registered organisations, in your currency."), ("Delivered worldwide", "To one address or many, in one shipment or staggered, tracked from the UK."),
-             ("Your name on it", "Custom name cards, your logo on the inside label from 100 bags, and a note from you in every bag."), ("We run the rotation", "We hold the expiry dates, send the refills before they're due and send you a yearly readiness report."), ("Policy wording", "The paragraph for your emergency or business-continuity plan, written for your organisation.")]
+             ("Ready to go", "The same standard bags we sell to families, each with a write-on name card, so there is nothing to wait for."), ("We run the rotation", "We hold the expiry dates, remind you before anything is due and send you a yearly readiness report."), ("Policy wording", "The paragraph for your emergency or business-continuity plan, written for your organisation.")]
     offer_html = "".join(f'<div class="stack" style="flex:1 1 260px;gap:6px;border-top:1px solid var(--line2);padding-top:16px"><strong>{t}</strong><p class="p small">{d}</p></div>' for t, d in offer)
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:28px">
@@ -492,7 +492,7 @@ def organisations():
 <section class="section"><div class="wrap stack" style="gap:28px"><div class="stack" style="gap:10px"><p class="eyebrow">What you get</p><h2 class="h2">Bought once. Looked after for years.</h2></div><div class="grid" style="gap:24px">{offer_html}</div></div></section>
 <section class="section band" id="quote"><div class="wrap split">
 <div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How it works</p><h2 class="h2">Tell us who the bags are for.</h2>
-<ol class="body" style="padding-left:22px;display:flex;flex-direction:column;gap:10px"><li>Tell us how many people, where they are, and who they are: staff, guests, residents, students.</li><li>We send a quote in your currency, a sample bag if you'd like one, and the wording for your plan.</li><li>Bags arrive assembled and labelled, in one delivery or staggered across sites.</li><li>We keep the dates and send refills before anything expires, invoiced the same way.</li></ol></div>
+<ol class="body" style="padding-left:22px;display:flex;flex-direction:column;gap:10px"><li>Tell us how many people, where they are, and who they are: staff, guests, residents, students.</li><li>We send a quote in your currency, a sample bag if you'd like one, and the wording for your plan.</li><li>Bags arrive assembled, in one delivery or staggered across sites.</li><li>We keep the dates and remind you before anything expires.</li></ol></div>
 <form class="stack" style="flex:1 1 420px;gap:14px" data-api="/enquiry">
 <input type="hidden" name="kind" value="organisation">
 <div class="form-row"><label class="field">Organisation<input name="org" required></label><label class="field">Your name<input name="name" required></label></div>
@@ -504,7 +504,7 @@ def organisations():
 </form>
 </div></section>
 """
-    page("organisations.html", "Go bags for organisations, offices and schools — Blackout SOS", "Emergency go bags for workplaces, schools, hotels, property managers, care providers and charities worldwide. Volume pricing, invoice terms, custom name cards and managed rotation.", body)
+    page("organisations.html", "Go bags for organisations, offices and schools — Blackout SOS", "Emergency go bags for workplaces, schools, hotels, property managers, care providers and charities worldwide. Volume pricing, invoice terms, worldwide delivery and expiry reminders.", body)
 def about():
     body = """
 <section class="section top"><div class="wrap stack" style="gap:28px">
