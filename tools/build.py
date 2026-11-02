@@ -206,7 +206,7 @@ def home():
 <div class="chips">{chips_html}</div>
 </div></section>
 <section class="section"><div class="wrap grid">
-<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Rotation reminders</p><h3 class="h3">Your bag tells you when it's time.</h3><p class="p">Every bag carries a rotation card and a QR code. Scan it once and we'll email you when the water, the rations or the batteries are due, and when the power bank wants charging. Cub owners get a reminder as their baby moves up a stage.</p><a href="guides/the-72-hour-list-explained.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">The 72-hour list</a></div>
+<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Rotation reminders</p><h3 class="h3">Your bag tells you when it's time.</h3><p class="p">Sign up when you order and our newsletter emails you automatically when the water, the rations or the batteries are due, and when the power bank wants charging. Cub owners get a reminder as their baby moves up a stage.</p><a href="guides/the-72-hour-list-explained.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">The 72-hour list</a></div>
 <div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">For organisations</p><h3 class="h3">One bag per desk, per room, per person.</h3><p class="p">Workplaces, schools, hotels and property managers around the world buy in tens and hundreds, with volume pricing, invoice terms and a rotation schedule we run for them.</p><a href="organisations.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">Request a quote</a></div>
 </div></section>
 <section class="section tight" style="border-top:1px solid var(--line)"><div class="wrap" style="display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between">
@@ -308,7 +308,7 @@ def product(slug):
 <div style="flex:2 1 520px;display:flex;flex-wrap:wrap;gap:0 40px"><div class="rows" style="flex:1 1 240px">{rows(build_rows[:half])}</div><div class="rows" style="flex:1 1 240px">{rows(build_rows[half:])}</div></div>
 </div></section>
 <section id="rotation" class="section band"><div class="wrap split">
-<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">Rotation dates</p><h2 class="h2">Buy it once. We'll tell you when.</h2><p class="p">Scan the card in the lid and we remember your dates. When something is due, we email you exactly what to swap and nothing else.</p></div>
+<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">Rotation dates</p><h2 class="h2">Buy it once. We'll tell you when.</h2><p class="p">We remember when you bought it. When something is due, our newsletter emails you exactly what to swap and nothing else.</p></div>
 <div class="rows" style="flex:1 1 420px">{rotation}</div>
 </div></section>
 <section id="faq" class="section"><div class="wrap split">
@@ -525,7 +525,7 @@ def about():
 </div></div></section>
 <section class="section band"><div class="wrap split">
 <div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How we make them</p><h2 class="h2">Designed in London. Assembled in the UK. Sent anywhere.</h2></div>
-<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The bags are made to our own drawings from TPU-laminated Cordura, taped seams and YKK AquaGuard zips, the same materials as expedition packs. Every item inside is checked against the claim on the box and packed by hand in the UK, into pouches with a place for everything. Every bag leaves with a rotation card, and we keep the dates so you don't have to.</p>
+<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The bags are made to our own drawings from TPU-laminated Cordura, taped seams and YKK AquaGuard zips, the same materials as expedition packs. Every item inside is checked against the claim on the box and packed by hand in the UK, into pouches with a place for everything. We keep the dates and email you when anything is due, so you don't have to.</p>
 <p class="body">Questions go to a real inbox and get a real answer. <a href="contact.html" style="border-bottom:1px solid var(--muted)">Write to us</a>.</p></div>
 </div></section>
 """

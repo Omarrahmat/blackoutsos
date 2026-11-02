@@ -322,7 +322,7 @@ dict(slug="the-72-hour-list-explained", cat="Planning", mins=8, title="The 72-ho
             "<strong>Bottled water.</strong> About 2.5 to 3 litres a person a day to drink; 10 litres a day is 'most comfortable' with cooking and washing. The bag: the first day's pouches and the means to treat 50 litres more. The cupboard: the rest. See the water guide.",
             "<strong>Non-perishable food for three days, and a tin opener.</strong> The bag: two 2,325-calorie rations with a 15-year date, vegan and made without nut ingredients. The cupboard: tins and dried food you already eat, rotated. The Unit has the tin opener.",
             "<strong>A battery or wind-up torch, and a battery or wind-up radio.</strong> The bag: the head torch with 10-year lithium cells, and the crank-and-solar radio in the lid. Nothing to buy.",
-            "<strong>A portable power bank and spare batteries.</strong> The bag: 10,000 mAh in the Operator, 20,000 in the Unit, with cables. Charge them every three months; the rotation card reminds you.",
+            "<strong>A portable power bank and spare batteries.</strong> The bag: 10,000 mAh in the Operator, 20,000 in the Unit, with cables. Charge them every three months; our reminder emails tell you when.",
             "<strong>A first aid kit, hand sanitiser and wet wipes.</strong> The bag: a BS 8599-1 kit, a trauma dressing, masks and gloves, sanitiser and wipes. The cupboard: your own regular medicines, see the medication guide.",
             "<strong>Baby supplies and pet supplies.</strong> The Cub and the Scout exist because the list is right: ready-to-feed formula so you don't need to boil water, nappies, and three days of the animal's own food."]),
         ("The gaps", "a bag can't fill", "What belongs in the house", [
@@ -334,7 +334,7 @@ dict(slug="the-72-hour-list-explained", cat="Planning", mins=8, title="The 72-ho
             "Two meeting points and an out-of-area contact, on the family plan card. See the meeting point guide.",
             "Who in your street lives alone, and who checks on them. The Priority Services Register for anyone vulnerable.",
             "A child who has opened the bag before, and knows the whistle. Ten minutes, see the child's guide.",
-            "A date in the diary when the clocks change: check the batteries, the water dates, the medicines, the phone numbers. The bag's rotation card and our reminders do the remembering."])],
+            "A date in the diary when the clocks change: check the batteries, the water dates, the medicines, the phone numbers. Our reminder emails do the remembering."])],
     never=None,
     after=("The honest line", "A go bag is not a stockpile. It is the first day, carried, and the means to make the next two safe. The cupboard is the rest, and the plan on the card is the part that matters most. Buy the bag for the walk; fill the cupboard for the wait."),
     frombag=[("#5c6a3a", "Olive pouch:", "water pouches, tablets, rations, comfort pack"), ("#ededed", "Lid pocket:", "torch, radio, power bank, batteries, cards"), ("#2f7d4a", "Green pouch:", "first aid, masks, gloves, your medication pouch"), ("#2a2a2a", "Document pouch:", "copies, cash, contacts, map")],
