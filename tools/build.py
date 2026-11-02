@@ -114,12 +114,19 @@ def art(slug, h=None):
 def bag_card(slug, r):
     b = BAGS[slug]
     heights = {"operator": "200px", "recruit": "150px", "cub": "170px", "unit": "130px", "scout": "150px"}
-    return f"""<a class="card" href="{r}bags/{slug}.html" style="flex:1 1 260px">
+    if b.get("variants"):
+        cta = f'<a class="pill sm solid" href="{r}bags/{slug}.html" style="flex:1 1 auto">Choose {"stage" if slug=="cub" else "dog or cat"}</a>'
+    else:
+        cta = f'<button type="button" class="pill sm solid" data-add="{b["sku"]}" style="flex:1 1 auto">Add to basket</button>'
+    return f"""<div class="card" style="flex:1 1 260px;padding:24px">
+<a href="{r}bags/{slug}.html" style="display:flex;flex-direction:column;gap:18px">
 <div style="height:220px;display:flex;align-items:flex-end;justify-content:center">{art(slug, heights[slug])}</div>
 <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="display" style="font-size:30px">{b['name']}</span><span class="tag" style="background:{b['colour']}"></span></div>
 <p class="p small">{b['card']}</p>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto"><span style="font-size:18px;font-weight:600">{gbp(b['price'])}</span><span class="muted small">View bag →</span></div>
-</a>"""
+</a>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto"><span style="font-size:20px;font-weight:600">{gbp(b['price'])}</span>{cta}</div>
+<a href="{r}bags/{slug}.html" class="muted small" style="align-self:flex-start;border-bottom:1px solid var(--line3)">What's inside →</a>
+</div>"""
 
 def subscribe_form(r, source="site"):
     return f"""<form class="form-row" data-api="/subscribe" style="flex:1 1 420px">
@@ -144,11 +151,11 @@ def home():
     chips_html = "".join(f'<a class="chip" href="guides/{s}.html">{t}</a>' for s, t in chips)
     schema = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Blackout SOS", "url": SITE, "legalName": "Urban Carers Ltd", "description": "72-hour go bags assembled in the UK. One bag per person, one colour per bag.", "contactPoint": {"@type": "ContactPoint", "email": "hello@blackoutsos.com", "contactType": "customer service", "areaServed": "GB"}})
     body = f"""
-{hero_html(r)}
+{hero_html(r, art, BAGS, gbp)}
 <section class="strip"><span>Assembled in the UK</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Refills when it's time</span></section>
 <section class="section"><div class="wrap stack" style="gap:40px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
-<div class="stack" style="gap:10px"><p class="eyebrow">The range</p><h2 class="h2">One bag per person. One colour per bag.</h2></div>
+<div class="stack" style="gap:10px"><p class="eyebrow">Shop the range</p><h2 class="h2">One bag per person. One colour per bag.</h2></div>
 <p class="p" style="max-width:420px">Blue for adults, red for children, yellow for the baby, green for the family duffel, orange for the pet. In the dark, at the door, everyone grabs the right one.</p>
 </div>
 <div class="grid">{cards}</div>
