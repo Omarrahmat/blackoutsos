@@ -4,6 +4,7 @@ Every page is written from the content modules so the header, footer and links s
 import os, json, datetime, html as H
 from content_bags import BAGS, ORDER
 from content_guides import GUIDES, CATS
+from hero import hero_html, HERO_CSS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://blackoutsos.com"
@@ -143,16 +144,7 @@ def home():
     chips_html = "".join(f'<a class="chip" href="guides/{s}.html">{t}</a>' for s, t in chips)
     schema = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Blackout SOS", "url": SITE, "legalName": "Urban Carers Ltd", "description": "72-hour go bags assembled in the UK. One bag per person, one colour per bag.", "contactPoint": {"@type": "ContactPoint", "email": "hello@blackoutsos.com", "contactType": "customer service", "areaServed": "GB"}})
     body = f"""
-<section class="wrap" style="padding:clamp(56px,8vw,120px) clamp(16px,4vw,48px) clamp(48px,6vw,96px);display:flex;flex-wrap:wrap;gap:48px;align-items:center">
-<div class="stack" style="flex:1 1 520px;gap:28px">
-<p class="eyebrow">72-hour go bags · assembled in the UK</p>
-<h1 class="h1">Three dots.<br>Three dashes.<br>Three days.</h1>
-<p class="lede" style="max-width:560px">A go bag for every person in your house, packed by people who have done the thinking so you never have to. Plain from a distance. Fully kitted up close. Ready by the door.</p>
-<div style="display:flex;flex-wrap:wrap;gap:14px"><a class="pill solid" href="bags/index.html">Shop the range</a><a class="pill" href="guides/the-72-hour-list-explained.html">The 72-hour checklist</a></div>
-<div class="muted small" style="display:flex;flex-wrap:wrap;gap:10px 28px"><span>Waterproof Cordura</span><span>15-year rations</span><span>Vegan, made without nuts</span><span>Free UK delivery</span></div>
-</div>
-<div style="flex:1 1 420px;display:flex;justify-content:center"><div class="bag-art" style="width:100%;max-width:560px">{svg_operator('#1F5FBF', None, 'The Operator go bag: matte black backpack with a tonal BLACKOUT SOS patch, Morse code mark, bottle pocket and a small blue tag on the zip')}</div></div>
-</section>
+{hero_html(r)}
 <section class="strip"><span>Assembled in the UK</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Refills when it's time</span></section>
 <section class="section"><div class="wrap stack" style="gap:40px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
