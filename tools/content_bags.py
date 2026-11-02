@@ -166,7 +166,7 @@ BAGS = {
          ("Will the rest centre take my pet?", "Not always. Most emergency shelters try, but it is not guaranteed, so the plan is a friend or family member who will take you both, and a carrier by the door. The 'Pets in an emergency' guide walks you through it."),
          ("Why a muzzle in the dog kit?", "A hurt or frightened dog can bite the person helping it. Vets and rescue teams ask for a soft muzzle; having one means your dog gets treated faster."),
          ("What about the microchip?", "Keep the details up to date today; it is the law for dogs and, since 2024, for cats in England. The pet card carries the number, so anyone who finds your pet can call it in."),
-         ("Two pets?", "One Scout each. Two can clip onto one Operator, one above the other.")],
+         ("Two pets?", "One Scout each. An Operator carries one docked bag at a time, so with two pets, two adults each take one, or the second Scout goes on its own straps.")],
     pairs=[("operator", "Your own bag; the Scout clips onto it."), ("recruit", "The same body, for a child."), ("unit", "The family's car and home bag.")],
 ),
 }
