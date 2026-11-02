@@ -70,7 +70,7 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 <a data-screen="subscribers">Subscribers <span class="n" id="nSubs">0</span></a>
 <a data-screen="import">Amazon import</a>
 </nav>
-<div class="stack" style="margin-top:auto;gap:10px;padding:0 6px;font-size:13px;color:var(--muted)"><span id="who"></span><a class="btn" id="signout">Sign out</a><a class="btn" href="../index.html">View the site</a></div>
+<div class="stack" style="margin-top:auto;gap:10px;padding:0 6px;font-size:13px;color:var(--muted)"><span id="who"></span><a class="btn" id="changepw">Change password</a><a class="btn" id="signout">Sign out</a><a class="btn" href="../index.html">View the site</a></div>
 </aside>
 <main class="main">
 
@@ -141,6 +141,13 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     boot();
   });
   $('signout').addEventListener('click', async function () { await sb.auth.signOut(); location.reload(); });
+  $('changepw').addEventListener('click', async function () {
+    var a = prompt('New password (at least 10 characters):'); if (!a) return;
+    if (a.length < 10) return alert('Use at least 10 characters.');
+    var b = prompt('Type it again:'); if (a !== b) return alert('They did not match. Nothing changed.');
+    var r = await sb.auth.updateUser({ password: a });
+    alert(r.error ? r.error.message : 'Password changed.');
+  });
   sb.auth.getSession().then(function (r) { if (r.data.session) boot(); });
 
   async function boot() {
