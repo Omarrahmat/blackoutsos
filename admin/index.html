@@ -55,6 +55,7 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 <label class="field">Password<input name="password" type="password" required autocomplete="current-password"></label>
 <button type="submit" class="pill solid">Sign in</button>
 <p id="loginMsg" class="p small" hidden></p>
+<p id="connMsg" class="p small muted"></p>
 </form>
 <p class="p small">Only addresses listed as admins can see anything. Nothing here is public.</p>
 </div>
@@ -117,59 +118,97 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (function () {
   'use strict';
   var URL_ = 'https://vbgustjtxjmjlgukzcfa.supabase.co';
   var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3VzdGp0eGptamxndWt6Y2ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMzI1MjcsImV4cCI6MjEwODcwODUyN30.Y_gKh0rs7HVI6rf3z8mmCAh-LcT-cTqJypqawbkdw7w';
-  var sb = window.supabase.createClient(URL_, KEY);
+  var SKEY = 'bsos.admin.session.v1';
   var COLOURS = { operator: '#1F5FBF', recruit: '#D0202E', 'cub-1': '#F5C518', 'cub-2': '#F5C518', 'cub-3': '#F5C518', unit: '#2BA84A', 'scout-dog': '#F28C28', 'scout-cat': '#F28C28' };
   var CHANNEL = { website: '#3987e5', amazon: '#d95926', organisation: '#199e70' };
   var state = { products: [], orders: [], items: [], enquiries: [], subs: [], moves: [], orderFilter: 'all', inboxFilter: 'open' };
+  var session = null;
+  try { session = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) { session = null; }
+
   function gbp(p) { return '£' + (p / 100).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmtDate(s) { var d = new Date(s); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   function $(id) { return document.getElementById(id); }
   function status(s) { return '<span class="status ' + esc(s) + '"><i></i>' + esc(s) + '</span>'; }
+  function saveSession(s) { session = s; try { if (s) localStorage.setItem(SKEY, JSON.stringify(s)); else localStorage.removeItem(SKEY); } catch (e) {} }
 
-  // ---- auth ----
+  // ---- auth and data, no library: Supabase's REST endpoints directly ----
+  async function authPost(path, body) {
+    var r = await fetch(URL_ + '/auth/v1/' + path, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    var j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) throw new Error(j.error_description || j.msg || j.message || j.error || ('Sign-in failed (HTTP ' + r.status + ')'));
+    return j;
+  }
+  async function signIn(email, password) {
+    var j = await authPost('token?grant_type=password', { email: email, password: password });
+    saveSession({ access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: (j.user && j.user.email) || email });
+  }
+  async function ensureFresh() {
+    if (!session) return false;
+    if (session.expires_at - 60 > Math.floor(Date.now() / 1000)) return true;
+    try { var j = await authPost('token?grant_type=refresh_token', { refresh_token: session.refresh_token }); saveSession({ access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: session.email }); return true; }
+    catch (e) { saveSession(null); return false; }
+  }
+  async function rest(method, table, query, body, prefer) {
+    await ensureFresh();
+    var h = { apikey: KEY, Authorization: 'Bearer ' + (session ? session.access_token : KEY), 'Content-Type': 'application/json' };
+    if (prefer) h.Prefer = prefer;
+    var r = await fetch(URL_ + '/rest/v1/' + table + (query ? '?' + query : ''), { method: method, headers: h, body: body ? JSON.stringify(body) : undefined });
+    if (r.status === 204) return [];
+    var j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) throw new Error((j && (j.message || j.hint || j.details)) || ('HTTP ' + r.status));
+    return j;
+  }
+  var db = {
+    get: function (table, query) { return rest('GET', table, query); },
+    patch: function (table, query, body) { return rest('PATCH', table, query, body, 'return=representation'); },
+    post: function (table, body) { return rest('POST', table, '', body, 'return=representation'); }
+  };
+
+  // ---- connection check and login ----
+  fetch(URL_ + '/auth/v1/settings', { headers: { apikey: KEY } }).then(function (r) { $('connMsg').textContent = r.ok ? '' : 'Cannot reach the sign-in service (HTTP ' + r.status + ').'; }).catch(function () { $('connMsg').textContent = 'Cannot reach the sign-in service from this page. Check your connection.'; });
+
   $('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault(); var f = new FormData(e.target); var msg = $('loginMsg'); msg.hidden = true;
-    var r = await sb.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
-    if (r.error) { msg.hidden = false; msg.textContent = r.error.message; return; }
-    boot();
+    var btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = 'Signing in…';
+    try { await signIn(String(f.get('email')).trim().toLowerCase(), String(f.get('password'))); await boot(); }
+    catch (err) { msg.hidden = false; msg.textContent = err.message; }
+    btn.disabled = false; btn.textContent = 'Sign in';
   });
-  $('signout').addEventListener('click', async function () { await sb.auth.signOut(); location.reload(); });
+  $('signout').addEventListener('click', function () { saveSession(null); location.reload(); });
   $('changepw').addEventListener('click', async function () {
     var a = prompt('New password (at least 10 characters):'); if (!a) return;
     if (a.length < 10) return alert('Use at least 10 characters.');
     var b = prompt('Type it again:'); if (a !== b) return alert('They did not match. Nothing changed.');
-    var r = await sb.auth.updateUser({ password: a });
-    alert(r.error ? r.error.message : 'Password changed.');
+    try { await ensureFresh(); var r = await fetch(URL_ + '/auth/v1/user', { method: 'PUT', headers: { apikey: KEY, Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json' }, body: JSON.stringify({ password: a }) }); var j = await r.json(); alert(r.ok ? 'Password changed.' : (j.msg || j.message || j.error_description || 'Could not change the password.')); }
+    catch (err) { alert(err.message); }
   });
-  sb.auth.getSession().then(function (r) { if (r.data.session) boot(); });
+  if (session) { ensureFresh().then(function (ok) { if (ok) boot(); }); }
 
   async function boot() {
-    var u = (await sb.auth.getUser()).data.user; if (!u) return;
-    $('who').textContent = u.email;
+    $('who').textContent = session.email || '';
     $('login').classList.add('hidden'); $('app').classList.remove('hidden');
     await loadAll();
   }
 
   async function loadAll() {
     var since = new Date(Date.now() - 30 * 864e5).toISOString();
-    var q = await Promise.all([
-      sb.from('bsos_products').select('*').order('sku'),
-      sb.from('bsos_orders').select('*').order('created_at', { ascending: false }).limit(500),
-      sb.from('bsos_order_items').select('*'),
-      sb.from('bsos_enquiries').select('*').order('created_at', { ascending: false }).limit(500),
-      sb.from('bsos_subscribers').select('*').order('created_at', { ascending: false }).limit(2000),
-      sb.from('bsos_stock_moves').select('*').order('created_at', { ascending: false }).limit(100)
-    ]);
-    var err = q.find(function (r) { return r.error; });
-    if (err) { alert('Could not load: ' + err.error.message + ' (is this address listed as an admin?)'); return; }
-    state.products = q[0].data; state.orders = q[1].data; state.items = q[2].data; state.enquiries = q[3].data; state.subs = q[4].data; state.moves = q[5].data;
+    try {
+      var q = await Promise.all([
+        db.get('bsos_products', 'select=*&order=sku.asc'),
+        db.get('bsos_orders', 'select=*&order=created_at.desc&limit=500'),
+        db.get('bsos_order_items', 'select=*'),
+        db.get('bsos_enquiries', 'select=*&order=created_at.desc&limit=500'),
+        db.get('bsos_subscribers', 'select=*&order=created_at.desc&limit=2000'),
+        db.get('bsos_stock_moves', 'select=*&order=created_at.desc&limit=100')
+      ]);
+    } catch (err) { alert('Could not load the shop data: ' + err.message + '. If this says permission denied, this email is not listed as an admin.'); return; }
+    state.products = q[0]; state.orders = q[1]; state.items = q[2]; state.enquiries = q[3]; state.subs = q[4]; state.moves = q[5];
     state.since = since;
     renderAll();
   }
@@ -192,12 +231,11 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
       ['Subscribers', String(subs), 'Be Ready alerts and reminders']];
     $('tiles').innerHTML = tiles.map(function (t) { return '<div class="tile"><span class="eyebrow" style="letter-spacing:1.5px">' + t[0] + '</span><span class="v">' + t[1] + '</span><span class="p small">' + esc(t[2]) + '</span></div>'; }).join('');
     $('nOrders').textContent = toPack; $('nInbox').textContent = openEnq; $('nSubs').textContent = subs;
-    // chart
     var days = []; for (var i = 29; i >= 0; i--) { var d = new Date(Date.now() - i * 864e5); days.push(d.toISOString().slice(0, 10)); }
     var data = {}; days.forEach(function (d) { data[d] = {}; });
     ro.forEach(function (o) { var d = o.created_at.slice(0, 10); if (data[d]) data[d][o.channel] = (data[d][o.channel] || 0) + o.total_pence; });
     var max = 1; days.forEach(function (d) { var t = 0; for (var k in data[d]) t += data[d][k]; if (t > max) max = t; });
-    var ymax = Math.max(1000, Math.ceil(max / 100000) * 100000) / 100; // pounds
+    var ymax = Math.max(1000, Math.ceil(max / 100000) * 100000) / 100;
     var W = 780, Hh = 280, L = 48, R = 12, T = 16, B = 30, pw = W - L - R, ph = Hh - T - B, step = pw / 30, bw = step - 5;
     var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" style="width:100%;height:auto" role="img" aria-label="Daily revenue, last 30 days, by channel">';
     for (var g = 0; g <= 4; g++) { var y = T + ph - ph * g / 4; svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '" stroke="#1e1e1e"/><text x="' + (L - 8) + '" y="' + (y + 4) + '" text-anchor="end" fill="#6f6f6f" font-size="11" font-family="Inter">£' + Math.round(ymax * g / 4).toLocaleString('en-GB') + '</text>'; }
@@ -209,24 +247,21 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     svg += '</svg>';
     var legend = '<div style="display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted)">' + Object.keys(CHANNEL).map(function (k) { return '<span style="display:inline-flex;align-items:center;gap:8px"><span class="tag" style="width:10px;height:10px;background:' + CHANNEL[k] + '"></span>' + k + ' <span style="color:var(--ink);font-weight:500">' + gbp(byCh[k] || 0) + '</span></span>'; }).join('') + '</div>';
     $('chart').innerHTML = legend + svg;
-    // waiting
     var w = '';
     state.orders.filter(function (o) { return o.status === 'paid'; }).slice(0, 6).forEach(function (o) { w += '<div class="row clickable" data-open-order="' + o.id + '"><span>Pack and ship: ' + esc(o.name || o.email || 'order') + '</span><span>' + gbp(o.total_pence) + '</span></div>'; });
     state.enquiries.filter(function (e) { return e.status === 'open'; }).slice(0, 6).forEach(function (e) { w += '<div class="row clickable" data-open-enq="' + e.id + '"><span>' + (e.kind === 'complaint' ? 'Complaint' : e.kind === 'organisation' ? 'Quote request' : 'Message') + ': ' + esc(e.name || e.org || e.email) + '</span><span>' + fmtDate(e.created_at) + '</span></div>'; });
     $('waiting').innerHTML = w || '<p class="p small">Nothing waiting. Enjoy it.</p>';
-    // bags sold
     var sold = {}; var roIds = {}; ro.forEach(function (o) { roIds[o.id] = 1; });
     state.items.forEach(function (it) { if (roIds[it.order_id]) sold[it.sku] = (sold[it.sku] || 0) + it.qty; });
-    var mx = Math.max.apply(null, Object.values(sold).concat([1]));
+    var mx = Math.max.apply(null, Object.keys(sold).map(function (k) { return sold[k]; }).concat([1]));
     $('bagsSold').innerHTML = state.products.map(function (p) { var n = sold[p.sku] || 0; return '<div style="display:flex;align-items:center;gap:12px;font-size:14px"><span style="flex:0 0 120px;display:inline-flex;align-items:center;gap:8px"><span class="tag" style="background:' + COLOURS[p.sku] + '"></span>' + esc(p.name + (p.variant ? ' ' + p.variant : '')) + '</span><div class="bar" style="flex:1"><i style="width:' + Math.round(n / mx * 100) + '%;background:' + COLOURS[p.sku] + '"></i></div><span style="flex:0 0 40px;text-align:right;color:var(--muted)">' + n + '</span></div>'; }).join('');
-    // stock mini
     $('stockMini').innerHTML = '<thead><tr><th>Bag</th><th>On hand</th><th>Sold 30d</th><th>Cover</th></tr></thead><tbody>' + state.products.map(function (p) { var n = sold[p.sku] || 0; var cover = n ? (p.stock / (n / 4.3)).toFixed(1) + ' wks' : (p.stock ? '—' : 'none'); return '<tr><td>' + esc(p.name + (p.variant ? ' · ' + p.variant : '')) + '</td><td>' + p.stock + '</td><td>' + n + '</td><td>' + cover + '</td></tr>'; }).join('') + '</tbody>';
   }
 
   // ---- orders ----
   function renderOrders() {
     var statuses = ['all', 'paid', 'packed', 'shipped', 'delivered', 'cancelled', 'refunded'];
-    $('orderFilters').innerHTML = statuses.map(function (s) { return '<a class="chip' + (state.orderFilter === s ? ' solid' : '') + '" data-of="' + s + '" style="padding:8px 14px;font-size:13px;' + (state.orderFilter === s ? 'background:var(--ink);color:var(--bg)' : '') + '">' + s + '</a>'; }).join('');
+    $('orderFilters').innerHTML = statuses.map(function (s) { return '<a class="chip" data-of="' + s + '" style="padding:8px 14px;font-size:13px;' + (state.orderFilter === s ? 'background:var(--ink);color:var(--bg)' : '') + '">' + s + '</a>'; }).join('');
     var rows = state.orders.filter(function (o) { return state.orderFilter === 'all' || o.status === state.orderFilter; });
     $('ordersTable').innerHTML = '<thead><tr><th>When</th><th>Channel</th><th>Customer</th><th>Bags</th><th>Total</th><th>Status</th></tr></thead><tbody>' + (rows.length ? rows.map(function (o) {
       var its = state.items.filter(function (i) { return i.order_id === o.id; }).map(function (i) { return i.qty + ' × ' + i.sku; }).join(', ');
@@ -246,8 +281,8 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
       + '<div class="grid"><div class="stack" style="flex:1 1 260px"><p class="eyebrow">Items</p>' + its.map(function (i) { return '<div class="row"><span>' + i.qty + ' × ' + esc(i.sku) + '</span><span>' + gbp(i.unit_pence * i.qty) + '</span></div>'; }).join('') + '<div class="row"><strong>Total</strong><strong>' + gbp(o.total_pence) + '</strong></div></div>'
       + '<div class="stack" style="flex:1 1 260px"><p class="eyebrow">Deliver to</p><pre>' + esc(addrText) + '</pre><p class="p small">' + esc(o.email || '') + (o.phone ? ' · ' + esc(o.phone) : '') + '</p></div>'
       + '<div class="stack" style="flex:1 1 260px"><p class="eyebrow">Notes and tracking</p><textarea id="orderNotes" style="min-height:100px">' + esc(o.notes || '') + '</textarea><a class="btn" id="saveNotes">Save notes</a></div></div>';
-    d.querySelectorAll('[data-advance]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-advance'); if (s === 'cancelled' && !confirm('Mark this order cancelled? Refund it in Stripe separately.')) return; var r = await sb.from('bsos_orders').update({ status: s, updated_at: new Date().toISOString() }).eq('id', id); if (r.error) return alert(r.error.message); o.status = s; renderAll(); openOrder(id); }; });
-    $('saveNotes').onclick = async function () { var r = await sb.from('bsos_orders').update({ notes: $('orderNotes').value, updated_at: new Date().toISOString() }).eq('id', id); if (r.error) return alert(r.error.message); o.notes = $('orderNotes').value; alert('Saved'); };
+    d.querySelectorAll('[data-advance]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-advance'); if (s === 'cancelled' && !confirm('Mark this order cancelled? Refund it in Stripe separately.')) return; try { await db.patch('bsos_orders', 'id=eq.' + id, { status: s, updated_at: new Date().toISOString() }); } catch (e) { return alert(e.message); } o.status = s; renderAll(); openOrder(id); }; });
+    $('saveNotes').onclick = async function () { try { await db.patch('bsos_orders', 'id=eq.' + id, { notes: $('orderNotes').value, updated_at: new Date().toISOString() }); } catch (e) { return alert(e.message); } o.notes = $('orderNotes').value; alert('Saved'); };
     $('closeOrder').onclick = function () { d.classList.add('hidden'); };
     d.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -266,15 +301,15 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     $('inboxDetail').innerHTML = '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><div><h2 class="h4">' + esc(e.subject || (e.kind === 'organisation' ? 'Quote request' : 'Message')) + '</h2><p class="p small">' + esc(e.kind) + ' · ' + fmtDate(e.created_at) + ' · ' + status(e.status) + '</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn solid" href="mailto:' + esc(e.email) + '?subject=' + subj + '">Reply by email</a><a class="btn" data-enq-status="replied">Mark replied</a><a class="btn" data-enq-status="closed">Close</a><a class="btn" data-enq-status="open">Reopen</a></div></div>'
       + '<div class="rows"><div class="row"><span>From</span><span>' + esc(e.name || '') + ' · ' + esc(e.email) + (e.phone ? ' · ' + esc(e.phone) : '') + '</span></div>' + (e.org ? '<div class="row"><span>Organisation</span><span>' + esc(e.org) + (e.segment ? ' · ' + esc(e.segment) : '') + '</span></div>' : '') + (e.bags ? '<div class="row"><span>Bags</span><span>' + esc(e.bags) + '</span></div>' : '') + (e.order_ref ? '<div class="row"><span>Order</span><span>' + esc(e.order_ref) + '</span></div>' : '') + '</div>'
       + '<pre>' + esc(e.message || '(no message)') + '</pre>' + (e.kind === 'complaint' ? '<p class="notice">Complaint: acknowledge within four working hours, resolve within 48. Replacement first, refund second. Log the root cause in the order notes.</p>' : '');
-    $('inboxDetail').querySelectorAll('[data-enq-status]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-enq-status'); var r = await sb.from('bsos_enquiries').update({ status: s }).eq('id', e.id); if (r.error) return alert(r.error.message); e.status = s; renderAll(); openEnq(id); }; });
+    $('inboxDetail').querySelectorAll('[data-enq-status]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-enq-status'); try { await db.patch('bsos_enquiries', 'id=eq.' + e.id, { status: s }); } catch (err) { return alert(err.message); } e.status = s; renderAll(); openEnq(id); }; });
   }
 
   // ---- stock ----
   function renderStock() {
     $('stockTable').innerHTML = '<thead><tr><th>Bag</th><th>SKU</th><th>Price</th><th>On hand</th><th>Active</th><th>Adjust</th></tr></thead><tbody>' + state.products.map(function (p) { return '<tr><td><span class="tag" style="width:8px;height:8px;background:' + COLOURS[p.sku] + '"></span> ' + esc(p.name + (p.variant ? ' · ' + p.variant : '')) + '</td><td>' + esc(p.sku) + '</td><td>' + gbp(p.price_pence) + '</td><td><strong>' + p.stock + '</strong></td><td><a class="btn" data-toggle="' + p.sku + '">' + (p.active ? 'On sale' : 'Hidden') + '</a></td><td><a class="btn" data-adj="' + p.sku + '">+ / −</a></td></tr>'; }).join('') + '</tbody>';
     $('movesTable').innerHTML = '<thead><tr><th>When</th><th>SKU</th><th>Change</th><th>Reason</th><th>Ref</th></tr></thead><tbody>' + (state.moves.length ? state.moves.map(function (m) { return '<tr><td>' + fmtDate(m.created_at) + '</td><td>' + esc(m.sku) + '</td><td>' + (m.delta > 0 ? '+' : '') + m.delta + '</td><td>' + esc(m.reason) + '</td><td class="muted">' + esc(m.ref || '') + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="muted">No movements yet.</td></tr>') + '</tbody>';
-    $('stockTable').querySelectorAll('[data-adj]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-adj'); var p = state.products.find(function (x) { return x.sku === sku; }); var v = prompt('Change for ' + sku + ' (e.g. 300 for stock landed, -2 for damaged). On hand now: ' + p.stock); if (v == null) return; var delta = parseInt(v, 10); if (!delta) return; var reason = prompt('Reason (landed, count, damaged, sample, amazon-fba)') || 'adjustment'; var r1 = await sb.from('bsos_products').update({ stock: p.stock + delta }).eq('sku', sku); if (r1.error) return alert(r1.error.message); await sb.from('bsos_stock_moves').insert({ sku: sku, delta: delta, reason: reason }); await loadAll(); }; });
-    $('stockTable').querySelectorAll('[data-toggle]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-toggle'); var p = state.products.find(function (x) { return x.sku === sku; }); var r = await sb.from('bsos_products').update({ active: !p.active }).eq('sku', sku); if (r.error) return alert(r.error.message); await loadAll(); }; });
+    $('stockTable').querySelectorAll('[data-adj]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-adj'); var p = state.products.find(function (x) { return x.sku === sku; }); var v = prompt('Change for ' + sku + ' (e.g. 300 for stock landed, -2 for damaged). On hand now: ' + p.stock); if (v == null) return; var delta = parseInt(v, 10); if (!delta) return; var reason = prompt('Reason (landed, count, damaged, sample, amazon-fba)') || 'adjustment'; try { await db.patch('bsos_products', 'sku=eq.' + encodeURIComponent(sku), { stock: p.stock + delta }); await db.post('bsos_stock_moves', { sku: sku, delta: delta, reason: reason }); } catch (e) { return alert(e.message); } await loadAll(); }; });
+    $('stockTable').querySelectorAll('[data-toggle]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-toggle'); var p = state.products.find(function (x) { return x.sku === sku; }); try { await db.patch('bsos_products', 'sku=eq.' + encodeURIComponent(sku), { active: !p.active }); } catch (e) { return alert(e.message); } await loadAll(); }; });
   }
 
   // ---- subscribers ----
@@ -298,18 +333,20 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     var rows = parseImport().filter(function (r) { return r.ok; }); if (!rows.length) return alert('Nothing valid to import. Use Preview first.');
     if (!confirm('Import ' + rows.length + ' Amazon orders?')) return;
     var done = 0, skipped = 0;
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
-      var exists = await sb.from('bsos_orders').select('id').eq('channel', 'amazon').eq('notes', 'Amazon ' + r.ref).maybeSingle();
-      if (exists.data) { skipped++; continue; }
-      var ins = await sb.from('bsos_orders').insert({ channel: 'amazon', total_pence: r.total, status: 'shipped', notes: 'Amazon ' + r.ref, created_at: r.date + 'T12:00:00Z' }).select('id').single();
-      if (ins.error) { alert(ins.error.message); break; }
-      var p = state.products.find(function (x) { return x.sku === r.sku; });
-      await sb.from('bsos_order_items').insert({ order_id: ins.data.id, sku: r.sku, qty: r.qty, unit_pence: Math.round(r.total / r.qty) });
-      await sb.from('bsos_products').update({ stock: p.stock - r.qty }).eq('sku', r.sku); p.stock -= r.qty;
-      await sb.from('bsos_stock_moves').insert({ sku: r.sku, delta: -r.qty, reason: 'amazon order', ref: r.ref });
-      done++;
-    }
+    try {
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var exists = await db.get('bsos_orders', 'select=id&channel=eq.amazon&notes=eq.' + encodeURIComponent('Amazon ' + r.ref));
+        if (exists.length) { skipped++; continue; }
+        var ins = await db.post('bsos_orders', { channel: 'amazon', total_pence: r.total, status: 'shipped', notes: 'Amazon ' + r.ref, created_at: r.date + 'T12:00:00Z' });
+        var oid = ins[0].id;
+        var p = state.products.find(function (x) { return x.sku === r.sku; });
+        await db.post('bsos_order_items', { order_id: oid, sku: r.sku, qty: r.qty, unit_pence: Math.round(r.total / r.qty) });
+        await db.patch('bsos_products', 'sku=eq.' + encodeURIComponent(r.sku), { stock: p.stock - r.qty }); p.stock -= r.qty;
+        await db.post('bsos_stock_moves', { sku: r.sku, delta: -r.qty, reason: 'amazon order', ref: r.ref });
+        done++;
+      }
+    } catch (e) { alert(e.message); }
     $('importOut').innerHTML = '<p class="p">Imported ' + done + ', skipped ' + skipped + ' already in.</p>'; await loadAll();
   };
 
