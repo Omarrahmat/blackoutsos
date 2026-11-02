@@ -40,7 +40,7 @@
 .screen{display:none;flex-direction:column;gap:24px}.screen.on{display:flex}
 .login{max-width:420px;margin:12vh auto;display:flex;flex-direction:column;gap:16px}
 .hidden{display:none !important}
-pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
+pre{white-space:pre-wrap;font-size:14px;line-height:1.55;font-family:inherit;color:var(--soft);margin:0}
 .bar{height:8px;background:#1a1a1a;border-radius:4px}.bar i{display:block;height:8px;border-radius:4px}
 .sample{background:var(--ink);color:var(--bg);font-size:13px;font-weight:500;text-align:center;padding:10px 16px}
 @media(max-width:860px){.app{flex-direction:column}.side{width:auto;flex:none;border-right:none;border-bottom:1px solid var(--line)}.side nav{flex-direction:row;flex-wrap:wrap}.main{padding:20px 16px 40px}}
@@ -73,7 +73,8 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 <a data-screen="subscribers">Subscribers <span class="n" id="nSubs">0</span></a>
 <a data-screen="visitors">Visitors <span class="n" id="nLive">0</span></a>
 <a data-screen="warnings">Warnings</a>
-<a data-screen="emails">Emails</a>
+<a data-screen="mailbox">Mailbox <span class="n" id="nMail">0</span></a>
+<a data-screen="emails">Email log</a>
 <a data-screen="import">Amazon import</a>
 </nav>
 <div class="stack" style="margin-top:auto;gap:10px;padding:0 6px;font-size:13px;color:var(--muted)"><span id="who"></span><a class="btn" id="changepw">Change password</a><a class="btn" id="signout">Sign out</a><a class="btn" href="../index.html">View the site</a></div>
@@ -138,6 +139,14 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 <div class="panel" style="flex:1 1 360px"><div><h2 class="h4">Fetch runs</h2><p class="p small">Latest first</p></div><div style="overflow-x:auto"><table class="list" id="alertRuns"></table></div></div>
 </div>
 <div class="panel"><div><h2 class="h4">Situation notes from the research desk</h2><p class="p small">Shown on the warnings page for that country</p></div><div id="postsList" class="rows"></div></div>
+</section>
+
+<section id="s-mailbox" class="screen">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px"><div><h1 class="h2">Mailbox</h1><p class="p">Everything the AI staff receive and send, live from AgentMail. Open a conversation to read it in full or reply yourself.</p></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="mbInbox" style="height:40px;border-radius:999px;padding:0 14px;max-width:280px"></select><div class="chips" id="mbTabs"><a class="chip on" data-mb="inbox">Inbox</a><a class="chip" data-mb="sent">Sent</a><a class="chip" data-mb="unread">Unread</a></div><a class="btn" id="mbRefresh">Refresh</a></div></div>
+<p class="p small" id="mbState"></p>
+<div class="grid"><div class="panel" style="flex:1 1 360px;max-height:75vh;overflow:auto"><div id="mbList" class="rows"></div><a class="btn hidden" id="mbMore" style="align-self:center">Load more</a></div>
+<div class="panel" style="flex:2 1 520px;max-height:75vh;overflow:auto" id="mbThread"><p class="p">Pick a conversation.</p></div></div>
 </section>
 
 <section id="s-emails" class="screen">
@@ -459,6 +468,68 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     $('emailWaitlist').onclick = async function () { var sku = sel.value; var p = state.products.find(function (x) { return x.sku === sku; }); if (!p) return; if (!confirm('Email everyone waiting for the ' + p.name + (p.variant ? ' (' + p.variant + ')' : '') + ' that it is in stock?')) return; $('emailOut').textContent = 'Sending…'; try { var r = await api.sendEmail({ kind: 'waitlist', sku: sku }); $('emailOut').textContent = r.recipients + ' on the list: ' + r.sent + ' sent, ' + r.skipped + ' skipped, ' + r.failed + ' failed.'; await loadAll(); } catch (e) { $('emailOut').textContent = e.message; } };
   }
 
+
+  // ---- mailbox (AgentMail, through the viewer's AgentMail connector) ----
+  var mb = { inbox: null, tab: 'inbox', next: null, threads: [], open: null };
+  function mbParse(r) { var p = r && r.payload !== undefined ? r.payload : r; if (p && p.content && Array.isArray(p.content)) p = p.content.map(function (c) { return c.text || ''; }).join(''); if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) {} } if (p && p.structuredContent) p = p.structuredContent; return p; }
+  async function am(tool, args) {
+    if (!mcp) throw new Error('The mailbox opens in the back office app inside Claude.');
+    try { return mbParse(await mcp.callTool('AgentMail', tool, args, { cache: false })); }
+    catch (err) { var code = err && err.code; throw new Error({ server_not_connected: 'AgentMail is not connected to your Claude account. Add it under claude.ai Settings → Connectors.', needs_reauth: 'Reconnect AgentMail under claude.ai Settings → Connectors.', not_in_manifest: 'AgentMail access was declined for this page. Allow it in the page\'s Permissions menu.' }[code] || (err && err.message) || 'AgentMail call failed'); }
+  }
+  function addr(x) { if (!x) return ''; if (Array.isArray(x)) return x.map(addr).join(', '); if (typeof x === 'object') return x.email || x.address || x.name || ''; return String(x); }
+  function mbWhen(t) { if (!t) return ''; var d = new Date(t); return isNaN(d) ? '' : fmtDate(d.toISOString()); }
+  async function mbInit() {
+    if (mb.inbox) return;
+    var sel = $('mbInbox');
+    try {
+      var r = await am('list_inboxes', { limit: 50 }); var list = (r && (r.inboxes || r.items)) || [];
+      list.forEach(function (i) { var id = i.inboxId || i.inbox_id || i.id; var o = document.createElement('option'); o.value = id; o.textContent = (i.displayName || i.display_name ? (i.displayName || i.display_name) + ' · ' : '') + id; sel.appendChild(o); });
+      var pref = list.map(function (i) { return i.inboxId || i.inbox_id || i.id; }).filter(function (id) { return /@blackoutsos\.com$/.test(id); })[0] || 'blackoutsos@agentmail.to';
+      if (!sel.options.length) { var o = document.createElement('option'); o.value = pref; o.textContent = pref; sel.appendChild(o); }
+      sel.value = pref; mb.inbox = sel.value;
+    } catch (e) { $('mbState').textContent = e.message; return; }
+    sel.onchange = function () { mb.inbox = sel.value; mbLoad(true); };
+    document.querySelectorAll('[data-mb]').forEach(function (a) { a.onclick = function () { document.querySelectorAll('[data-mb]').forEach(function (b) { b.classList.toggle('on', b === a); }); mb.tab = a.getAttribute('data-mb'); mbLoad(true); }; });
+    $('mbRefresh').onclick = function () { mbLoad(true); };
+    $('mbMore').onclick = function () { mbLoad(false); };
+    mbLoad(true);
+  }
+  async function mbLoad(reset) {
+    if (!mb.inbox) return;
+    if (reset) { mb.next = null; mb.threads = []; }
+    $('mbState').textContent = 'Loading…';
+    var args = { inboxId: mb.inbox, limit: 25 }; if (mb.next) args.pageToken = mb.next;
+    if (mb.tab === 'sent') args.labels = ['sent']; if (mb.tab === 'unread') args.labels = ['unread'];
+    try { var r = await am('list_threads', args); } catch (e) { $('mbState').textContent = e.message; return; }
+    var th = (r && r.threads) || []; mb.threads = mb.threads.concat(th); mb.next = r && (r.nextPageToken || r.next_page_token) || null;
+    $('mbMore').classList.toggle('hidden', !mb.next);
+    $('mbState').textContent = mb.threads.length ? '' : (mb.tab === 'sent' ? 'Nothing sent yet from ' + mb.inbox + '.' : 'No messages yet in ' + mb.inbox + '.');
+    if (mb.tab === 'inbox') $('nMail').textContent = mb.threads.filter(function (t) { return (t.labels || []).indexOf('unread') >= 0; }).length;
+    $('mbList').innerHTML = mb.threads.map(function (t, i) {
+      var unread = (t.labels || []).indexOf('unread') >= 0; var id = t.threadId || t.thread_id || t.id;
+      return '<div class="row clickable" data-mb-open="' + esc(id) + '" style="flex-direction:column;align-items:flex-start;gap:4px;' + (unread ? 'border-left:3px solid #3987e5;padding-left:10px' : '') + '"><span style="display:flex;justify-content:space-between;width:100%;gap:10px"><strong style="' + (unread ? '' : 'font-weight:500') + '">' + esc(mb.tab === 'sent' ? addr(t.recipients) : addr(t.senders)) + '</strong><span class="muted small" style="white-space:nowrap">' + mbWhen(t.timestamp || t.updatedAt || t.updated_at || t.receivedTimestamp) + '</span></span><span>' + esc(t.subject || '(no subject)') + '</span><span class="muted small">' + esc((t.preview || '').slice(0, 140)) + ((t.messageCount || t.message_count) > 1 ? ' · ' + (t.messageCount || t.message_count) + ' messages' : '') + '</span></div>';
+    }).join('');
+    document.querySelectorAll('[data-mb-open]').forEach(function (el) { el.onclick = function () { mbOpen(el.getAttribute('data-mb-open')); }; });
+  }
+  async function mbOpen(id) {
+    $('mbThread').innerHTML = '<p class="p">Loading…</p>';
+    try { var t = await am('get_thread', { inboxId: mb.inbox, threadId: id, limit: 50 }); } catch (e) { $('mbThread').innerHTML = '<p class="p">' + esc(e.message) + '</p>'; return; }
+    var msgs = (t && t.messages) || []; mb.open = { id: id, msgs: msgs };
+    var last = msgs[msgs.length - 1];
+    $('mbThread').innerHTML = '<h2 class="h4">' + esc(t.subject || (last && last.subject) || '(no subject)') + '</h2>' + msgs.map(function (m) {
+      var mine = (m.labels || []).indexOf('sent') >= 0;
+      var body = m.text || m.extractedText || m.extracted_text || m.preview || '';
+      return '<div class="stack" style="gap:8px;padding:14px 16px;border-radius:14px;background:' + (mine ? '#13202f' : '#161616') + ';border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong>' + (mine ? 'Sent by Blackout SOS' : esc(addr(m.from))) + '</strong><span class="muted small">' + mbWhen(m.timestamp || m.createdAt || m.created_at) + '</span></div><span class="muted small">To ' + esc(addr(m.to)) + (m.cc && m.cc.length ? ' · cc ' + esc(addr(m.cc)) : '') + '</span><pre>' + esc(body) + '</pre>' + ((m.attachments || []).length ? '<span class="muted small">Attachments: ' + m.attachments.map(function (a) { return esc(a.filename || 'file'); }).join(', ') + '</span>' : '') + '</div>';
+    }).join('') + (last ? '<div class="stack" style="gap:10px;border-top:1px solid var(--line);padding-top:16px"><label class="p small">Reply yourself (sends immediately from ' + esc(mb.inbox) + ')</label><textarea id="mbReply" placeholder="Write your reply…"></textarea><div style="display:flex;gap:10px"><a class="btn solid" id="mbSend">Send reply</a><span class="p small" id="mbSendState"></span></div></div>' : '');
+    var send = $('mbSend'); if (send) send.onclick = async function () {
+      var text = $('mbReply').value.trim(); if (!text) return; var target = msgs.filter(function (m) { return (m.labels || []).indexOf('sent') < 0; }).pop() || last;
+      if (!confirm('Send this reply now?')) return; $('mbSendState').textContent = 'Sending…';
+      try { await am('reply_to_message', { inboxId: mb.inbox, messageId: target.messageId || target.message_id || target.id, text: text, labels: ['owner'] }); $('mbSendState').textContent = 'Sent.'; mbOpen(id); }
+      catch (e) { $('mbSendState').textContent = e.message; }
+    };
+  }
+
   // ---- import ----
   function parseImport() {
     var skus = {}; state.products.forEach(function (p) { skus[p.sku] = p; });
@@ -490,7 +561,7 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
   };
 
   // ---- navigation ----
-  function showScreen(name) { document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('on', s.id === 's-' + name); }); document.querySelectorAll('#nav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-screen') === name); }); }
+  function showScreen(name) { if (name === 'mailbox') mbInit(); document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('on', s.id === 's-' + name); }); document.querySelectorAll('#nav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-screen') === name); }); }
   document.addEventListener('click', function (e) {
     var t = e.target.closest('[data-screen]'); if (t) { showScreen(t.getAttribute('data-screen')); return; }
     var o = e.target.closest('[data-open-order]'); if (o) { openOrder(o.getAttribute('data-open-order')); return; }
