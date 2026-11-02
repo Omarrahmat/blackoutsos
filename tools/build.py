@@ -46,7 +46,7 @@ def head(title, desc, path, r, extra="", lang="en-GB"):
 """
 
 def nav(r):
-    return f"""<div class="ticker" data-ticker data-ready-href="{r}guides/the-72-hour-list-explained.html" aria-live="polite"><div class="tk-view"><div class="tk-track"><a class="tk-item" href="{r}guides/the-72-hour-list-explained.html"><span class="tk-dot none"></span>Be Ready: the Government advises every household to hold three days of supplies. <span class="tk-src">The 72-hour checklist →</span></a></div></div><a class="tk-loc" href="{r}alerts.html">Live warnings</a></div>
+    return f"""<div class="ticker" data-ticker data-ready-href="{r}guides/the-72-hour-list-explained.html" data-alerts-href="{r}alerts.html" aria-live="polite"><a class="tk-label" href="{r}alerts.html"><span class="tk-pulse"></span>Live</a><div class="tk-view"><div class="tk-track"><a class="tk-item" href="{r}guides/the-72-hour-list-explained.html"><span class="tk-dot info"></span><span class="tk-scope">Be ready</span>Hold three days of water, food, light and medicines for everyone at home</a></div></div></div>
 <header class="nav">
 <a class="brand" href="{r}index.html" aria-label="Blackout SOS home"><span class="word">Blackout SOS</span>{morse()}</a>
 <nav class="nav-links" aria-label="Main">
@@ -500,21 +500,30 @@ def about():
     body = """
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <p class="eyebrow">Our story</p>
-<h1 class="h1" style="max-width:1000px">Built by a family who kept a bag by the door.</h1>
-<p class="lede">Blackout SOS started in London in 2026, in a fostering household of five people and a cat. With children in the house who had already lived through enough, the question was never whether to have a go bag. It was why the ones you could buy were so bad.</p>
+<h1 class="h1" style="max-width:1100px">It starts the same way in every house. The lights go out.</h1>
+<p class="lede" style="max-width:820px">The fridge stops humming. Somebody says "it's probably just us". Five phones light up at once, and within a minute everyone is opening drawers in the dark: where's the torch, where are the batteries, who's got charge. The cat is under the sofa. Nobody knows which of the three tins in the cupboard is food and which is screws.</p>
 </div></section>
-<section class="section band"><div class="wrap grid">
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">The problem</p><p class="p">The kits on sale were a rucksack with things thrown in: a cheap torch, a foil blanket, a tin of biscuits with nuts in it, camouflage on the outside and nothing for a child, a baby or a dog. When the Government asked every household to hold three days of supplies, the answer on the shelf was a bag you'd be embarrassed to carry and couldn't find the plasters in.</p></div>
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">The idea</p><p class="p">One bag per person, because an emergency doesn't happen to households, it happens to people. One colour per bag, so a seven-year-old grabs the right one in the dark. Four pouches with a colour each, so the first aid is where it was last time. Food everyone can eat. A bag you'd carry on the Tube.</p></div>
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">The rules</p><p class="p">We don't sell fear. We point to 999 and the authorities first, we check every guide against official advice, and we don't make a claim the label can't back. Vegan and made without nut ingredients means we can show you the paperwork. Waterproof means ten minutes under a shower head.</p></div>
+<section class="section band"><div class="wrap split" style="gap:48px">
+<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">The question</p><h2 class="h2">Why was every go bag on sale so bad?</h2></div>
+<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">We went looking for a bag to keep by the door and found the same thing everywhere: a camouflage rucksack stuffed with a cheap torch, a foil blanket and a tin of biscuits with nuts in, built for one imaginary man in the woods. Nothing for a child who needs to carry their own. Nothing for a baby who needs feeding at 3am without a kettle. Nothing for the dog.</p>
+<p class="body">Meanwhile, governments on both sides of the Atlantic were saying the same thing in plainer and plainer words: every household should be able to look after itself for three days. Storms, floods, heat, grid failures, cyber attacks. Not if, but how often.</p></div>
 </div></section>
-<section class="section"><div class="wrap split">
-<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How we make them</p><h2 class="h2">Designed in London. Assembled in the UK.</h2></div>
-<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The bags are made to our drawings from the same TPU-laminated Cordura, taped seams and YKK AquaGuard zips as expedition packs. The contents are sourced from UK suppliers wherever one exists, checked against the claims on the box, and packed by hand in the UK into pouches with a place for everything. Every bag leaves with a rotation card, and we hold the dates so you don't have to.</p>
-<p class="body">If you want to talk to the person who packed your bag, <a href="contact.html" style="border-bottom:1px solid var(--muted)">write to us</a>: it will be a short conversation, because we are a small team, and a useful one.</p></div>
+<section class="section"><div class="wrap stack" style="gap:28px">
+<div class="stack" style="gap:12px;max-width:820px"><p class="eyebrow">The name</p><h2 class="h2">··· ––– ··· Three dots. Three dashes. Three days.</h2>
+<p class="body">SOS in Morse is the oldest distress call there is: no language, no alphabet, just light or sound. A blackout is when you'd need it. Three days is what the authorities ask you to cover. So the name became the brand, and the Morse became the mark: it's laser-cut into the side of every bag, and in a torch beam it reads the same in any country in the world.</p></div>
+<div class="grid">
+<div class="card" style="flex:1 1 280px"><p class="eyebrow">One bag per person</p><p class="p">An emergency doesn't happen to households, it happens to people. So there's a bag for an adult, a child, a baby, the family and the pet, each packed for who's carrying it.</p></div>
+<div class="card" style="flex:1 1 280px"><p class="eyebrow">One colour per bag</p><p class="p">Blue, red, yellow, green, orange. A seven-year-old grabs the right one in the dark, and the first aid is in the same pouch it was last time.</p></div>
+<div class="card" style="flex:1 1 280px"><p class="eyebrow">Matte black outside</p><p class="p">No camouflage, no slogans. A bag you'd carry on the Tube or the subway, that doesn't announce what's inside it.</p></div>
+<div class="card" style="flex:1 1 280px"><p class="eyebrow">We don't sell fear</p><p class="p">We point to the emergency services and the official advice first, show the live warnings for where you are, and never make a claim the label can't back.</p></div>
+</div></div></section>
+<section class="section band"><div class="wrap split">
+<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How we make them</p><h2 class="h2">Designed in London. Assembled in the UK. Sent anywhere.</h2></div>
+<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The bags are made to our own drawings from TPU-laminated Cordura, taped seams and YKK AquaGuard zips, the same materials as expedition packs. Every item inside is checked against the claim on the box and packed by hand in the UK, into pouches with a place for everything. Every bag leaves with a rotation card, and we keep the dates so you don't have to.</p>
+<p class="body">Questions go to a real inbox and get a real answer. <a href="contact.html" style="border-bottom:1px solid var(--muted)">Write to us</a>.</p></div>
 </div></section>
 """
-    page("about.html", "Our story — Blackout SOS", "Blackout SOS was started in London by a foster carer who couldn't find a go bag worth keeping by the door. One bag per person, one colour per bag.", body)
+    page("about.html", "Our story — Blackout SOS", "Three dots, three dashes, three days: why Blackout SOS exists, what the name means, and how every bag is designed in London and assembled in the UK.", body)
 
 def delivery():
     from shipping import ZONES, RATES, BANDS

@@ -62,25 +62,27 @@
   // ---- ticker (every page) ----
   function renderTicker(loc, rows) {
     var el = document.querySelector('[data-ticker]'); if (!el) return;
-    var list = forLoc(rows, loc).filter(function (a) { return a.level <= 3; }).slice(0, 12);
-    var place = placeName(loc);
-    var items = '';
-    if (list.length) {
-      items = list.map(function (a) {
-        return '<a class="tk-item" href="' + esc(a.link || '#') + '" target="_blank" rel="noopener"><span class="tk-dot ' + LEVEL[a.level] + '"></span><strong>' + esc(a.event) + '</strong> — ' + esc(a.area || G.names[a.country] || '') + ' <span class="tk-src">' + esc(SOURCES[a.source] || a.source) + '</span></a>';
-      }).join('');
-      el.className = 'ticker live lvl-' + LEVEL[list[0].level];
-    } else {
-      var note = covered(loc.country) ? 'No official warnings in force for ' + esc(place) + ' right now.' : 'No major events reported for ' + esc(place) + ' right now.';
-      items = '<span class="tk-item"><span class="tk-dot none"></span>' + note + ' <a class="tk-src" href="' + el.getAttribute('data-ready-href') + '">The 72-hour checklist →</a></span>';
-      el.className = 'ticker quiet';
-    }
-    var html = '<div class="tk-track">' + items + '</div>';
-    var moving = list.length > 0 && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    el.innerHTML = '<div class="tk-view' + (moving ? ' moving' : '') + '">' + html + (moving ? html : '') + '</div>' +
-      '<a class="tk-loc" href="' + el.getAttribute('data-ready-href').replace(/guides\/the-72-hour-list-explained\.html$/, 'alerts.html') + '">' + esc(place) + '</a>';
-    var track = el.querySelector('.tk-track');
-    if (moving && track) { var w = track.scrollWidth; el.style.setProperty('--tk-dur', Math.max(18, Math.round(w / 60)) + 's'); }
+    var place = placeName(loc), nation = G.names[loc.country] || loc.country;
+    var local = forLoc(rows, loc).filter(function (a) { return a.level <= 3 && loc.region && a.regions && a.regions.indexOf(loc.region) >= 0; });
+    var seen = {}; local.forEach(function (a) { seen[a.id] = 1; });
+    var national = rows.filter(function (a) { return !seen[a.id] && a.level <= 2; });
+    if (!loc.region) { national = rows.filter(function (a) { return a.level <= 3; }); local = []; }
+    var list = local.slice(0, 8).map(function (a) { return [a, 'Near you']; }).concat(national.slice(0, 8).map(function (a) { return [a, nation]; }));
+    var item = function (a, scope) {
+      return '<a class="tk-item" href="' + esc(a.link || el.getAttribute('data-alerts-href')) + '" target="_blank" rel="noopener"><span class="tk-dot ' + LEVEL[a.level] + '" title="' + LEVEL[a.level] + '"></span><span class="tk-scope">' + esc(scope) + '</span><strong>' + esc(a.event) + '</strong><span class="tk-area">' + esc(a.area || '') + '</span></a>';
+    };
+    var top = list.length ? Math.min.apply(null, list.map(function (x) { return x[0].level; })) : 0;
+    var items;
+    if (list.length) items = list.map(function (x) { return item(x[0], x[1]); }).join('');
+    else items = '<span class="tk-item"><span class="tk-dot none"></span><span class="tk-scope">' + esc(place) + '</span>' + (covered(loc.country) ? 'No official warnings in force right now' : 'No major events reported right now') + '</span>'
+      + '<a class="tk-item" href="' + el.getAttribute('data-ready-href') + '"><span class="tk-dot info"></span><span class="tk-scope">Be ready</span>Hold three days of water, food, light and medicines for everyone at home</a>'
+      + '<a class="tk-item" href="' + el.getAttribute('data-alerts-href') + '"><span class="tk-dot info"></span><span class="tk-scope">Live</span>Official warnings checked every 15 minutes</a>';
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var track = '<div class="tk-track">' + items + '</div>';
+    el.className = 'ticker' + (top ? ' has lvl-' + LEVEL[top] : '');
+    el.innerHTML = '<a class="tk-label" href="' + el.getAttribute('data-alerts-href') + '"><span class="tk-pulse"></span>' + (top === 1 ? 'Red warning' : top === 2 ? 'Warnings' : top === 3 ? 'Warnings' : 'Live') + '</a><div class="tk-view' + (reduce ? '' : ' moving') + '">' + track + (reduce ? '' : track) + '</div>';
+    var t = el.querySelector('.tk-track');
+    if (!reduce && t) el.style.setProperty('--tk-dur', Math.max(25, Math.round(t.scrollWidth / 55)) + 's');
   }
 
   // ---- selector dialog ----
