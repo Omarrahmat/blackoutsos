@@ -19,10 +19,10 @@ def morse():
     d = '<i></i>' * 3; l = '<i class="l"></i>' * 3
     return f'<span class="morse" aria-hidden="true">{d}<b></b>{l}<b></b>{d}</span>'
 
-def head(title, desc, path, r, extra=""):
+def head(title, desc, path, r, extra="", lang="en-GB"):
     canonical = f"{SITE}/{path}".replace("/index.html", "/")
     return f"""<!doctype html>
-<html lang="en-GB">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,6 +71,7 @@ def footer(r):
 <div class="stack" style="max-width:320px"><span class="display" style="font-size:26px;letter-spacing:2px">Blackout SOS</span><p class="p small">Designed in London. Assembled in the UK. Three dots, three dashes, three days.</p></div>
 <div class="col"><span>Shop</span><a href="{r}bags/operator.html">Operator</a><a href="{r}bags/recruit.html">Recruit</a><a href="{r}bags/cub.html">Cub</a><a href="{r}bags/unit.html">Unit</a><a href="{r}bags/scout.html">Scout</a><a href="{r}refills.html">Refills</a></div>
 <div class="col"><span>Learn</span><a href="{r}guides/index.html">Guides</a><a href="{r}guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="{r}alerts.html">Live warnings</a><a href="{r}bags/operator.html#inside">What's in the bag</a><a href="{r}refills.html">Rotation dates</a></div>
+<div class="col"><span>Where you are</span><a href="{r}us/index.html">United States</a><a href="{r}world/index.html">Europe and worldwide</a><a href="{r}alerts.html">Live warnings</a><a href="{r}delivery-returns.html">Delivery to your country</a></div>
 <div class="col"><span>Company</span><a href="{r}about.html">Our story</a><a href="{r}organisations.html">For organisations</a><a href="{r}delivery-returns.html">Delivery and returns</a><a href="{r}contact.html">Contact</a><a href="{r}privacy.html">Privacy</a><a href="{r}terms.html">Terms</a></div>
 </div>
 <p class="legal">© {YEAR} Blackout SOS, London. blackoutsos.com · Company details are on the <a href="{r}terms.html">terms page</a>. In an emergency call your local emergency number (999 in the UK, 911 in the US, 112 in Europe). This site gives general preparedness advice, not emergency instructions from the authorities.</p>
@@ -89,10 +90,12 @@ def write(path, html_text):
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, "w") as f: f.write(html_text)
 
-def page(path, title, desc, body, extra_head=""):
+def page(path, title, desc, body, extra_head="", lang="en-GB", loc=None):
     depth = path.count("/")
     r = "../" * depth
-    write(path, head(title, desc, path, r, extra_head) + nav(r) + body + footer(r))
+    h = head(title, desc, path, r, extra_head, lang)
+    if loc: h = h.replace("<body>", f'<body data-loc-country="{loc[0]}" data-loc-region="{loc[1] or ""}">', 1)
+    write(path, h + nav(r) + body + footer(r))
 
 # ---------- SVG bag art ----------
 def svg_operator(c, h=None, label="Operator go bag, front view"):
@@ -603,6 +606,7 @@ def alerts():
 <div class="stack" style="gap:12px"><p class="eyebrow">Live official warnings</p><h1 class="h1">Warnings in force for <span data-alerts-place>your area</span>.</h1>
 <p class="lede">Straight from the national services, checked every 15 minutes: the Met Office and Environment Agency for the UK, the National Weather Service for the United States, 37 national weather services across Europe through MeteoAlarm, and GDACS for major disasters anywhere in the world.</p>
 <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><button type="button" class="pill" data-loc-open>Change area</button><span class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</span></div></div>
+<div class="stack" style="gap:14px" data-alerts-posts></div>
 <div class="stack" style="gap:28px" data-alerts-page><div class="card"><p class="p">Loading the latest warnings…</p></div></div>
 </div></section>
 <section class="section band" id="email"><div class="wrap split" style="gap:40px">
@@ -633,8 +637,80 @@ else{t.textContent="That link didn't work.";m.textContent=(j&&j.error)||'Write t
 }).catch(function(){t.textContent="We couldn't reach the server.";m.textContent='Please try again in a minute, or write to hello@blackoutsos.com.';});})();</script>
 """)
 
+# ---------- LOCALISED: United States and countries ----------
+from content_local import US_STATES, COUNTRIES, state_slug
+US_KIT = [("Water","One gallon per person per day, for at least three days, for drinking and sanitation (Ready.gov). The bags carry purification tablets and pouches; store the gallons at home."),
+  ("Food","Three days of food that needs no cooking or fridge. Our rations are vegan, made without nut ingredients and last 15 years."),
+  ("Light and power","Flashlight, spare batteries, a power bank, a hand-crank or battery NOAA Weather Radio at home."),
+  ("First aid and medicines","A first-aid kit, and a week of prescription medicines with a copy of each prescription."),
+  ("Documents","Copies of IDs, insurance policies and bank records in a waterproof sleeve, plus some cash in small bills."),
+  ("Warmth and shelter","Emergency blankets, a rain poncho, warm layers; in hurricane country, work gloves and a whistle."),
+  ("Family and pets","A meeting place, an out-of-state contact everyone knows, and a kit for each child and pet.")]
+def us_hub():
+    states = "".join(f'<a class="card" href="{state_slug(n)}.html" style="flex:1 1 200px;padding:16px 18px"><strong>{n}</strong><span class="muted small">{", ".join(h[:2])}</span></a>' for c, n, h in US_STATES)
+    kit = "".join(f'<div class="row" style="align-items:flex-start;flex-wrap:wrap"><strong style="flex:0 0 200px">{k}</strong><span style="flex:1 1 300px;text-align:left;color:var(--soft)">{v}</span></div>' for k, v in US_KIT)
+    body = f"""
+<section class="section top"><div class="wrap stack" style="gap:20px"><p class="eyebrow">United States</p><h1 class="h1">Be ready for three days, wherever you live in the US.</h1>
+<p class="lede">FEMA and Ready.gov ask every household to be able to look after itself for at least 72 hours after a disaster. Here is what that means where you live, the official warnings in force for your state right now, and a go bag for each person, shipped to you from the UK.</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px"><a class="pill solid" href="#states">Find your state</a><a class="pill" href="../bags/index.html">See the bags</a></div></div></section>
+<section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · National Weather Service</p><h2 class="h2">Serious warnings in force in <span data-alerts-place>the United States</span></h2><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div><a class="pill" href="../alerts.html" style="align-self:flex-start">All warnings, any state</a></div></section>
+<section class="section"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">The 72-hour kit, US version</p><h2 class="h2">What the official checklist asks for.</h2><p class="p">From Ready.gov's basic disaster supplies kit, with what our bags already carry. In an emergency call 911; for official alerts keep Wireless Emergency Alerts switched on and follow your state and county emergency management.</p></div><div class="stack" style="flex:2 1 520px;gap:0;border-top:1px solid var(--line2)">{kit}</div></div></section>
+<section class="section band" id="states"><div class="wrap stack" style="gap:20px"><p class="eyebrow">By state</p><h2 class="h2">Your state's hazards and live warnings.</h2><div class="grid" style="gap:12px">{states}</div></div></section>
+<section class="section"><div class="wrap stack" style="gap:12px;max-width:760px"><p class="eyebrow">Delivery to the US</p><p class="body">Every bag is assembled in the UK and sent tracked: 5 to 9 working days, or 2 to 4 by express, from £29.95 for one bag. Prices are in pounds; your card shows dollars. US import duty and any courier fee are collected on delivery. <a href="../delivery-returns.html" style="border-bottom:1px solid var(--muted)">Delivery and duties</a>.</p></div></section>
+"""
+    page("us/index.html", "Emergency go bags and 72-hour kits in the United States — Blackout SOS", "What FEMA and Ready.gov ask every US household to keep for 72 hours, live National Weather Service warnings by state, and go bags shipped to the US.", body, lang="en-US", loc=("US", ""))
+
+def us_state(code, name, hazards):
+    slug = state_slug(name)
+    fema = "https://www.ready.gov/" if code == "DC" else f"https://www.fema.gov/locations/{slug}"
+    hz = "".join(f"<li>{h}</li>" for h in hazards)
+    others = " · ".join(f'<a href="{state_slug(n)}.html">{n}</a>' for c, n, h in US_STATES if c != code)
+    schema = json.dumps({"@context": "https://schema.org", "@type": "WebPage", "name": f"Emergency preparedness in {name}", "about": {"@type": "State", "name": name}, "inLanguage": "en-US"})
+    body = f"""
+<div class="wrap crumbs" style="padding-top:24px"><a href="../index.html">Home</a><span>/</span><a href="index.html">United States</a><span>/</span><span class="here">{name}</span></div>
+<section class="section top" style="padding-top:28px"><div class="wrap stack" style="gap:18px"><p class="eyebrow">{name} · live warnings and 72-hour kit</p><h1 class="h1">Be ready in {name}.</h1>
+<p class="lede">The hazards {name} plans for, the official warnings in force right now, and what to keep so every person in the house can manage for 72 hours. In an emergency call 911.</p></div></section>
+<section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · National Weather Service</p><h2 class="h2">Warnings in force in <span data-alerts-place>{name}</span></h2><p class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</p><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div></div></section>
+<section class="section"><div class="wrap split" style="gap:40px">
+<div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">What {name} plans for</p><h2 class="h2">The main hazards.</h2><ul class="body" style="margin:0;padding-left:20px">{hz}</ul><p class="p small">Your county's emergency management office and <a href="{fema}" style="border-bottom:1px solid var(--line3)">FEMA's page for {name}</a> have the local plans, shelters and evacuation zones.</p></div>
+<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Ready.gov's basics: one gallon of water per person per day for at least three days, three days of food that needs no cooking, a flashlight and battery or hand-crank weather radio, first aid, a week of medicines, copies of documents, cash, and a plan for the family and pets. Our bags carry everything that travels with you, one bag per person, one colour per bag.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/operator.html">The Operator, adult</a><a class="pill" href="../bags/index.html">The whole range</a></div><p class="p small">Shipped tracked from the UK: 5–9 working days. US import duty is collected on delivery. <a href="../delivery-returns.html" style="border-bottom:1px solid var(--line3)">Delivery and duties</a></p></div>
+</div></section>
+<section class="section band" id="email"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">One email when a serious warning is issued for {name}.</h2><p class="p">Red and amber only, with the three things to do in the first hour. No marketing in between.</p></div>
+<form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe"><input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes"><label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label><button type="submit" class="pill solid">Email me {name} warnings</button><p class="p small ok" data-done hidden>You're on the list for {name}.</p></form></div></section>
+<section class="section"><div class="wrap stack" style="gap:10px"><p class="eyebrow">Other states</p><p class="p small" style="line-height:2">{others}</p></div></section>
+<script type="application/ld+json">{schema}</script>
+"""
+    page(f"us/{slug}.html", f"{name} emergency kit, go bags and live weather warnings — Blackout SOS", f"Live National Weather Service warnings for {name}, the hazards {name} plans for ({', '.join(hazards[:3]).lower()}), and the 72-hour kit Ready.gov recommends.", body, lang="en-US", loc=("US", code))
+
+def world_hub():
+    cards = "".join(f'<a class="card" href="{c.lower()}.html" style="flex:1 1 220px;padding:16px 18px"><strong>{n}</strong><span class="muted small">Emergency {num} · {w}</span></a>' for c, n, num, w, u, hz in COUNTRIES)
+    body = f"""
+<section class="section top"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Europe and worldwide</p><h1 class="h1">Live warnings and the 72-hour kit, country by country.</h1>
+<p class="lede">We read the official warnings from 37 national weather services across Europe, the US National Weather Service and GDACS for major disasters everywhere, every 15 minutes. Pick your country for its warnings, its emergency number and its hazards. We deliver to almost every country from the UK.</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../alerts.html">Warnings for my area</a><a class="pill" href="../us/index.html">United States</a><a class="pill" href="../guides/index.html">United Kingdom guides</a></div></div></section>
+<section class="section band"><div class="wrap grid" style="gap:12px">{cards}</div></section>
+"""
+    page("world/index.html", "Emergency kits and live warnings by country — Blackout SOS", "Official weather warnings and major disaster alerts for your country, emergency numbers, and go bags delivered worldwide from the UK.", body)
+
+def world_country(c, n, num, wname, wurl, hazards):
+    hz = "".join(f"<li>{h}</li>" for h in hazards)
+    lang = {"US": "en-US", "CA": "en-CA", "AU": "en-AU", "NZ": "en-NZ", "IE": "en-IE"}.get(c, "en")
+    body = f"""
+<div class="wrap crumbs" style="padding-top:24px"><a href="../index.html">Home</a><span>/</span><a href="index.html">Worldwide</a><span>/</span><span class="here">{n}</span></div>
+<section class="section top" style="padding-top:28px"><div class="wrap stack" style="gap:18px"><p class="eyebrow">{n} · live warnings and 72-hour kit</p><h1 class="h1">Be ready in {n}.</h1>
+<p class="lede">The official warnings in force in {n} right now, the hazards the country plans for, and a go bag for each person delivered from the UK. In an emergency call {num}.</p></div></section>
+<section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · {wname}</p><h2 class="h2">Warnings in force in <span data-alerts-place>{n}</span></h2><p class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</p><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div><p class="p small">The national service is the authority: <a href="{wurl}" target="_blank" rel="noopener" style="border-bottom:1px solid var(--line3)">{wname}</a>.</p></div></section>
+<section class="section"><div class="wrap split" style="gap:40px">
+<div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">What {n} plans for</p><h2 class="h2">The main hazards.</h2><ul class="body" style="margin:0;padding-left:20px">{hz}</ul></div>
+<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Three days of water (about 3 litres per person per day for drinking, more for washing), food that needs no cooking, light, warmth, first aid, a week of medicines, copies of documents, some cash and a plan for the family and pets. Our bags carry what travels with you: one bag per person, one colour per bag.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/index.html">See the bags</a><a class="pill" href="../delivery-returns.html">Delivery to {n}</a></div><p class="p small">Prices are in pounds; your card shows your own currency. Any import tax is collected on delivery.</p></div>
+</div></section>
+<section class="section band" id="email"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">One email when a serious warning is issued in {n}.</h2></div>
+<form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe"><input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes"><label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label><button type="submit" class="pill solid">Email me serious warnings</button><p class="p small ok" data-done hidden>You're on the list.</p></form></div></section>
+"""
+    page(f"world/{c.lower()}.html", f"{n}: emergency kit, go bags and live weather warnings — Blackout SOS", f"Live official warnings for {n} from {wname}, the hazards {n} plans for, the emergency number ({num}) and go bags delivered from the UK.", body, lang=lang, loc=(c, ""))
+
 def meta_files():
-    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "refills.html", "organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
+    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "us/", "world/"] + [f"us/{state_slug(n)}.html" for c, n, h in US_STATES] + [f"world/{c[0].lower()}.html" for c in COUNTRIES] + ["refills.html", "organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
     today = datetime.date.today().isoformat()
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("sitemap.xml", sm)
@@ -646,5 +722,5 @@ if __name__ == "__main__":
     for s in ORDER: product(s)
     guides_index()
     for g in GUIDES: guide_page(g)
-    basket(); checkout_pages(); alerts(); unsubscribe(); refills(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()
+    basket(); checkout_pages(); alerts(); us_hub(); [us_state(*x) for x in US_STATES]; world_hub(); [world_country(*x) for x in COUNTRIES]; unsubscribe(); refills(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()
     print("built")

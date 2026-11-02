@@ -20,7 +20,9 @@
     var region = country === 'US' ? (G.usTz[tz] || '') : '';
     return { country: country, region: region, guessed: true };
   }
-  function getLoc() { try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && v.country) return v; } catch (e) {} return detect(); }
+  function pageLoc() { var b = document.body; return b && b.getAttribute('data-loc-country') ? { country: b.getAttribute('data-loc-country'), region: b.getAttribute('data-loc-region') || '' } : null; }
+  function getLoc(own) {
+    var pl = own ? null : pageLoc(); if (pl) return pl; try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && v.country) return v; } catch (e) {} return detect(); }
   function setLoc(loc) { try { localStorage.setItem(KEY, JSON.stringify({ country: loc.country, region: loc.region || '' })); } catch (e) {} }
   function regionName(loc) { var list = G.regions[loc.country] || []; for (var i = 0; i < list.length; i++) if (list[i][0] === loc.region) return list[i][1]; return ''; }
   function placeName(loc) { return regionName(loc) || G.names[loc.country] || loc.country; }
@@ -98,8 +100,18 @@
   }
 
   // ---- alerts page ----
+  function renderPosts(loc) {
+    var box = document.querySelector('[data-alerts-posts]'); if (!box || !window.fetch) return;
+    var url = 'https://vbgustjtxjmjlgukzcfa.supabase.co/rest/v1/bsos_posts_public?or=(country.eq.' + encodeURIComponent(loc.country) + ',country.is.null)&order=published_at.desc&limit=6';
+    fetch(url, { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }).then(function (r) { return r.ok ? r.json() : []; }).then(function (posts) {
+      posts = (posts || []).filter(function (p) { return !loc.region || !p.region || p.region === loc.region; });
+      if (!posts.length) { box.innerHTML = ''; return; }
+      box.innerHTML = '<p class="eyebrow">Situation notes from our research desk</p>' + posts.map(function (p) { return '<div class="card stack" style="gap:8px"><strong>' + esc(p.title) + '</strong><p class="p small">' + esc(p.body) + '</p><span class="muted small">' + when(p.published_at) + (p.link ? ' · <a href="' + esc(p.link) + '" target="_blank" rel="noopener" style="border-bottom:1px solid var(--line3)">official source</a>' : '') + '</span></div>'; }).join('');
+    }).catch(function () {});
+  }
   function renderPage(loc, rows) {
     var box = document.querySelector('[data-alerts-page]'); if (!box) return;
+    renderPosts(loc);
     var list = forLoc(rows, loc);
     var place = placeName(loc);
     var title = document.querySelector('[data-alerts-place]'); if (title) title.textContent = place;
@@ -156,7 +168,7 @@
     e.preventDefault(); openSelector(getLoc(), run);
   });
   document.addEventListener('DOMContentLoaded', function () {
-    var loc = getLoc(); run(loc); beacon(loc);
+    var loc = getLoc(); run(loc); beacon(getLoc(true));
     // keep the ticker fresh on long-open pages
     setInterval(function () { cache = {}; run(getLoc()); }, 15 * 60 * 1000);
   });
