@@ -40,7 +40,7 @@ dict(slug="flooding-before-during-after", cat="Weather", mins=9, title="Flooding
         ("Before", "today", "Know your risk and get the warning", [
             "Check your address at gov.uk's flood risk service, and sign up for free flood warnings by text, email or phone. A flood alert means be prepared; a flood warning means act now; a severe flood warning means danger to life.",
             "Agree where the family goes if you have to leave: a relative on higher ground, not a rest centre you have never seen. Write it on the family plan card in the Unit.",
-            "Find out now how to turn off the gas, electricity and water. Label the switches with the marker from the lid.",
+            "Find out now how to turn off the gas, electricity and water. Label the switches.",
             "Put copies of documents, photos and insurance details in the document pouch. Photograph every room while it's dry; the insurer will ask."]),
         ("During", "the warning", "Move things up, people out, early", [
             "When the warning comes, move valuables, medicines and the children's things upstairs or onto high shelves. Put the Unit and the Operators by the door you will leave by.",
@@ -124,7 +124,7 @@ dict(slug="water-treating-storing-rationing", cat="Water and food", mins=7, titl
     sections=[
         ("How much", "to store", "Three days, per person, plus the extras", [
             "For drinking alone, an adult needs about 2.5 to 3 litres a day; the government's guidance calls 10 litres a day per person 'most comfortable' once cooking and washing are included. Three days for a family of four is 30 litres to drink, and far more to be comfortable.",
-            "Store bottled water somewhere cool and dark, and rotate it: write the date on the bottles with the marker from the lid, and use the oldest for the garden when the year is up.",
+            "Store bottled water somewhere cool and dark, and rotate it: write the date on the bottles, and use the oldest for the garden when the year is up.",
             "Add water for pets, and for a baby's formula if you use powder. Ready-to-feed formula needs none, which is why it's in the Cub.",
             "The bag's 500 ml pouches are five-year, foil-sealed water for the first day on the move. They are not the store; they are the walk to it."]),
         ("When", "the taps stop", "Fill what you can, then treat what you must", [
@@ -251,7 +251,7 @@ dict(slug="the-family-meeting-point", cat="Planning", mins=4, title="The family<
             "Review the card when the clocks change, with the bag check. Numbers move; children change schools."])],
     never=("Never", "Never plan to meet 'at home' after an evacuation, and never make the plan depend on one phone being charged. Paper, two places, one number."),
     after=None,
-    frombag=[("#2a2a2a", "Document pouch:", "the family plan card, contacts card, cash, paper map"), ("#D0202E", "Recruit name window:", "the child's copy of the photo card and your number"), ("#ededed", "Lid pocket:", "pen and the marker, for the card")],
+    frombag=[("#2a2a2a", "Document pouch:", "the family plan card, contacts card, cash, paper map"), ("#D0202E", "Recruit name window:", "the child's copy of the photo card and your number"), ("#ededed", "Lid pocket:", "the pen, for the cards")],
     numbers=[("Life at risk", "999"), ("Non-emergency police", "101"), ("Your out-of-area contact", "on the card"), ("Emergency Alerts", "gov.uk/alerts")],
     cta=("unit", "The Unit, £449", "Comes with the family plan card: meeting points, contacts, local map."),
     next=["teaching-your-child-the-bag", "the-72-hour-list-explained", "cyber-outage-cards-cash-and-comms"],

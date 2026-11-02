@@ -75,8 +75,7 @@
     var items;
     if (list.length) items = list.map(function (x) { return item(x[0], x[1]); }).join('');
     else items = '<span class="tk-item"><span class="tk-dot none"></span><span class="tk-scope">' + esc(place) + '</span>' + (covered(loc.country) ? 'No official warnings in force right now' : 'No major events reported right now') + '</span>'
-      + '<a class="tk-item" href="' + el.getAttribute('data-ready-href') + '"><span class="tk-dot info"></span><span class="tk-scope">Be ready</span>Hold three days of water, food, light and medicines for everyone at home</a>'
-      + '<a class="tk-item" href="' + el.getAttribute('data-alerts-href') + '"><span class="tk-dot info"></span><span class="tk-scope">Live</span>Official warnings checked every 15 minutes</a>';
+      + '<a class="tk-item" href="' + el.getAttribute('data-ready-href') + '"><span class="tk-dot info"></span><span class="tk-scope">Be ready</span>Hold three days of water, food, light and medicines for everyone at home</a>';
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var track = '<div class="tk-track">' + items + '</div>';
     el.className = 'ticker' + (top ? ' has lvl-' + LEVEL[top] : '');
@@ -198,7 +197,7 @@
     e.preventDefault(); openSelector(getLoc(), run);
   });
   document.addEventListener('DOMContentLoaded', function () {
-    locate().then(function () { run(getLoc()); localBox(getLoc(true)); beacon(getLoc(true)); });
+    locate().then(function () { try { document.dispatchEvent(new CustomEvent('bsos:loc', { detail: getLoc(true) })); } catch (e) {} run(getLoc()); localBox(getLoc(true)); beacon(getLoc(true)); });
     // keep the ticker fresh on long-open pages
     setInterval(function () { cache = {}; run(getLoc()); }, 15 * 60 * 1000);
   });

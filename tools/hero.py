@@ -50,7 +50,7 @@ def hero_html(r="", art=None, bags=None, gbp=None):
 <h1 class="h1">A 72-hour go bag for every person in your house.</h1>
 </div>
 <div class="stack" style="gap:18px;flex:0 1 420px">
-<p class="lede">Five bags, one colour each, from £89. Packed in the UK with 15-year rations, waterproof, vegan and made without nuts. Free UK delivery, worldwide shipping, dispatched in three working days.</p>
+<p class="lede">Five bags, one colour each, from £89. Packed in the UK with 15-year rations, waterproof, vegan and made without nuts. <span data-ship-line-hero>Free UK delivery, worldwide shipping, dispatched in three working days.</span></p>
 <div class="hero-ctas"><a class="pill solid" href="{r}bags/index.html">Shop the range</a><a class="pill" href="{r}bags/operator.html">The Operator, £199</a></div>
 </div>
 </div>

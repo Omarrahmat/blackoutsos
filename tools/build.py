@@ -53,7 +53,6 @@ def nav(r):
 <a href="{r}bags/index.html">Bags</a>
 <a href="{r}guides/index.html">Guides</a>
 <a href="{r}alerts.html">Live warnings</a>
-<a href="{r}refills.html">Refills</a>
 <a href="{r}organisations.html">For organisations</a>
 <a href="{r}about.html">Our story</a>
 </nav>
@@ -69,8 +68,8 @@ def footer(r):
 <div class="wrap">
 <div class="foot">
 <div class="stack" style="max-width:320px"><span class="display" style="font-size:26px;letter-spacing:2px">Blackout SOS</span><p class="p small">Designed in London. Assembled in the UK. Three dots, three dashes, three days.</p></div>
-<div class="col"><span>Shop</span><a href="{r}bags/operator.html">Operator</a><a href="{r}bags/recruit.html">Recruit</a><a href="{r}bags/cub.html">Cub</a><a href="{r}bags/unit.html">Unit</a><a href="{r}bags/scout.html">Scout</a><a href="{r}refills.html">Refills</a></div>
-<div class="col"><span>Learn</span><a href="{r}guides/index.html">Guides</a><a href="{r}guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="{r}alerts.html">Live warnings</a><a href="{r}bags/operator.html#inside">What's in the bag</a><a href="{r}refills.html">Rotation dates</a></div>
+<div class="col"><span>Shop</span><a href="{r}bags/operator.html">Operator</a><a href="{r}bags/recruit.html">Recruit</a><a href="{r}bags/cub.html">Cub</a><a href="{r}bags/unit.html">Unit</a><a href="{r}bags/scout.html">Scout</a></div>
+<div class="col"><span>Learn</span><a href="{r}guides/index.html">Guides</a><a href="{r}guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="{r}alerts.html">Live warnings</a><a href="{r}bags/operator.html#inside">What's in the bag</a></div>
 <div class="col"><span>Where you are</span><a href="{r}us/index.html">United States</a><a href="{r}world/index.html">Europe and worldwide</a><a href="{r}alerts.html">Live warnings</a><a href="{r}delivery-returns.html">Delivery to your country</a></div>
 <div class="col"><span>Company</span><a href="{r}about.html">Our story</a><a href="{r}organisations.html">For organisations</a><a href="{r}delivery-returns.html">Delivery and returns</a><a href="{r}contact.html">Contact</a><a href="{r}privacy.html">Privacy</a><a href="{r}terms.html">Terms</a></div>
 </div>
@@ -163,7 +162,7 @@ def home():
     schema = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Blackout SOS", "url": SITE, "description": "72-hour go bags assembled in the UK. One bag per person, one colour per bag.", "contactPoint": {"@type": "ContactPoint", "email": "hello@blackoutsos.com", "contactType": "customer service", "areaServed": "GB"}})
     body = f"""
 {hero_html(r, art, BAGS, gbp)}
-<section class="strip"><span>Assembled in the UK · ships worldwide</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Refills when it's time</span></section>
+<section class="strip"><span>Assembled in the UK · ships worldwide</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Reminders when it's time</span></section>
 <section class="section"><div class="wrap stack" style="gap:40px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
 <div class="stack" style="gap:10px"><p class="eyebrow">Shop the range</p><h2 class="h2">One bag per person. One colour per bag.</h2></div>
@@ -207,7 +206,7 @@ def home():
 <div class="chips">{chips_html}</div>
 </div></section>
 <section class="section"><div class="wrap grid">
-<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Refills and rotation</p><h3 class="h3">Your bag tells you when it's time.</h3><p class="p">Every bag carries a rotation card and a QR code. Scan it once and we'll remind you when the water, the rations or the batteries are due, and when the power bank wants charging. Cub owners get a stage refill as their baby grows: Cub 1, Cub 2, Cub 3.</p><a href="refills.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">See refill packs</a></div>
+<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Rotation reminders</p><h3 class="h3">Your bag tells you when it's time.</h3><p class="p">Every bag carries a rotation card and a QR code. Scan it once and we'll email you when the water, the rations or the batteries are due, and when the power bank wants charging. Cub owners get a reminder as their baby moves up a stage.</p><a href="guides/the-72-hour-list-explained.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">The 72-hour list</a></div>
 <div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">For organisations</p><h3 class="h3">One bag per desk, per room, per person.</h3><p class="p">Workplaces, schools, hotels and property managers around the world buy in tens and hundreds, with volume pricing, invoice terms and a rotation schedule we run for them.</p><a href="organisations.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">Request a quote</a></div>
 </div></section>
 <section class="section tight" style="border-top:1px solid var(--line)"><div class="wrap" style="display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between">
@@ -239,9 +238,9 @@ def range_page():
 <p class="p" style="max-width:760px">A household of two adults, a child of seven, a baby and a dog is two Operators, a Recruit, a Cub and a Scout, with the Cub and the Scout clipped onto the Operators so the adults' hands stay free. Add a Unit if you would leave by car or shelter at home. Prices include VAT and UK delivery.</p>
 </div></section>
 <section class="section"><div class="wrap grid">
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">Standard build</p><h3 class="h4 sans" style="font-weight:600">Every bag, every time</h3><p class="p">500D TPU-laminated Cordura, taped seams, YKK AquaGuard zips, a 1000D base. Name window by the handle with a write-on card and marker. Side bottle pocket. Whistle on a lanyard and one in the buckle. Reflective piping. The Morse SOS cut into the side.</p></div>
+<div class="card" style="flex:1 1 300px"><p class="eyebrow">Standard build</p><h3 class="h4 sans" style="font-weight:600">Every bag, every time</h3><p class="p">500D TPU-laminated Cordura, taped seams, YKK AquaGuard zips, a 1000D base. Name window by the handle with a write-on card. Side bottle pocket. Whistle on a lanyard and one in the buckle. Reflective piping. The Morse SOS cut into the side.</p></div>
 <div class="card" style="flex:1 1 300px"><p class="eyebrow">Honest food</p><h3 class="h4 sans" style="font-weight:600">Vegan, made without nut ingredients</h3><p class="p">NRG-5 Zero rations: 2,325 kcal per 500 g, labelled vegan and gluten-free, 15-year date. No sweets in a child's bag. The Cub's infant formula is the one exception in the range and the box says so.</p></div>
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">Nothing bespoke</p><h3 class="h4 sans" style="font-weight:600">Ships the day you order</h3><p class="p">Names go on the card with the marker in the lid, by you. Nothing is printed to order, so every bag is a standard product, in stock, assembled in the UK and dispatched within three working days.</p></div>
+<div class="card" style="flex:1 1 300px"><p class="eyebrow">Nothing bespoke</p><h3 class="h4 sans" style="font-weight:600">Ships the day you order</h3><p class="p">Names go on the write-on card, in your own handwriting. Nothing is printed to order, so every bag is a standard product, in stock, assembled in the UK and dispatched within three working days.</p></div>
 </div></section>
 """
     page("bags/index.html", "The range — Blackout SOS go bags", "Operator for adults, Recruit for children, Cub for babies, Unit for the family, Scout for the dog or cat. One bag per person, one colour per bag.", body)
@@ -274,12 +273,12 @@ def product(slug):
 <div class="stack" style="flex:1 1 420px;gap:24px">
 <div class="stack" style="gap:10px"><div class="eyebrow" style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:10px;height:10px;background:{b['colour']}"></span>{b['who']} · {b['colour_name']} tag</div><h1 class="h1" style="font-size:clamp(56px,7vw,96px)">{b['name']}</h1><p class="lede" style="font-size:17px">{b['lede']}</p></div>
 <div class="muted small" style="display:flex;flex-wrap:wrap;gap:8px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0">{"".join(f"<span>{s}</span>" for s in b["specs"])}</div>
-<div style="display:flex;align-items:baseline;gap:14px"><span class="price">{gbp(b['price'])}</span><span class="muted small">inc. UK VAT · free UK delivery · ships worldwide</span></div>
+<div style="display:flex;align-items:baseline;gap:14px"><span class="price">{gbp(b['price'])}</span><span class="muted small" data-ship-line>inc. UK VAT · free UK delivery · ships worldwide</span></div>
 <form class="stack" style="gap:14px" data-product="{b['sku']}">
 {variants}
 <div data-avail="{b['sku']}" data-when="in" data-follow-variant hidden style="display:contents">
 <button type="submit" class="pill solid" style="height:58px;font-size:16px">Add to basket — {gbp(b['price'])}</button>
-<p class="p small">Write-on name card and marker included. Nothing to personalise, nothing to wait for.</p>
+<p class="p small">Write-on name card included: add names with your own pen. Nothing to personalise, nothing to wait for.</p>
 </div>
 </form>
 <div id="notify" data-avail="{b['sku']}" data-when="out" data-follow-variant class="card stack" style="gap:12px;padding:22px;border-color:{b['colour']}">
@@ -294,7 +293,7 @@ def product(slug):
 </form>
 </div>
 <div class="stack" style="gap:10px;font-size:14px;line-height:1.5;color:var(--soft)">{notes}</div>
-<div class="anchor-list" style="border-top:1px solid var(--line)"><a href="#inside"><span>What's inside</span><span>{len([i for p in b['pouches'] for i in p[2]])} lines</span></a><a href="#build"><span>The bag</span><span>Materials and build</span></a><a href="#rotation"><span>Rotation and refills</span><span>5 to 15 years</span></a><a href="#faq"><span>Questions</span><span>Straight answers</span></a></div>
+<div class="anchor-list" style="border-top:1px solid var(--line)"><a href="#inside"><span>What's inside</span><span>{len([i for p in b['pouches'] for i in p[2]])} lines</span></a><a href="#build"><span>The bag</span><span>Materials and build</span></a><a href="#rotation"><span>Rotation dates</span><span>5 to 15 years</span></a><a href="#faq"><span>Questions</span><span>Straight answers</span></a></div>
 </div>
 </section>
 <section id="inside" class="section band"><div class="wrap stack" style="gap:36px">
@@ -309,7 +308,7 @@ def product(slug):
 <div style="flex:2 1 520px;display:flex;flex-wrap:wrap;gap:0 40px"><div class="rows" style="flex:1 1 240px">{rows(build_rows[:half])}</div><div class="rows" style="flex:1 1 240px">{rows(build_rows[half:])}</div></div>
 </div></section>
 <section id="rotation" class="section band"><div class="wrap split">
-<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">Rotation and refills</p><h2 class="h2">Buy it once. We'll keep it alive.</h2><p class="p">Scan the card in the lid and we remember your dates. When something is due, a refill pack arrives with exactly what to swap and nothing else. <a href="../refills.html" style="border-bottom:1px solid var(--muted)">How refills work</a>.</p></div>
+<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">Rotation dates</p><h2 class="h2">Buy it once. We'll tell you when.</h2><p class="p">Scan the card in the lid and we remember your dates. When something is due, we email you exactly what to swap and nothing else.</p></div>
 <div class="rows" style="flex:1 1 420px">{rotation}</div>
 </div></section>
 <section id="faq" class="section"><div class="wrap split">
@@ -726,7 +725,7 @@ def world_country(c, n, num, wname, wurl, hazards):
     page(f"world/{c.lower()}.html", f"{n}: emergency kit, go bags and live weather warnings — Blackout SOS", f"Live official warnings for {n} from {wname}, the hazards {n} plans for, the emergency number ({num}) and go bags delivered from the UK.", body, lang=lang, loc=(c, ""))
 
 def meta_files():
-    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "us/", "world/"] + [f"us/{state_slug(n)}.html" for c, n, h in US_STATES] + [f"world/{c[0].lower()}.html" for c in COUNTRIES] + ["refills.html", "organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
+    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "us/", "world/"] + [f"us/{state_slug(n)}.html" for c, n, h in US_STATES] + [f"world/{c[0].lower()}.html" for c in COUNTRIES] + ["organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
     today = datetime.date.today().isoformat()
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("sitemap.xml", sm)
@@ -738,5 +737,5 @@ if __name__ == "__main__":
     for s in ORDER: product(s)
     guides_index()
     for g in GUIDES: guide_page(g)
-    basket(); checkout_pages(); alerts(); us_hub(); [us_state(*x) for x in US_STATES]; world_hub(); [world_country(*x) for x in COUNTRIES]; unsubscribe(); refills(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()
+    basket(); checkout_pages(); alerts(); us_hub(); [us_state(*x) for x in US_STATES]; world_hub(); [world_country(*x) for x in COUNTRIES]; unsubscribe(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()
     print("built")

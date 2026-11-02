@@ -128,6 +128,21 @@
       + ' Payment is taken on Stripe\'s secure page: cards, Apple Pay and Google Pay.';
   }
 
+
+  // Delivery line for the visitor's own country (product pages and the homepage)
+  function shipLines(cc) {
+    var S = window.BSOS_SHIP, G = window.BSOS_GEO; if (!S || !G || !cc) return;
+    var name = G.names[cc] || cc; var line, hero;
+    if (S.noShip.indexOf(cc) >= 0) { line = 'inc. UK VAT · we can\'t deliver to ' + name + ' yet'; hero = 'Assembled in the UK. We can\'t deliver to ' + name + ' yet — email us.'; }
+    else if (cc === 'GB') { line = 'inc. VAT · free UK delivery in 2 to 3 working days'; hero = 'Free UK delivery, dispatched in three working days.'; }
+    else { var q = shipQuote(cc, { operator: 1 }); var art = /^(United|Netherlands|Philippines|Czech|Dominican|Bahamas|Gambia|Maldives)/.test(name) ? 'the ' : '';
+      line = 'Delivered to ' + art + name + ' in ' + q.days + ' · from ' + gbp(q.standard) + ' · any import tax collected on delivery';
+      hero = 'Delivered to ' + art + name + ' in ' + q.days + ', tracked from the UK. Your card pays in your own currency.'; }
+    document.querySelectorAll('[data-ship-line]').forEach(function (el) { el.textContent = line; });
+    document.querySelectorAll('[data-ship-line-hero]').forEach(function (el) { el.textContent = hero; });
+  }
+  document.addEventListener('bsos:loc', function (e) { var cc = e.detail && e.detail.country; try { var v = localStorage.getItem(SHIP_KEY); if (v) cc = v; } catch (x) {} shipLines(cc); });
+
   function renderBasket() {
     var box = document.querySelector('[data-basket]');
     if (!box) return;
