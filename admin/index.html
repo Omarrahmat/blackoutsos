@@ -49,8 +49,9 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 <div id="login" class="login">
 <a href="../index.html" class="brand" style="display:flex;align-items:center;gap:14px"><span class="word" style="font-family:'Barlow Condensed';font-weight:700;font-size:26px;letter-spacing:2px;text-transform:uppercase">Blackout SOS</span></a>
 <p class="eyebrow">Back office</p>
-<h1 class="h2">Sign in.</h1>
-<form id="loginForm" class="stack" style="gap:12px">
+<div id="connecting" class="stack" style="gap:10px"><h1 class="h2">Connecting.</h1><p class="p small" id="connState">Reaching the shop database…</p><a class="btn" id="connRetry" hidden>Try again</a></div>
+<h1 class="h2" id="loginTitle" hidden>Sign in.</h1>
+<form id="loginForm" hidden class="stack" style="gap:12px">
 <label class="field">Email<input name="email" type="email" required autocomplete="username"></label>
 <label class="field">Password<input name="password" type="password" required autocomplete="current-password"></label>
 <button type="submit" class="pill solid">Sign in</button>
@@ -137,7 +138,39 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
   function status(s) { return '<span class="status ' + esc(s) + '"><i></i>' + esc(s) + '</span>'; }
   function saveSession(s) { session = s; try { if (s) localStorage.setItem(SKEY, JSON.stringify(s)); else localStorage.removeItem(SKEY); } catch (e) {} }
 
-  // ---- auth and data, no library: Supabase's REST endpoints directly ----
+  // ---- two ways in: the viewer's Supabase connector (inside Claude, no password) or email + password (on blackoutsos.com) ----
+  var mcp = null, backend = null;
+  function lit(v) { if (v === null || v === undefined) return 'null'; if (typeof v === 'number') return String(v); if (typeof v === 'boolean') return v ? 'true' : 'false'; return "'" + String(v).replace(/'/g, "''") + "'"; }
+  function sets(fields) { return Object.keys(fields).map(function (k) { return k + ' = ' + lit(fields[k]); }).join(', '); }
+  function parsePayload(p) {
+    if (Array.isArray(p)) return p;
+    if (p && typeof p === 'object') {
+      if (Array.isArray(p.result)) return p.result;
+      if (typeof p.result === 'string') p = p.result;
+      else if (Array.isArray(p.content)) p = p.content.map(function (c) { return c.text || ''; }).join('');
+      else return p;
+    }
+    if (typeof p === 'string') {
+      var m = p.match(/<untrusted-data-[^>]*>\s*([\s\S]*?)\s*<\/untrusted-data-[^>]*>/); var t = m ? m[1] : p;
+      try { var j = JSON.parse(t); return (j && typeof j === 'object' && typeof j.result === 'string') ? parsePayload(j.result) : j; } catch (e) {}
+      var i = t.indexOf('['), k = t.lastIndexOf(']'); if (i >= 0 && k > i) { try { return JSON.parse(t.slice(i, k + 1)); } catch (e2) {} }
+      if (/^\s*\[\s*\]\s*$/.test(t) || /no rows|empty/i.test(t)) return [];
+      throw new Error('Could not read the database reply.');
+    }
+    return p;
+  }
+  async function sql(query) {
+    var r;
+    try { r = await mcp.callTool('Supabase', 'execute_sql', { query: query }, { cache: false }); }
+    catch (err) { var code = err && err.code; var msg = { server_not_connected: 'Supabase is not connected to your Claude account. Add it under claude.ai Settings → Connectors.', needs_reauth: 'Reconnect Supabase under claude.ai Settings → Connectors, then try again.', approval_required: 'Allow this page to use Supabase when claude.ai asks, then try again.', not_in_manifest: 'Supabase access was declined for this page. Open the page\'s Permissions menu to allow it.', blocked_by_policy: 'Your organisation blocks this connector.', consent_required: 'Allow this page to use Supabase when claude.ai asks, then try again.' }[code]; var e = new Error(msg || (err && err.message) || 'Database call failed'); e.code = code; throw e; }
+    return parsePayload(r && r.payload !== undefined ? r.payload : r);
+  }
+  function rowsOf(x) { return Array.isArray(x) ? x : (x && Array.isArray(x.rows) ? x.rows : []); }
+
+  // password path (blackoutsos.com): Supabase auth + REST, no library
+  var SKEY = 'bsos.admin.session.v1'; var session = null;
+  try { session = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) { session = null; }
+  function saveSession(s) { session = s; try { if (s) localStorage.setItem(SKEY, JSON.stringify(s)); else localStorage.removeItem(SKEY); } catch (e) {} }
   async function authPost(path, body) {
     var r = await fetch(URL_ + '/auth/v1/' + path, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     var j = {}; try { j = await r.json(); } catch (e) {}
@@ -164,15 +197,38 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     if (!r.ok) throw new Error((j && (j.message || j.hint || j.details)) || ('HTTP ' + r.status));
     return j;
   }
-  var db = {
-    get: function (table, query) { return rest('GET', table, query); },
-    patch: function (table, query, body) { return rest('PATCH', table, query, body, 'return=representation'); },
-    post: function (table, body) { return rest('POST', table, '', body, 'return=representation'); }
+
+  // one API for the screens, two backends
+  var api = {
+    loadAll: async function () {
+      if (backend === 'mcp') {
+        var rows = rowsOf(await sql("select json_build_object('products', (select coalesce(json_agg(p order by p.sku), '[]'::json) from public.bsos_products p), 'orders', (select coalesce(json_agg(o), '[]'::json) from (select * from public.bsos_orders order by created_at desc limit 500) o), 'items', (select coalesce(json_agg(i), '[]'::json) from public.bsos_order_items i), 'enquiries', (select coalesce(json_agg(e), '[]'::json) from (select * from public.bsos_enquiries order by created_at desc limit 500) e), 'subs', (select coalesce(json_agg(s), '[]'::json) from (select * from public.bsos_subscribers order by created_at desc limit 2000) s), 'moves', (select coalesce(json_agg(m), '[]'::json) from (select * from public.bsos_stock_moves order by created_at desc limit 100) m)) as j"));
+        var j = rows[0] && rows[0].j; if (typeof j === 'string') j = JSON.parse(j); if (!j) throw new Error('Empty reply from the database.');
+        return j;
+      }
+      var q = await Promise.all([rest('GET', 'bsos_products', 'select=*&order=sku.asc'), rest('GET', 'bsos_orders', 'select=*&order=created_at.desc&limit=500'), rest('GET', 'bsos_order_items', 'select=*'), rest('GET', 'bsos_enquiries', 'select=*&order=created_at.desc&limit=500'), rest('GET', 'bsos_subscribers', 'select=*&order=created_at.desc&limit=2000'), rest('GET', 'bsos_stock_moves', 'select=*&order=created_at.desc&limit=100')]);
+      return { products: q[0], orders: q[1], items: q[2], enquiries: q[3], subs: q[4], moves: q[5] };
+    },
+    updateOrder: function (id, fields) { return backend === 'mcp' ? sql('update public.bsos_orders set ' + sets(fields) + ' where id = ' + lit(id) + ' returning id') : rest('PATCH', 'bsos_orders', 'id=eq.' + id, fields, 'return=representation'); },
+    updateEnquiry: function (id, fields) { return backend === 'mcp' ? sql('update public.bsos_enquiries set ' + sets(fields) + ' where id = ' + lit(id) + ' returning id') : rest('PATCH', 'bsos_enquiries', 'id=eq.' + id, fields, 'return=representation'); },
+    updateProduct: function (sku, fields) { return backend === 'mcp' ? sql('update public.bsos_products set ' + sets(fields) + ' where sku = ' + lit(sku) + ' returning sku') : rest('PATCH', 'bsos_products', 'sku=eq.' + encodeURIComponent(sku), fields, 'return=representation'); },
+    insertMove: function (row) { return backend === 'mcp' ? sql('insert into public.bsos_stock_moves (sku, delta, reason, ref) values (' + lit(row.sku) + ', ' + lit(row.delta) + ', ' + lit(row.reason) + ', ' + lit(row.ref || null) + ') returning id') : rest('POST', 'bsos_stock_moves', '', row, 'return=representation'); },
+    findAmazon: async function (ref) { if (backend === 'mcp') return rowsOf(await sql('select id from public.bsos_orders where channel = ' + lit('amazon') + ' and notes = ' + lit('Amazon ' + ref))); return rest('GET', 'bsos_orders', 'select=id&channel=eq.amazon&notes=eq.' + encodeURIComponent('Amazon ' + ref)); },
+    insertOrder: async function (row) { if (backend === 'mcp') { var r = rowsOf(await sql('insert into public.bsos_orders (channel, total_pence, status, notes, created_at) values (' + lit(row.channel) + ', ' + lit(row.total_pence) + ', ' + lit(row.status) + ', ' + lit(row.notes) + ', ' + lit(row.created_at) + ') returning id')); return r[0].id; } var j = await rest('POST', 'bsos_orders', '', row, 'return=representation'); return j[0].id; },
+    insertItem: function (row) { return backend === 'mcp' ? sql('insert into public.bsos_order_items (order_id, sku, qty, unit_pence) values (' + lit(row.order_id) + ', ' + lit(row.sku) + ', ' + lit(row.qty) + ', ' + lit(row.unit_pence) + ') returning id') : rest('POST', 'bsos_order_items', '', row, 'return=representation'); }
   };
 
-  // ---- connection check and login ----
-  fetch(URL_ + '/auth/v1/settings', { headers: { apikey: KEY } }).then(function (r) { $('connMsg').textContent = r.ok ? '' : 'Cannot reach the sign-in service (HTTP ' + r.status + ').'; }).catch(function () { $('connMsg').textContent = 'Cannot reach the sign-in service from this page. Check your connection.'; });
-
+  // ---- choose the way in ----
+  async function start() {
+    var cl = window.claude;
+    if (cl && typeof cl.use === 'function') { try { mcp = await cl.use('mcp'); } catch (e) { mcp = null; } }
+    if (mcp) { backend = 'mcp'; $('connState').textContent = 'Reading the shop through your Supabase connector. If claude.ai asks, allow it.'; try { await boot(); return; } catch (e) { $('connState').textContent = e.message; $('connRetry').hidden = false; return; } }
+    backend = 'rest';
+    $('connecting').hidden = true; $('loginTitle').hidden = false; $('loginForm').hidden = false;
+    fetch(URL_ + '/auth/v1/settings', { headers: { apikey: KEY } }).then(function (r) { $('connMsg').textContent = r.ok ? '' : 'Cannot reach the sign-in service (HTTP ' + r.status + ').'; }).catch(function () { $('connMsg').textContent = 'Cannot reach the sign-in service from this page. Open the dashboard at blackoutsos.com/admin or inside Claude.'; });
+    if (session && await ensureFresh()) boot();
+  }
+  $('connRetry').addEventListener('click', function () { $('connRetry').hidden = true; $('connState').textContent = 'Trying again…'; boot().catch(function (e) { $('connState').textContent = e.message; $('connRetry').hidden = false; }); });
   $('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault(); var f = new FormData(e.target); var msg = $('loginMsg'); msg.hidden = true;
     var btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = 'Signing in…';
@@ -182,33 +238,27 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
   });
   $('signout').addEventListener('click', function () { saveSession(null); location.reload(); });
   $('changepw').addEventListener('click', async function () {
+    if (backend === 'mcp') return alert('You are signed in through your Claude account here; the password is only used at blackoutsos.com/admin.');
     var a = prompt('New password (at least 10 characters):'); if (!a) return;
     if (a.length < 10) return alert('Use at least 10 characters.');
     var b = prompt('Type it again:'); if (a !== b) return alert('They did not match. Nothing changed.');
     try { await ensureFresh(); var r = await fetch(URL_ + '/auth/v1/user', { method: 'PUT', headers: { apikey: KEY, Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json' }, body: JSON.stringify({ password: a }) }); var j = await r.json(); alert(r.ok ? 'Password changed.' : (j.msg || j.message || j.error_description || 'Could not change the password.')); }
     catch (err) { alert(err.message); }
   });
-  if (session) { ensureFresh().then(function (ok) { if (ok) boot(); }); }
+  start();
 
   async function boot() {
-    $('who').textContent = session.email || '';
-    $('login').classList.add('hidden'); $('app').classList.remove('hidden');
+    $('who').textContent = backend === 'mcp' ? 'via your Claude account' : (session && session.email) || '';
     await loadAll();
+    $('login').classList.add('hidden'); $('app').classList.remove('hidden');
   }
 
   async function loadAll() {
     var since = new Date(Date.now() - 30 * 864e5).toISOString();
-    try {
-      var q = await Promise.all([
-        db.get('bsos_products', 'select=*&order=sku.asc'),
-        db.get('bsos_orders', 'select=*&order=created_at.desc&limit=500'),
-        db.get('bsos_order_items', 'select=*'),
-        db.get('bsos_enquiries', 'select=*&order=created_at.desc&limit=500'),
-        db.get('bsos_subscribers', 'select=*&order=created_at.desc&limit=2000'),
-        db.get('bsos_stock_moves', 'select=*&order=created_at.desc&limit=100')
-      ]);
-    } catch (err) { alert('Could not load the shop data: ' + err.message + '. If this says permission denied, this email is not listed as an admin.'); return; }
-    state.products = q[0]; state.orders = q[1]; state.items = q[2]; state.enquiries = q[3]; state.subs = q[4]; state.moves = q[5];
+    var d;
+    try { d = await api.loadAll(); }
+    catch (err) { if (backend === 'mcp') throw err; alert('Could not load the shop data: ' + err.message + '. If this says permission denied, this email is not listed as an admin.'); return; }
+    state.products = d.products || []; state.orders = d.orders || []; state.items = d.items || []; state.enquiries = d.enquiries || []; state.subs = d.subs || []; state.moves = d.moves || [];
     state.since = since;
     renderAll();
   }
@@ -281,8 +331,8 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
       + '<div class="grid"><div class="stack" style="flex:1 1 260px"><p class="eyebrow">Items</p>' + its.map(function (i) { return '<div class="row"><span>' + i.qty + ' × ' + esc(i.sku) + '</span><span>' + gbp(i.unit_pence * i.qty) + '</span></div>'; }).join('') + '<div class="row"><strong>Total</strong><strong>' + gbp(o.total_pence) + '</strong></div></div>'
       + '<div class="stack" style="flex:1 1 260px"><p class="eyebrow">Deliver to</p><pre>' + esc(addrText) + '</pre><p class="p small">' + esc(o.email || '') + (o.phone ? ' · ' + esc(o.phone) : '') + '</p></div>'
       + '<div class="stack" style="flex:1 1 260px"><p class="eyebrow">Notes and tracking</p><textarea id="orderNotes" style="min-height:100px">' + esc(o.notes || '') + '</textarea><a class="btn" id="saveNotes">Save notes</a></div></div>';
-    d.querySelectorAll('[data-advance]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-advance'); if (s === 'cancelled' && !confirm('Mark this order cancelled? Refund it in Stripe separately.')) return; try { await db.patch('bsos_orders', 'id=eq.' + id, { status: s, updated_at: new Date().toISOString() }); } catch (e) { return alert(e.message); } o.status = s; renderAll(); openOrder(id); }; });
-    $('saveNotes').onclick = async function () { try { await db.patch('bsos_orders', 'id=eq.' + id, { notes: $('orderNotes').value, updated_at: new Date().toISOString() }); } catch (e) { return alert(e.message); } o.notes = $('orderNotes').value; alert('Saved'); };
+    d.querySelectorAll('[data-advance]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-advance'); if (s === 'cancelled' && !confirm('Mark this order cancelled? Refund it in Stripe separately.')) return; try { await api.updateOrder(id, { status: s, updated_at: new Date().toISOString() }); } catch (e) { return alert(e.message); } o.status = s; renderAll(); openOrder(id); }; });
+    $('saveNotes').onclick = async function () { try { await api.updateOrder(id, { notes: $('orderNotes').value, updated_at: new Date().toISOString() }); } catch (e) { return alert(e.message); } o.notes = $('orderNotes').value; alert('Saved'); };
     $('closeOrder').onclick = function () { d.classList.add('hidden'); };
     d.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -301,15 +351,15 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     $('inboxDetail').innerHTML = '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><div><h2 class="h4">' + esc(e.subject || (e.kind === 'organisation' ? 'Quote request' : 'Message')) + '</h2><p class="p small">' + esc(e.kind) + ' · ' + fmtDate(e.created_at) + ' · ' + status(e.status) + '</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn solid" href="mailto:' + esc(e.email) + '?subject=' + subj + '">Reply by email</a><a class="btn" data-enq-status="replied">Mark replied</a><a class="btn" data-enq-status="closed">Close</a><a class="btn" data-enq-status="open">Reopen</a></div></div>'
       + '<div class="rows"><div class="row"><span>From</span><span>' + esc(e.name || '') + ' · ' + esc(e.email) + (e.phone ? ' · ' + esc(e.phone) : '') + '</span></div>' + (e.org ? '<div class="row"><span>Organisation</span><span>' + esc(e.org) + (e.segment ? ' · ' + esc(e.segment) : '') + '</span></div>' : '') + (e.bags ? '<div class="row"><span>Bags</span><span>' + esc(e.bags) + '</span></div>' : '') + (e.order_ref ? '<div class="row"><span>Order</span><span>' + esc(e.order_ref) + '</span></div>' : '') + '</div>'
       + '<pre>' + esc(e.message || '(no message)') + '</pre>' + (e.kind === 'complaint' ? '<p class="notice">Complaint: acknowledge within four working hours, resolve within 48. Replacement first, refund second. Log the root cause in the order notes.</p>' : '');
-    $('inboxDetail').querySelectorAll('[data-enq-status]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-enq-status'); try { await db.patch('bsos_enquiries', 'id=eq.' + e.id, { status: s }); } catch (err) { return alert(err.message); } e.status = s; renderAll(); openEnq(id); }; });
+    $('inboxDetail').querySelectorAll('[data-enq-status]').forEach(function (b) { b.onclick = async function () { var s = b.getAttribute('data-enq-status'); try { await api.updateEnquiry(e.id, { status: s }); } catch (err) { return alert(err.message); } e.status = s; renderAll(); openEnq(id); }; });
   }
 
   // ---- stock ----
   function renderStock() {
     $('stockTable').innerHTML = '<thead><tr><th>Bag</th><th>SKU</th><th>Price</th><th>On hand</th><th>Active</th><th>Adjust</th></tr></thead><tbody>' + state.products.map(function (p) { return '<tr><td><span class="tag" style="width:8px;height:8px;background:' + COLOURS[p.sku] + '"></span> ' + esc(p.name + (p.variant ? ' · ' + p.variant : '')) + '</td><td>' + esc(p.sku) + '</td><td>' + gbp(p.price_pence) + '</td><td><strong>' + p.stock + '</strong></td><td><a class="btn" data-toggle="' + p.sku + '">' + (p.active ? 'On sale' : 'Hidden') + '</a></td><td><a class="btn" data-adj="' + p.sku + '">+ / −</a></td></tr>'; }).join('') + '</tbody>';
     $('movesTable').innerHTML = '<thead><tr><th>When</th><th>SKU</th><th>Change</th><th>Reason</th><th>Ref</th></tr></thead><tbody>' + (state.moves.length ? state.moves.map(function (m) { return '<tr><td>' + fmtDate(m.created_at) + '</td><td>' + esc(m.sku) + '</td><td>' + (m.delta > 0 ? '+' : '') + m.delta + '</td><td>' + esc(m.reason) + '</td><td class="muted">' + esc(m.ref || '') + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="muted">No movements yet.</td></tr>') + '</tbody>';
-    $('stockTable').querySelectorAll('[data-adj]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-adj'); var p = state.products.find(function (x) { return x.sku === sku; }); var v = prompt('Change for ' + sku + ' (e.g. 300 for stock landed, -2 for damaged). On hand now: ' + p.stock); if (v == null) return; var delta = parseInt(v, 10); if (!delta) return; var reason = prompt('Reason (landed, count, damaged, sample, amazon-fba)') || 'adjustment'; try { await db.patch('bsos_products', 'sku=eq.' + encodeURIComponent(sku), { stock: p.stock + delta }); await db.post('bsos_stock_moves', { sku: sku, delta: delta, reason: reason }); } catch (e) { return alert(e.message); } await loadAll(); }; });
-    $('stockTable').querySelectorAll('[data-toggle]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-toggle'); var p = state.products.find(function (x) { return x.sku === sku; }); try { await db.patch('bsos_products', 'sku=eq.' + encodeURIComponent(sku), { active: !p.active }); } catch (e) { return alert(e.message); } await loadAll(); }; });
+    $('stockTable').querySelectorAll('[data-adj]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-adj'); var p = state.products.find(function (x) { return x.sku === sku; }); var v = prompt('Change for ' + sku + ' (e.g. 300 for stock landed, -2 for damaged). On hand now: ' + p.stock); if (v == null) return; var delta = parseInt(v, 10); if (!delta) return; var reason = prompt('Reason (landed, count, damaged, sample, amazon-fba)') || 'adjustment'; try { await api.updateProduct(sku, { stock: p.stock + delta }); await api.insertMove({ sku: sku, delta: delta, reason: reason }); } catch (e) { return alert(e.message); } await loadAll(); }; });
+    $('stockTable').querySelectorAll('[data-toggle]').forEach(function (b) { b.onclick = async function () { var sku = b.getAttribute('data-toggle'); var p = state.products.find(function (x) { return x.sku === sku; }); try { await api.updateProduct(sku, { active: !p.active }); } catch (e) { return alert(e.message); } await loadAll(); }; });
   }
 
   // ---- subscribers ----
@@ -336,14 +386,13 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     try {
       for (var i = 0; i < rows.length; i++) {
         var r = rows[i];
-        var exists = await db.get('bsos_orders', 'select=id&channel=eq.amazon&notes=eq.' + encodeURIComponent('Amazon ' + r.ref));
+        var exists = await api.findAmazon(r.ref);
         if (exists.length) { skipped++; continue; }
-        var ins = await db.post('bsos_orders', { channel: 'amazon', total_pence: r.total, status: 'shipped', notes: 'Amazon ' + r.ref, created_at: r.date + 'T12:00:00Z' });
-        var oid = ins[0].id;
+        var oid = await api.insertOrder({ channel: 'amazon', total_pence: r.total, status: 'shipped', notes: 'Amazon ' + r.ref, created_at: r.date + 'T12:00:00Z' });
         var p = state.products.find(function (x) { return x.sku === r.sku; });
-        await db.post('bsos_order_items', { order_id: oid, sku: r.sku, qty: r.qty, unit_pence: Math.round(r.total / r.qty) });
-        await db.patch('bsos_products', 'sku=eq.' + encodeURIComponent(r.sku), { stock: p.stock - r.qty }); p.stock -= r.qty;
-        await db.post('bsos_stock_moves', { sku: r.sku, delta: -r.qty, reason: 'amazon order', ref: r.ref });
+        await api.insertItem({ order_id: oid, sku: r.sku, qty: r.qty, unit_pence: Math.round(r.total / r.qty) });
+        await api.updateProduct(r.sku, { stock: p.stock - r.qty }); p.stock -= r.qty;
+        await api.insertMove({ sku: r.sku, delta: -r.qty, reason: 'amazon order', ref: r.ref });
         done++;
       }
     } catch (e) { alert(e.message); }
