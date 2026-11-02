@@ -167,7 +167,7 @@
       if (!sid) { sid = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); sessionStorage.setItem('bsos.sid', sid); }
       var body = JSON.stringify({ s: sid, p: location.pathname, r: document.referrer || '', c: loc.country, g: loc.region || '', l: String(navigator.language || '').slice(0, 12), d: window.innerWidth < 760 ? 'm' : 'd' });
       var url = 'https://vbgustjtxjmjlgukzcfa.supabase.co/functions/v1/hit';
-      if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+      if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
       else fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
     } catch (e) {}
   }
