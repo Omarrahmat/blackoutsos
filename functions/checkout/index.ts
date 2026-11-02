@@ -15,7 +15,7 @@ Deno.serve(async (req: Request) => {
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const skus = [...new Set(items.map((i) => String(i.sku)))];
-  const { data: products, error } = await supabase.from("bsos_products").select("sku,name,variant,price_pence,active").in("sku", skus);
+  const { data: products, error } = await supabase.from("bsos_products").select("sku,name,variant,price_pence,active,stock").in("sku", skus);
   if (error) return json({ error: "The catalogue is unavailable right now." }, 500);
   const by: Record<string, any> = Object.fromEntries((products || []).map((p: any) => [p.sku, p]));
 
@@ -35,6 +35,7 @@ Deno.serve(async (req: Request) => {
     const prod = by[String(it.sku)];
     const qty = Math.max(1, Math.min(10, parseInt(it.qty) || 1));
     if (!prod || !prod.active) return json({ error: `${it.sku} is not available.` }, 400);
+    if ((prod.stock || 0) < qty) return json({ error: `${prod.name}${prod.variant ? " (" + prod.variant + ")" : ""} is not in stock yet. Join the list on its page and we will email you the day it is.` }, 409);
     p.set(`line_items[${n}][quantity]`, String(qty));
     p.set(`line_items[${n}][price_data][currency]`, "gbp");
     p.set(`line_items[${n}][price_data][unit_amount]`, String(prod.price_pence));

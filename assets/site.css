@@ -124,6 +124,14 @@ article .never p{font-size:17px;line-height:1.55;font-weight:500}
 @media(max-width:760px){.nav-links{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:none}.nav-links::-webkit-scrollbar{display:none}.nav-right{margin-left:auto}.stat .n{font-size:52px}.bag-art svg{max-height:420px}}
 @media print{.banner,.nav,footer,.aside-card.light,.next{display:none}body{background:#fff;color:#000}article ol,article ul,.body{color:#000}}
 
+
+/* launch bar + live availability */
+.launch-bar{background:#161616;border-bottom:1px solid var(--line);color:var(--soft);font-size:13px;text-align:center;padding:10px 16px}
+.launch-bar a{color:var(--ink);border-bottom:1px solid var(--line3)}
+.launch-bar[hidden],[data-avail][hidden]{display:none!important}
+.variant.soon::after{content:" · soon";color:var(--soft);font-weight:400}
+.variant.soon[aria-pressed="true"]::after{color:inherit;opacity:.7}
+
 /* hero */
 .hero{position:relative;background:#050505;overflow:hidden;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
 .hero-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 48px;padding-top:clamp(32px,4vw,48px)}

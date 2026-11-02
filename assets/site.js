@@ -16,6 +16,30 @@
     'scout-cat':  { name: 'Scout', variant: 'Cat', price: 9900, colour: '#F28C28', url: 'bags/scout.html' }
   };
 
+  // Live availability: the database says which bags can be bought right now. Default markup shows "coming soon";
+  // this only ever switches a bag ON after a successful check, so a failed check can never sell what isn't there.
+  var REST = 'https://vbgustjtxjmjlgukzcfa.supabase.co/rest/v1/bsos_availability?select=sku,in_stock';
+  var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3VzdGp0eGptamxndWt6Y2ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMzI1MjcsImV4cCI6MjEwODcwODUyN30.Y_gKh0rs7HVI6rf3z8mmCAh-LcT-cTqJypqawbkdw7w';
+  var AVAILABLE = {};
+  function applyAvailability() {
+    var els = document.querySelectorAll('[data-avail]');
+    for (var i = 0; i < els.length; i++) {
+      var inStock = !!AVAILABLE[els[i].getAttribute('data-avail')];
+      var when = els[i].getAttribute('data-when');
+      els[i].hidden = (when === 'in') ? !inStock : inStock;
+    }
+    var any = false; for (var k in AVAILABLE) if (AVAILABLE[k]) any = true;
+    var bar = document.querySelector('[data-launch-bar]'); if (bar) bar.hidden = any;
+    document.querySelectorAll('.variant[data-sku]').forEach(function (v) { v.classList.toggle('soon', !AVAILABLE[v.getAttribute('data-sku')]); });
+  }
+  function loadAvailability() {
+    if (!window.fetch) return;
+    fetch(REST, { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (rows) { (rows || []).forEach(function (row) { AVAILABLE[row.sku] = !!row.in_stock; }); applyAvailability(); })
+      .catch(function () {});
+  }
+
   function gbp(p) { return '£' + (p / 100).toFixed(p % 100 ? 2 : 0); }
   function read() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
   function write(b) { try { localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} renderCount(); }
@@ -36,6 +60,7 @@
   }
 
   function add(sku, qty) {
+    if (!AVAILABLE[sku]) { toast('Not available to order yet — join the list on the bag page and we will tell you the day it is.'); return; }
     if (!CATALOGUE[sku]) return;
     var b = read(); b[sku] = (b[sku] || 0) + (qty || 1); write(b);
     toast(CATALOGUE[sku].name + ' added to your basket');
@@ -55,6 +80,9 @@
         this.setAttribute('aria-pressed', 'true');
         sku = this.getAttribute('data-sku');
         var label = form.querySelector('[data-variant-label]'); if (label) label.textContent = this.getAttribute('data-label') || '';
+        // the buy button and the notify-me box follow the chosen variant
+        document.querySelectorAll('[data-avail][data-follow-variant]').forEach(function (el) { el.setAttribute('data-avail', sku); });
+        applyAvailability();
       });
     }
     form.addEventListener('submit', function (e) { e.preventDefault(); add(sku, 1); });
@@ -147,7 +175,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    renderCount(); initProduct(); renderBasket(); initCheckout(); initForms(); initSuccess();
+    renderCount(); initProduct(); renderBasket(); initCheckout(); initForms(); initSuccess(); loadAvailability();
     document.querySelectorAll('[data-add]').forEach(function (el) { el.addEventListener('click', function (e) { e.preventDefault(); add(el.getAttribute('data-add'), 1); }); });
   });
 

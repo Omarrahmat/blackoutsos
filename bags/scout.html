@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Inter:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Blackout SOS Scout", "description": "One dog or cat \u00b7 15 L \u00b7 water, bowls, lead, clean-up, pet first aid, a write-on ID tag. Dog and cat kits. Clips onto the Operator.", "brand": {"@type": "Brand", "name": "Blackout SOS"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "99.00", "availability": "https://schema.org/PreOrder", "url": "https://blackoutsos.com/bags/scout.html"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Blackout SOS Scout", "description": "One dog or cat \u00b7 15 L \u00b7 water, bowls, lead, clean-up, pet first aid, a write-on ID tag. Dog and cat kits. Clips onto the Operator.", "brand": {"@type": "Brand", "name": "Blackout SOS"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "99.00", "availability": "https://schema.org/OutOfStock", "url": "https://blackoutsos.com/bags/scout.html"}}</script>
 </head>
 <body>
 <a class="banner" href="../guides/the-72-hour-list-explained.html">Be Ready: the Government advises every household to hold three days of supplies. Read the 72-hour checklist →</a>
@@ -32,6 +32,7 @@
 </nav>
 <div class="nav-right"><a class="basket-link" href="../basket.html" data-basket-count>Basket · 0</a></div>
 </header>
+<div class="launch-bar" data-launch-bar>First production run under way · <a href="../bags/index.html">See the range</a> and join the list to be first to order</div>
 <main>
 
 <div class="wrap crumbs" style="padding-top:24px"><a href="../index.html">Home</a><span>/</span><a href="index.html">Bags</a><span>/</span><span class="here">Scout</span></div>
@@ -43,9 +44,22 @@
 <div style="display:flex;align-items:baseline;gap:14px"><span class="price">£99</span><span class="muted small">inc. VAT · free UK delivery</span></div>
 <form class="stack" style="gap:14px" data-product="scout-dog">
 <div class="stack" style="gap:8px"><span class="eyebrow">Choose</span><div class="variants"><button type="button" class="variant" data-sku="scout-dog" data-label="Dog" aria-pressed="true">Scout Dog · Dog</button><button type="button" class="variant" data-sku="scout-cat" data-label="Cat" aria-pressed="false">Scout Cat · Cat</button></div></div>
+<div data-avail="scout-dog" data-when="in" data-follow-variant hidden style="display:contents">
 <button type="submit" class="pill solid" style="height:58px;font-size:16px">Add to basket — £99</button>
 <p class="p small">Write-on name card and marker included. Nothing to personalise, nothing to wait for.</p>
+</div>
 </form>
+<div id="notify" data-avail="scout-dog" data-when="out" data-follow-variant class="card stack" style="gap:12px;padding:22px;border-color:#F28C28">
+<p class="eyebrow" style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:10px;height:10px;background:#F28C28"></span>Coming soon</p>
+<p class="p">The first production run of the Scout is under way. Leave your email and you'll hear the day it's ready to order — one message, nothing else.</p>
+<form class="form-row" data-api="/subscribe">
+<input type="hidden" name="source" value="waitlist"><input type="hidden" name="bag" value="Scout">
+<label class="sr" for="notify-email">Email address</label>
+<input id="notify-email" name="email" type="email" required placeholder="you@example.com" style="flex:1 1 220px">
+<button type="submit" class="pill solid">Notify me</button>
+<p class="p small ok" data-done hidden style="flex:1 1 100%">You're on the list for the Scout. We'll email you the day it's ready.</p>
+</form>
+</div>
 <div class="stack" style="gap:10px;font-size:14px;line-height:1.5;color:var(--soft)"><p>Assembled to order in the UK and dispatched within three working days. 30-day returns if unopened.</p><p>The food canister is empty on purpose: a sudden change of food upsets a pet's stomach, so you fill it with three days of their own.</p><p>One Scout per animal, like every bag in the range. The same body as the Recruit.</p></div>
 <div class="anchor-list" style="border-top:1px solid var(--line)"><a href="#inside"><span>What's inside</span><span>20 lines</span></a><a href="#build"><span>The bag</span><span>Materials and build</span></a><a href="#rotation"><span>Rotation and refills</span><span>5 to 15 years</span></a><a href="#faq"><span>Questions</span><span>Straight answers</span></a></div>
 </div>

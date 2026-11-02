@@ -58,6 +58,7 @@ def nav(r):
 </nav>
 <div class="nav-right"><a class="basket-link" href="{r}basket.html" data-basket-count>Basket · 0</a></div>
 </header>
+<div class="launch-bar" data-launch-bar>First production run under way · <a href="{r}bags/index.html">See the range</a> and join the list to be first to order</div>
 <main>
 """
 
@@ -115,9 +116,12 @@ def bag_card(slug, r):
     b = BAGS[slug]
     heights = {"operator": "200px", "recruit": "150px", "cub": "170px", "unit": "130px", "scout": "150px"}
     if b.get("variants"):
-        cta = f'<a class="pill sm solid" href="{r}bags/{slug}.html" style="flex:1 1 auto">Choose {"stage" if slug=="cub" else "dog or cat"}</a>'
+        buy = f'<a class="pill sm solid" href="{r}bags/{slug}.html" style="flex:1 1 auto">Choose {"stage" if slug=="cub" else "dog or cat"}</a>'
     else:
-        cta = f'<button type="button" class="pill sm solid" data-add="{b["sku"]}" style="flex:1 1 auto">Add to basket</button>'
+        buy = f'<button type="button" class="pill sm solid" data-add="{b["sku"]}" style="flex:1 1 auto">Add to basket</button>'
+    # Availability is live: the database decides which of the two shows (site.js). Default is "coming soon" so nothing can be bought if the check fails.
+    cta = (f'<span data-avail="{b["sku"]}" data-when="in" hidden style="display:contents">{buy}</span>'
+           f'<a data-avail="{b["sku"]}" data-when="out" class="pill sm" href="{r}bags/{slug}.html#notify" style="flex:1 1 auto">Coming soon · Notify me</a>')
     return f"""<div class="card" style="flex:1 1 260px;padding:24px">
 <a href="{r}bags/{slug}.html" style="display:flex;flex-direction:column;gap:18px">
 <div style="height:220px;display:flex;align-items:flex-end;justify-content:center">{art(slug, heights[slug])}</div>
@@ -255,7 +259,7 @@ def product(slug):
     faq = "".join(f'<div class="faq"><p>{q}</p><p class="p small">{a}</p></div>' for q, a in b["faq"])
     pairs = "".join(f'<a class="card" href="{p}.html" style="flex:1 1 300px;flex-direction:row;justify-content:space-between;align-items:center;gap:20px"><span class="stack" style="gap:6px"><span class="display" style="font-size:30px">{BAGS[p]["name"]}</span><span class="p small">{line} {gbp(BAGS[p]["price"])}</span></span><span class="tag" style="background:{BAGS[p]["colour"]}"></span></a>' for p, line in b["pairs"])
     notes = "".join(f'<p>{n}</p>' for n in b["notes"])
-    schema = json.dumps({"@context": "https://schema.org", "@type": "Product", "name": f"Blackout SOS {b['name']}", "description": b["card"], "brand": {"@type": "Brand", "name": "Blackout SOS"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": f"{b['price']/100:.2f}", "availability": "https://schema.org/PreOrder", "url": f"{SITE}/bags/{slug}.html"}})
+    schema = json.dumps({"@context": "https://schema.org", "@type": "Product", "name": f"Blackout SOS {b['name']}", "description": b["card"], "brand": {"@type": "Brand", "name": "Blackout SOS"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": f"{b['price']/100:.2f}", "availability": "https://schema.org/InStock" if b.get("available") else "https://schema.org/OutOfStock", "url": f"{SITE}/bags/{slug}.html"}})
     body = f"""
 <div class="wrap crumbs" style="padding-top:24px"><a href="../index.html">Home</a><span>/</span><a href="index.html">Bags</a><span>/</span><span class="here">{b['name']}</span></div>
 <section class="wrap split" style="padding-top:32px;padding-bottom:clamp(56px,7vw,96px)">
@@ -266,9 +270,22 @@ def product(slug):
 <div style="display:flex;align-items:baseline;gap:14px"><span class="price">{gbp(b['price'])}</span><span class="muted small">inc. VAT · free UK delivery</span></div>
 <form class="stack" style="gap:14px" data-product="{b['sku']}">
 {variants}
+<div data-avail="{b['sku']}" data-when="in" data-follow-variant hidden style="display:contents">
 <button type="submit" class="pill solid" style="height:58px;font-size:16px">Add to basket — {gbp(b['price'])}</button>
 <p class="p small">Write-on name card and marker included. Nothing to personalise, nothing to wait for.</p>
+</div>
 </form>
+<div id="notify" data-avail="{b['sku']}" data-when="out" data-follow-variant class="card stack" style="gap:12px;padding:22px;border-color:{b['colour']}">
+<p class="eyebrow" style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:10px;height:10px;background:{b['colour']}"></span>Coming soon</p>
+<p class="p">The first production run of the {b['name']} is under way. Leave your email and you'll hear the day it's ready to order — one message, nothing else.</p>
+<form class="form-row" data-api="/subscribe">
+<input type="hidden" name="source" value="waitlist"><input type="hidden" name="bag" value="{b['name']}">
+<label class="sr" for="notify-email">Email address</label>
+<input id="notify-email" name="email" type="email" required placeholder="you@example.com" style="flex:1 1 220px">
+<button type="submit" class="pill solid">Notify me</button>
+<p class="p small ok" data-done hidden style="flex:1 1 100%">You're on the list for the {b['name']}. We'll email you the day it's ready.</p>
+</form>
+</div>
 <div class="stack" style="gap:10px;font-size:14px;line-height:1.5;color:var(--soft)">{notes}</div>
 <div class="anchor-list" style="border-top:1px solid var(--line)"><a href="#inside"><span>What's inside</span><span>{len([i for p in b['pouches'] for i in p[2]])} lines</span></a><a href="#build"><span>The bag</span><span>Materials and build</span></a><a href="#rotation"><span>Rotation and refills</span><span>5 to 15 years</span></a><a href="#faq"><span>Questions</span><span>Straight answers</span></a></div>
 </div>
