@@ -21,8 +21,20 @@
     return { country: country, region: region, guessed: true };
   }
   function pageLoc() { var b = document.body; return b && b.getAttribute('data-loc-country') ? { country: b.getAttribute('data-loc-country'), region: b.getAttribute('data-loc-region') || '' } : null; }
+  // Location is automatic: the visitor's connection (geo function), cached for this visit; time zone until it answers.
+  var GEO = null;
+  try { GEO = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) {}
   function getLoc(own) {
-    var pl = own ? null : pageLoc(); if (pl) return pl; try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && v.country) return v; } catch (e) {} return detect(); }
+    var pl = own ? null : pageLoc(); if (pl) return pl;
+    return GEO && GEO.country ? GEO : detect(); }
+  function locate() {
+    if (GEO && GEO.country) return Promise.resolve(GEO);
+    if (!window.fetch) return Promise.resolve(detect());
+    return fetch('https://vbgustjtxjmjlgukzcfa.supabase.co/functions/v1/geo').then(function (r) { return r.json(); }).then(function (g) {
+      if (g && g.country) { GEO = { country: g.country, region: g.region || '' }; try { sessionStorage.setItem(KEY, JSON.stringify(GEO)); } catch (e) {} }
+      return getLoc(true);
+    }).catch(function () { return detect(); });
+  }
   function setLoc(loc) { try { localStorage.setItem(KEY, JSON.stringify({ country: loc.country, region: loc.region || '' })); } catch (e) {} }
   function regionName(loc) { var list = G.regions[loc.country] || []; for (var i = 0; i < list.length; i++) if (list[i][0] === loc.region) return list[i][1]; return ''; }
   function placeName(loc) { return regionName(loc) || G.names[loc.country] || loc.country; }
@@ -66,7 +78,7 @@
     var html = '<div class="tk-track">' + items + '</div>';
     var moving = list.length > 0 && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     el.innerHTML = '<div class="tk-view' + (moving ? ' moving' : '') + '">' + html + (moving ? html : '') + '</div>' +
-      '<button type="button" class="tk-loc" data-loc-open aria-haspopup="dialog">' + esc(place) + ' ▾</button>';
+      '<a class="tk-loc" href="' + el.getAttribute('data-ready-href').replace(/guides\/the-72-hour-list-explained\.html$/, 'alerts.html') + '">' + esc(place) + '</a>';
     var track = el.querySelector('.tk-track');
     if (moving && track) { var w = track.scrollWidth; el.style.setProperty('--tk-dur', Math.max(18, Math.round(w / 60)) + 's'); }
   }
@@ -168,7 +180,7 @@
     e.preventDefault(); openSelector(getLoc(), run);
   });
   document.addEventListener('DOMContentLoaded', function () {
-    var loc = getLoc(); run(loc); beacon(getLoc(true));
+    locate().then(function () { run(getLoc()); beacon(getLoc(true)); });
     // keep the ticker fresh on long-open pages
     setInterval(function () { cache = {}; run(getLoc()); }, 15 * 60 * 1000);
   });

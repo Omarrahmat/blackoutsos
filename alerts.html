@@ -39,16 +39,16 @@
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <div class="stack" style="gap:12px"><p class="eyebrow">Live official warnings</p><h1 class="h1">Warnings in force for <span data-alerts-place>your area</span>.</h1>
 <p class="lede">Straight from the national services, checked every 15 minutes: the Met Office and Environment Agency for the UK, the National Weather Service for the United States, 37 national weather services across Europe through MeteoAlarm, and GDACS for major disasters anywhere in the world.</p>
-<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><button type="button" class="pill" data-loc-open>Change area</button><span class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</span></div></div>
+<span class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</span></div>
 <div class="stack" style="gap:14px" data-alerts-posts></div>
 <div class="stack" style="gap:28px" data-alerts-page><div class="card"><p class="p">Loading the latest warnings…</p></div></div>
 </div></section>
 <section class="section band" id="email"><div class="wrap split" style="gap:40px">
-<div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">Hear the moment a red or amber warning is issued for <span data-loc-name>your area</span>.</h2><p class="p">One email when a serious warning is issued where you live, with the three things to do in the first hour. No weather chat, no marketing in between. Change your area or stop at any time.</p></div>
+<div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">Hear the moment a red or amber warning is issued for <span data-loc-name>your area</span>.</h2><p class="p">One email when a serious warning is issued where you live, with the three things to do in the first hour. No weather chat, no marketing in between. Stop at any time.</p></div>
 <form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe">
 <input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes">
 <label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label>
-<p class="p small">Area: <strong data-loc-name>your area</strong> · <a href="#" data-loc-open style="border-bottom:1px solid var(--line3)">change</a></p>
+<p class="p small">Area: <strong data-loc-name>your area</strong></p>
 <button type="submit" class="pill solid">Email me serious warnings</button>
 <p class="p small ok" data-done hidden>You're on the list. We'll only write when it matters.</p>
 </form>

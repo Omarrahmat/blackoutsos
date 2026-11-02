@@ -93,7 +93,7 @@
   var SHIP_KEY = 'bsos.ship.v1';
   function shipCountry() {
     try { var v = localStorage.getItem(SHIP_KEY); if (v) return v; } catch (e) {}
-    try { var l = JSON.parse(localStorage.getItem('bsos.loc.v1') || 'null'); if (l && l.country) return l.country; } catch (e) {}
+    try { var l = JSON.parse(sessionStorage.getItem('bsos.loc.v1') || 'null'); if (l && l.country) return l.country; } catch (e) {}
     var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
     return (window.BSOS_GEO && window.BSOS_GEO.tz[tz]) || 'GB';
   }
