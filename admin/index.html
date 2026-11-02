@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Inter:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/geo.js"></script>
 <style>
 .app{display:flex;min-height:100vh}
 .side{width:232px;flex:0 0 232px;background:#0d0d0d;border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column;gap:28px}
@@ -70,6 +71,9 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 <a data-screen="inbox">Inbox <span class="n" id="nInbox">0</span></a>
 <a data-screen="stock">Stock</a>
 <a data-screen="subscribers">Subscribers <span class="n" id="nSubs">0</span></a>
+<a data-screen="visitors">Visitors <span class="n" id="nLive">0</span></a>
+<a data-screen="warnings">Warnings</a>
+<a data-screen="emails">Emails</a>
 <a data-screen="import">Amazon import</a>
 </nav>
 <div class="stack" style="margin-top:auto;gap:10px;padding:0 6px;font-size:13px;color:var(--muted)"><span id="who"></span><a class="btn" id="changepw">Change password</a><a class="btn" id="signout">Sign out</a><a class="btn" href="../index.html">View the site</a></div>
@@ -107,8 +111,39 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
 </section>
 
 <section id="s-subscribers" class="screen">
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px"><div><h1 class="h2">Subscribers</h1><p class="p">Be Ready alerts and rotation reminders. Export to send a campaign from your email tool.</p></div><a class="btn solid" id="exportSubs">Export CSV</a></div>
-<div class="panel"><div style="overflow-x:auto"><table class="list" id="subsTable"></table></div></div>
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px"><div><h1 class="h2">Subscribers</h1><p class="p">Newsletter, stock notices and warning emails by area. Newsletters go out from the Emails screen.</p></div><a class="btn solid" id="exportSubs">Export CSV</a></div>
+<div class="grid"><div class="panel" style="flex:1 1 300px"><div><h2 class="h4">By country</h2><p class="p small">Active subscribers · warning emails on</p></div><div style="overflow-x:auto"><table class="list" id="subsCountries"></table></div></div>
+<div class="panel" style="flex:2 1 520px"><div style="overflow-x:auto"><table class="list" id="subsTable"></table></div></div></div>
+</section>
+
+<section id="s-visitors" class="screen">
+<div><h1 class="h2">Visitors</h1><p class="p">Our own counter on every page: no cookies, no third party. "Live" is anyone who loaded a page in the last five minutes. Country and region are what the visitor chose for warnings, first guessed from their device.</p></div>
+<div class="tiles" id="visitTiles"></div>
+<div class="grid">
+<div class="panel" style="flex:1 1 360px"><div><h2 class="h4">By country</h2><p class="p small">Visitors, last 7 days · live now</p></div><div style="overflow-x:auto"><table class="list" id="visitCountries"></table></div></div>
+<div class="panel" style="flex:1 1 360px"><div><h2 class="h4">By state and region</h2><p class="p small">US states, UK regions · last 7 days</p></div><div style="overflow-x:auto"><table class="list" id="visitRegions"></table></div></div>
+</div>
+<div class="grid">
+<div class="panel" style="flex:2 1 480px"><div><h2 class="h4">Visitors per day</h2><p class="p small">Last 30 days</p></div><div id="visitChart"></div></div>
+<div class="panel" style="flex:1 1 300px"><div><h2 class="h4">Top pages</h2><p class="p small">Views, last 7 days</p></div><div id="visitPages" class="rows"></div></div>
+<div class="panel" style="flex:1 1 300px"><div><h2 class="h4">Came from</h2><p class="p small">Referring sites, last 7 days</p></div><div id="visitRefs" class="rows"></div></div>
+</div>
+</section>
+
+<section id="s-warnings" class="screen">
+<div><h1 class="h2">Live warnings feed</h1><p class="p">What the site's ticker and warnings pages are showing right now, and whether the 15-minute fetch is healthy.</p></div>
+<div class="tiles" id="alertTiles"></div>
+<div class="grid">
+<div class="panel" style="flex:1 1 360px"><div><h2 class="h4">Warnings in force by country</h2><p class="p small">Red and amber first</p></div><div style="overflow-x:auto"><table class="list" id="alertCountries"></table></div></div>
+<div class="panel" style="flex:1 1 360px"><div><h2 class="h4">Fetch runs</h2><p class="p small">Latest first</p></div><div style="overflow-x:auto"><table class="list" id="alertRuns"></table></div></div>
+</div>
+<div class="panel"><div><h2 class="h4">Situation notes from the research desk</h2><p class="p small">Shown on the warnings page for that country</p></div><div id="postsList" class="rows"></div></div>
+</section>
+
+<section id="s-emails" class="screen">
+<div><h1 class="h2">Emails</h1><p class="p">Everything the system has sent or tried to send: stock notices, warning emails and newsletters. "Skipped" means the email provider key is not set yet.</p></div>
+<div class="panel"><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><a class="btn" id="emailTest">Send me a test email</a><select id="waitlistSku" style="height:40px;border-radius:999px;padding:0 14px;max-width:260px"></select><a class="btn solid" id="emailWaitlist">Email the waitlist for this bag</a><span class="p small" id="emailOut"></span></div></div>
+<div class="panel"><div style="overflow-x:auto"><table class="list" id="emailsTable"></table></div></div>
 </section>
 
 <section id="s-import" class="screen">
@@ -127,7 +162,7 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
   var SKEY = 'bsos.admin.session.v1';
   var COLOURS = { operator: '#1F5FBF', recruit: '#D0202E', 'cub-1': '#F5C518', 'cub-2': '#F5C518', 'cub-3': '#F5C518', unit: '#2BA84A', 'scout-dog': '#F28C28', 'scout-cat': '#F28C28' };
   var CHANNEL = { website: '#3987e5', amazon: '#d95926', organisation: '#199e70' };
-  var state = { products: [], orders: [], items: [], enquiries: [], subs: [], moves: [], orderFilter: 'all', inboxFilter: 'open' };
+  var state = { products: [], orders: [], items: [], enquiries: [], subs: [], moves: [], visits: null, alertRuns: [], alertCountries: [], posts: [], emails: [], orderFilter: 'all', inboxFilter: 'open' };
   var session = null;
   try { session = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) { session = null; }
 
@@ -202,12 +237,14 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
   var api = {
     loadAll: async function () {
       if (backend === 'mcp') {
-        var rows = rowsOf(await sql("select json_build_object('products', (select coalesce(json_agg(p order by p.sku), '[]'::json) from public.bsos_products p), 'orders', (select coalesce(json_agg(o), '[]'::json) from (select * from public.bsos_orders order by created_at desc limit 500) o), 'items', (select coalesce(json_agg(i), '[]'::json) from public.bsos_order_items i), 'enquiries', (select coalesce(json_agg(e), '[]'::json) from (select * from public.bsos_enquiries order by created_at desc limit 500) e), 'subs', (select coalesce(json_agg(s), '[]'::json) from (select * from public.bsos_subscribers order by created_at desc limit 2000) s), 'moves', (select coalesce(json_agg(m), '[]'::json) from (select * from public.bsos_stock_moves order by created_at desc limit 100) m)) as j"));
+        var rows = rowsOf(await sql("select json_build_object('products', (select coalesce(json_agg(p order by p.sku), '[]'::json) from public.bsos_products p), 'orders', (select coalesce(json_agg(o), '[]'::json) from (select * from public.bsos_orders order by created_at desc limit 500) o), 'items', (select coalesce(json_agg(i), '[]'::json) from public.bsos_order_items i), 'enquiries', (select coalesce(json_agg(e), '[]'::json) from (select * from public.bsos_enquiries order by created_at desc limit 500) e), 'subs', (select coalesce(json_agg(s), '[]'::json) from (select * from public.bsos_subscribers order by created_at desc limit 2000) s), 'moves', (select coalesce(json_agg(m), '[]'::json) from (select * from public.bsos_stock_moves order by created_at desc limit 100) m), 'visits', public.bsos_visit_stats(), 'alertRuns', (select coalesce(json_agg(r), '[]'::json) from (select id, started_at, finished_at, ok, counts, errors from public.bsos_alert_runs order by id desc limit 8) r), 'alertCountries', (select coalesce(json_agg(c), '[]'::json) from (select country, count(*) as n, count(*) filter (where level <= 2) as serious, min(level) as top from public.bsos_alerts_public group by country order by min(level), count(*) desc limit 40) c), 'posts', (select coalesce(json_agg(x), '[]'::json) from (select id, country, region, title, left(body, 300) as body, published_at, expires_at, author from public.bsos_posts order by published_at desc limit 20) x), 'emails', (select coalesce(json_agg(x), '[]'::json) from (select id, kind, to_email, subject, ref, status, error, created_at from public.bsos_emails order by id desc limit 150) x)) as j"));
         var j = rows[0] && rows[0].j; if (typeof j === 'string') j = JSON.parse(j); if (!j) throw new Error('Empty reply from the database.');
         return j;
       }
-      var q = await Promise.all([rest('GET', 'bsos_products', 'select=*&order=sku.asc'), rest('GET', 'bsos_orders', 'select=*&order=created_at.desc&limit=500'), rest('GET', 'bsos_order_items', 'select=*'), rest('GET', 'bsos_enquiries', 'select=*&order=created_at.desc&limit=500'), rest('GET', 'bsos_subscribers', 'select=*&order=created_at.desc&limit=2000'), rest('GET', 'bsos_stock_moves', 'select=*&order=created_at.desc&limit=100')]);
-      return { products: q[0], orders: q[1], items: q[2], enquiries: q[3], subs: q[4], moves: q[5] };
+      var q = await Promise.all([rest('GET', 'bsos_products', 'select=*&order=sku.asc'), rest('GET', 'bsos_orders', 'select=*&order=created_at.desc&limit=500'), rest('GET', 'bsos_order_items', 'select=*'), rest('GET', 'bsos_enquiries', 'select=*&order=created_at.desc&limit=500'), rest('GET', 'bsos_subscribers', 'select=*&order=created_at.desc&limit=2000'), rest('GET', 'bsos_stock_moves', 'select=*&order=created_at.desc&limit=100'),
+        rest('POST', 'rpc/bsos_visit_stats', '', {}), rest('GET', 'bsos_alert_runs', 'select=id,started_at,finished_at,ok,counts,errors&order=id.desc&limit=8'), rest('GET', 'bsos_alerts_public', 'select=country,level&limit=2000'), rest('GET', 'bsos_posts', 'select=id,country,region,title,body,published_at,expires_at,author&order=published_at.desc&limit=20'), rest('GET', 'bsos_emails', 'select=id,kind,to_email,subject,ref,status,error,created_at&order=id.desc&limit=150')]);
+      var byC = {}; (q[8] || []).forEach(function (a) { var c = byC[a.country] || (byC[a.country] = { country: a.country, n: 0, serious: 0, top: 9 }); c.n++; if (a.level <= 2) c.serious++; if (a.level < c.top) c.top = a.level; });
+      return { products: q[0], orders: q[1], items: q[2], enquiries: q[3], subs: q[4], moves: q[5], visits: q[6], alertRuns: q[7], alertCountries: Object.keys(byC).map(function (k) { return byC[k]; }).sort(function (a, b) { return a.top - b.top || b.n - a.n; }), posts: q[9], emails: q[10] };
     },
     updateOrder: function (id, fields) { return backend === 'mcp' ? sql('update public.bsos_orders set ' + sets(fields) + ' where id = ' + lit(id) + ' returning id') : rest('PATCH', 'bsos_orders', 'id=eq.' + id, fields, 'return=representation'); },
     updateEnquiry: function (id, fields) { return backend === 'mcp' ? sql('update public.bsos_enquiries set ' + sets(fields) + ' where id = ' + lit(id) + ' returning id') : rest('PATCH', 'bsos_enquiries', 'id=eq.' + id, fields, 'return=representation'); },
@@ -215,6 +252,17 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     insertMove: function (row) { return backend === 'mcp' ? sql('insert into public.bsos_stock_moves (sku, delta, reason, ref) values (' + lit(row.sku) + ', ' + lit(row.delta) + ', ' + lit(row.reason) + ', ' + lit(row.ref || null) + ') returning id') : rest('POST', 'bsos_stock_moves', '', row, 'return=representation'); },
     findAmazon: async function (ref) { if (backend === 'mcp') return rowsOf(await sql('select id from public.bsos_orders where channel = ' + lit('amazon') + ' and notes = ' + lit('Amazon ' + ref))); return rest('GET', 'bsos_orders', 'select=id&channel=eq.amazon&notes=eq.' + encodeURIComponent('Amazon ' + ref)); },
     insertOrder: async function (row) { if (backend === 'mcp') { var r = rowsOf(await sql('insert into public.bsos_orders (channel, total_pence, status, notes, created_at) values (' + lit(row.channel) + ', ' + lit(row.total_pence) + ', ' + lit(row.status) + ', ' + lit(row.notes) + ', ' + lit(row.created_at) + ') returning id')); return r[0].id; } var j = await rest('POST', 'bsos_orders', '', row, 'return=representation'); return j[0].id; },
+    sendEmail: async function (payload) {
+      if (backend === 'mcp') {
+        var r = rowsOf(await sql("select net.http_post(url := 'https://vbgustjtxjmjlgukzcfa.supabase.co/functions/v1/send-email', headers := jsonb_build_object('Content-Type','application/json','x-fetch-key',(select decrypted_secret from vault.decrypted_secrets where name='bsos_alerts_fetch_key')), body := " + lit(JSON.stringify(payload)) + "::jsonb, timeout_milliseconds := 120000) as id"));
+        var id = r[0] && r[0].id; if (!id) throw new Error('Could not queue the send.');
+        for (var i = 0; i < 20; i++) { await new Promise(function (res) { setTimeout(res, 3000); }); var rr = rowsOf(await sql('select status_code, content from net._http_response where id = ' + lit(id))); if (rr.length) { var c = rr[0].content; try { c = JSON.parse(c); } catch (e) {} if (rr[0].status_code >= 400) throw new Error((c && c.error) || ('HTTP ' + rr[0].status_code)); return c; } }
+        throw new Error('The send is still running; check the Emails list in a minute.');
+      }
+      await ensureFresh();
+      var resp = await fetch(URL_ + '/functions/v1/send-email', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token }, body: JSON.stringify(payload) });
+      var j = await resp.json(); if (!resp.ok) throw new Error(j.error || ('HTTP ' + resp.status)); return j;
+    },
     insertItem: function (row) { return backend === 'mcp' ? sql('insert into public.bsos_order_items (order_id, sku, qty, unit_pence) values (' + lit(row.order_id) + ', ' + lit(row.sku) + ', ' + lit(row.qty) + ', ' + lit(row.unit_pence) + ') returning id') : rest('POST', 'bsos_order_items', '', row, 'return=representation'); }
   };
 
@@ -259,11 +307,15 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
     try { d = await api.loadAll(); }
     catch (err) { if (backend === 'mcp') throw err; alert('Could not load the shop data: ' + err.message + '. If this says permission denied, this email is not listed as an admin.'); return; }
     state.products = d.products || []; state.orders = d.orders || []; state.items = d.items || []; state.enquiries = d.enquiries || []; state.subs = d.subs || []; state.moves = d.moves || [];
+    state.visits = d.visits || null; state.alertRuns = d.alertRuns || []; state.alertCountries = d.alertCountries || []; state.posts = d.posts || []; state.emails = d.emails || [];
     state.since = since;
     renderAll();
   }
 
-  function renderAll() { renderOverview(); renderOrders(); renderInbox(); renderStock(); renderSubs(); }
+  // live: refresh every 60 seconds while the page is open and visible
+  setInterval(function () { if (document.visibilityState === 'visible' && !document.getElementById('app').classList.contains('hidden')) loadAll().catch(function () {}); }, 60000);
+
+  function renderAll() { renderOverview(); renderOrders(); renderInbox(); renderStock(); renderSubs(); renderVisitors(); renderWarnings(); renderEmails(); }
 
   // ---- overview ----
   function recent(o) { return o.created_at >= state.since && o.status !== 'cancelled' && o.status !== 'refunded'; }
@@ -278,7 +330,8 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
       ['Orders, 30 days', String(ro.length), toPack + ' to pack'],
       ['Average order', ro.length ? gbp(rev / ro.length) : '—', 'inc. VAT'],
       ['Open messages', String(openEnq), state.enquiries.filter(function (e) { return e.status === 'open' && e.kind === 'complaint'; }).length + ' complaints'],
-      ['Subscribers', String(subs), 'Be Ready alerts and reminders']];
+      ['Subscribers', String(subs), 'newsletter, waitlists, warnings'],
+      ['Visitors now', String((state.visits && state.visits.live) || 0), ((state.visits && state.visits.today) || 0) + ' today · ' + ((state.visits && state.visits.week) || 0) + ' this week']];
     $('tiles').innerHTML = tiles.map(function (t) { return '<div class="tile"><span class="eyebrow" style="letter-spacing:1.5px">' + t[0] + '</span><span class="v">' + t[1] + '</span><span class="p small">' + esc(t[2]) + '</span></div>'; }).join('');
     $('nOrders').textContent = toPack; $('nInbox').textContent = openEnq; $('nSubs').textContent = subs;
     var days = []; for (var i = 29; i >= 0; i--) { var d = new Date(Date.now() - i * 864e5); days.push(d.toISOString().slice(0, 10)); }
@@ -365,8 +418,45 @@ pre{white-space:pre-wrap;font-size:13px;color:var(--soft);margin:0}
   // ---- subscribers ----
   function renderSubs() {
     var live = state.subs.filter(function (s) { return !s.unsubscribed_at; });
-    $('subsTable').innerHTML = '<thead><tr><th>Email</th><th>Source</th><th>Bag</th><th>Bought</th><th>Joined</th></tr></thead><tbody>' + (live.length ? live.slice(0, 200).map(function (s) { return '<tr><td>' + esc(s.email) + '</td><td>' + esc(s.source || '') + '</td><td>' + esc(s.bag || '') + '</td><td>' + esc(s.bought || '') + '</td><td>' + fmtDate(s.created_at) + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="muted">No subscribers yet.</td></tr>') + '</tbody>';
-    $('exportSubs').onclick = function () { var csv = 'email,source,bag,bought,joined\n' + live.map(function (s) { return [s.email, s.source || '', s.bag || '', s.bought || '', s.created_at].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n'); var a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'blackoutsos-subscribers.csv'; a.click(); };
+    var byC = {}; live.forEach(function (s) { var k = s.country || '—'; var c = byC[k] || (byC[k] = { n: 0, alerts: 0 }); c.n++; if (s.alerts_opt_in) c.alerts++; });
+    $('subsCountries').innerHTML = '<thead><tr><th>Country</th><th>Subscribers</th><th>Warnings on</th></tr></thead><tbody>' + (Object.keys(byC).sort(function (a, b) { return byC[b].n - byC[a].n; }).map(function (k) { return '<tr><td>' + esc(k) + '</td><td>' + byC[k].n + '</td><td>' + byC[k].alerts + '</td></tr>'; }).join('') || '<tr><td colspan="3" class="muted">No subscribers yet.</td></tr>') + '</tbody>';
+    $('subsTable').innerHTML = '<thead><tr><th>Email</th><th>Source</th><th>Bag</th><th>Area</th><th>Warnings</th><th>Joined</th></tr></thead><tbody>' + (live.length ? live.slice(0, 300).map(function (s) { return '<tr><td>' + esc(s.email) + '</td><td>' + esc(s.source || '') + '</td><td>' + esc(s.bag || '') + '</td><td>' + esc((s.country || '') + (s.region ? ' · ' + s.region : '')) + '</td><td>' + (s.alerts_opt_in ? 'on' : '') + '</td><td>' + fmtDate(s.created_at) + '</td></tr>'; }).join('') : '<tr><td colspan="6" class="muted">No subscribers yet.</td></tr>') + '</tbody>';
+    $('exportSubs').onclick = function () { var csv = 'email,source,bag,bought,country,region,warnings,joined\n' + live.map(function (s) { return [s.email, s.source || '', s.bag || '', s.bought || '', s.country || '', s.region || '', s.alerts_opt_in ? 'yes' : '', s.created_at].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n'); var a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'blackoutsos-subscribers.csv'; a.click(); };
+  }
+
+  // ---- visitors ----
+  function renderVisitors() {
+    var v = state.visits; if (!v) { $('visitTiles').innerHTML = '<p class="p small">No visitor data yet.</p>'; return; }
+    var G = window.BSOS_GEO || { names: {}, regions: {} };
+    var nm = function (c) { return (G.names && G.names[c]) || c || 'Unknown'; };
+    var rn = function (c, r) { var list = (G.regions && G.regions[c]) || []; for (var i = 0; i < list.length; i++) if (list[i][0] === r) return list[i][1]; return r; };
+    $('nLive').textContent = v.live || 0;
+    $('visitTiles').innerHTML = [['Live now', v.live || 0, 'on the site in the last 5 minutes'], ['Today', v.today || 0, (v.views_today || 0) + ' page views'], ['Last 7 days', v.week || 0, 'unique visitors'], ['Countries', (v.by_country || []).length, 'reached this week']].map(function (t) { return '<div class="tile"><span class="eyebrow" style="letter-spacing:1.5px">' + t[0] + '</span><span class="v">' + t[1] + '</span><span class="p small">' + esc(t[2]) + '</span></div>'; }).join('');
+    $('visitCountries').innerHTML = '<thead><tr><th>Country</th><th>Visitors</th><th>Live</th></tr></thead><tbody>' + ((v.by_country || []).map(function (c) { return '<tr><td>' + esc(nm(c.country)) + '</td><td>' + c.n + '</td><td>' + (c.live ? '<strong style="color:#2BA84A">' + c.live + '</strong>' : '') + '</td></tr>'; }).join('') || '<tr><td colspan="3" class="muted">No visits recorded yet.</td></tr>') + '</tbody>';
+    $('visitRegions').innerHTML = '<thead><tr><th>Region</th><th>Country</th><th>Visitors</th><th>Live</th></tr></thead><tbody>' + ((v.by_region || []).map(function (c) { return '<tr><td>' + esc(rn(c.country, c.region)) + '</td><td>' + esc(c.country) + '</td><td>' + c.n + '</td><td>' + (c.live ? '<strong style="color:#2BA84A">' + c.live + '</strong>' : '') + '</td></tr>'; }).join('') || '<tr><td colspan="4" class="muted">Nothing by region yet.</td></tr>') + '</tbody>';
+    var days = (v.daily || []); var mx = Math.max.apply(null, days.map(function (d) { return d.n; }).concat([1]));
+    $('visitChart').innerHTML = days.length ? '<div style="display:flex;align-items:flex-end;gap:3px;height:140px">' + days.map(function (d) { return '<div title="' + d.day + ': ' + d.n + '" style="flex:1;background:#3987e5;border-radius:3px 3px 0 0;height:' + Math.max(2, Math.round(d.n / mx * 130)) + 'px"></div>'; }).join('') + '</div><p class="p small">' + days[0].day + ' → ' + days[days.length - 1].day + '</p>' : '<p class="p small">No visits yet.</p>';
+    $('visitPages').innerHTML = (v.top_pages || []).map(function (p) { return '<div class="row"><span>' + esc(p.path) + '</span><span>' + p.n + '</span></div>'; }).join('') || '<p class="p small">—</p>';
+    $('visitRefs').innerHTML = (v.referrers || []).map(function (p) { return '<div class="row"><span>' + esc(p.ref) + '</span><span>' + p.n + '</span></div>'; }).join('') || '<p class="p small">Direct and search only so far.</p>';
+  }
+
+  // ---- warnings feed ----
+  function renderWarnings() {
+    var G = window.BSOS_GEO || { names: {} }; var nm = function (c) { return (G.names && G.names[c]) || c; };
+    var last = state.alertRuns[0]; var total = state.alertCountries.reduce(function (t, c) { return t + c.n; }, 0); var serious = state.alertCountries.reduce(function (t, c) { return t + (c.serious || 0); }, 0);
+    var age = last ? Math.round((Date.now() - new Date(last.started_at).getTime()) / 60000) : null;
+    $('alertTiles').innerHTML = [['Warnings in force', total, 'across ' + state.alertCountries.length + ' countries'], ['Red and amber', serious, 'serious warnings now'], ['Last fetch', age == null ? '—' : age + ' min ago', last ? (last.ok ? 'healthy' : 'with errors: ' + ((last.errors || []).length)) : 'no runs yet'], ['Sources', last && last.counts ? Object.keys(last.counts).length : 0, last && last.counts ? Object.keys(last.counts).map(function (k) { return k + ' ' + last.counts[k]; }).join(' · ') : '']].map(function (t) { return '<div class="tile"><span class="eyebrow" style="letter-spacing:1.5px">' + t[0] + '</span><span class="v">' + t[1] + '</span><span class="p small">' + esc(t[2]) + '</span></div>'; }).join('');
+    $('alertCountries').innerHTML = '<thead><tr><th>Country</th><th>In force</th><th>Red/amber</th></tr></thead><tbody>' + (state.alertCountries.map(function (c) { return '<tr><td>' + esc(nm(c.country)) + '</td><td>' + c.n + '</td><td>' + (c.serious || 0) + '</td></tr>'; }).join('') || '<tr><td colspan="3" class="muted">Nothing in force.</td></tr>') + '</tbody>';
+    $('alertRuns').innerHTML = '<thead><tr><th>Started</th><th>OK</th><th>Counts</th><th>Errors</th></tr></thead><tbody>' + (state.alertRuns.map(function (r) { return '<tr><td>' + fmtDate(r.started_at) + '</td><td>' + (r.ok ? '✓' : (r.finished_at ? '✗' : '…')) + '</td><td class="muted">' + esc(r.counts ? Object.keys(r.counts).map(function (k) { return k + ' ' + r.counts[k]; }).join(', ') : '') + '</td><td class="muted">' + esc((r.errors || []).join('; ').slice(0, 160)) + '</td></tr>'; }).join('') || '<tr><td colspan="4" class="muted">No runs yet.</td></tr>') + '</tbody>';
+    $('postsList').innerHTML = state.posts.map(function (p) { return '<div class="row" style="align-items:flex-start;flex-wrap:wrap"><span style="flex:1 1 300px"><strong>' + esc(p.title) + '</strong><br><span class="p small">' + esc(p.body) + '</span></span><span class="muted small">' + esc((p.country || 'world') + (p.region ? ' · ' + p.region : '')) + ' · ' + fmtDate(p.published_at) + '</span></div>'; }).join('') || '<p class="p small">The research desk has not posted yet.</p>';
+  }
+
+  // ---- emails ----
+  function renderEmails() {
+    $('emailsTable').innerHTML = '<thead><tr><th>When</th><th>Kind</th><th>To</th><th>Subject</th><th>Status</th></tr></thead><tbody>' + (state.emails.map(function (e) { return '<tr><td>' + fmtDate(e.created_at) + '</td><td>' + esc(e.kind) + '</td><td>' + esc(e.to_email) + '</td><td>' + esc(e.subject) + '</td><td>' + esc(e.status) + (e.error ? ' <span class="muted">' + esc(e.error) + '</span>' : '') + '</td></tr>'; }).join('') || '<tr><td colspan="5" class="muted">Nothing sent yet.</td></tr>') + '</tbody>';
+    var sel = $('waitlistSku'); if (!sel.options.length) state.products.forEach(function (p) { var o = document.createElement('option'); o.value = p.sku; o.textContent = p.name + (p.variant ? ' · ' + p.variant : ''); sel.appendChild(o); });
+    $('emailTest').onclick = async function () { var to = backend === 'mcp' ? prompt('Send the test to which address?', '') : (session && session.email); if (!to) return; $('emailOut').textContent = 'Sending…'; try { var r = await api.sendEmail({ kind: 'test', to: to }); $('emailOut').textContent = r.sent ? 'Sent.' : (r.skipped ? 'Logged but not sent: the email provider key is not set yet.' : 'Failed — see the list.'); await loadAll(); } catch (e) { $('emailOut').textContent = e.message; } };
+    $('emailWaitlist').onclick = async function () { var sku = sel.value; var p = state.products.find(function (x) { return x.sku === sku; }); if (!p) return; if (!confirm('Email everyone waiting for the ' + p.name + (p.variant ? ' (' + p.variant + ')' : '') + ' that it is in stock?')) return; $('emailOut').textContent = 'Sending…'; try { var r = await api.sendEmail({ kind: 'waitlist', sku: sku }); $('emailOut').textContent = r.recipients + ' on the list: ' + r.sent + ' sent, ' + r.skipped + ' skipped, ' + r.failed + ' failed.'; await loadAll(); } catch (e) { $('emailOut').textContent = e.message; } };
   }
 
   // ---- import ----

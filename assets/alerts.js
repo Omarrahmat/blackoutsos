@@ -134,6 +134,19 @@
     document.querySelectorAll('[data-loc-name]').forEach(function (el) { el.textContent = placeName(loc); });
   }
 
+  // ---- one page view per load: no cookies, a random id for this tab, the viewer's chosen area ----
+  function beacon(loc) {
+    try {
+      if (location.protocol === 'file:' || /^(localhost|127\.)/.test(location.hostname) || navigator.webdriver) return;
+      var sid = sessionStorage.getItem('bsos.sid');
+      if (!sid) { sid = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); sessionStorage.setItem('bsos.sid', sid); }
+      var body = JSON.stringify({ s: sid, p: location.pathname, r: document.referrer || '', c: loc.country, g: loc.region || '', l: String(navigator.language || '').slice(0, 12), d: window.innerWidth < 760 ? 'm' : 'd' });
+      var url = 'https://vbgustjtxjmjlgukzcfa.supabase.co/functions/v1/hit';
+      if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+      else fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
+
   function run(loc) {
     stampForms(loc);
     load(loc.country).then(function (rows) { renderTicker(loc, rows); renderPage(loc, rows); });
@@ -143,7 +156,7 @@
     e.preventDefault(); openSelector(getLoc(), run);
   });
   document.addEventListener('DOMContentLoaded', function () {
-    var loc = getLoc(); run(loc);
+    var loc = getLoc(); run(loc); beacon(loc);
     // keep the ticker fresh on long-open pages
     setInterval(function () { cache = {}; run(getLoc()); }, 15 * 60 * 1000);
   });
