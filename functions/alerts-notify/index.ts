@@ -50,10 +50,10 @@ Deno.serve(async (req: Request) => {
     if (!fresh.length) continue;
     const top = fresh[0];
     const unsub = await unsubUrl(s.email, secret);
-    const items = fresh.map((a: any) => `<p style="margin:0 0 12px;padding:12px 14px;border-left:4px solid ${a.level === 1 ? "#ff3b30" : "#ff9f0a"};background:#161616;color:#ededed"><strong>${h.esc(a.event)}</strong><br><span style="color:#b5b5b5">${h.esc(a.area || "")}</span><br><span style="color:#9a9a9a;font-size:13px">${h.esc(NAMES[a.source] || a.source)}${a.expires_at ? " · until " + new Date(a.expires_at).toUTCString().slice(0, 22) + " UTC" : ""} · <a href="${h.esc(a.link || SITE + "/alerts.html")}" style="color:#9a9a9a">details</a></span></p>`).join("");
+    const items = fresh.map((a: any) => `<p style="margin:0 0 12px;padding:12px 14px;border-left:4px solid ${a.level === 1 ? "#ff3b30" : "#ff9f0a"};background:#f4f4f4;color:#222"><strong>${h.esc(a.event)}</strong><br><span style="color:#555">${h.esc(a.area || "")}</span><br><span style="color:#777;font-size:13px">${h.esc(NAMES[a.source] || a.source)}${a.expires_at ? " · until " + new Date(a.expires_at).toUTCString().slice(0, 22) + " UTC" : ""} · <a href="${h.esc(a.link || SITE + "/alerts.html")}" style="color:#777">details</a></span></p>`).join("");
     const html = layout(`${top.level === 1 ? "Red" : "Amber"} warning for your area`,
       h.h1(`${top.level === 1 ? "Red" : "Amber"} warning: ${top.event}`) + h.p(`In force for ${h.esc(top.area || s.country)}. ${fresh.length > 1 ? `${fresh.length} serious warnings are current for your area.` : ""}`) + items +
-      `<p style="margin:18px 0 6px;color:#fff;font-weight:600">The first hour</p>` + h.p(h.esc(firstHour(top.event))) + h.btn(`${SITE}/alerts.html`, "See all warnings for your area") +
+      `<p style="margin:18px 0 6px;font-weight:600">The first hour</p>` + h.p(h.esc(firstHour(top.event))) + h.btn(`${SITE}/alerts.html`, "See all warnings for your area") +
       h.small("Official information comes from the agency named on each warning. Follow instructions from your local authorities and emergency services first."), unsub, `${top.event} — ${top.area || ""}`);
     results.recipients++;
     const status = await send(supabase, { to: s.email, kind: "alert", ref: String(top.id), subject: `${top.level === 1 ? "Red" : "Amber"} warning: ${top.event} — ${(top.area || "").slice(0, 60)}`, html, text: `${top.event} — ${top.area}. ${firstHour(top.event)} ${SITE}/alerts.html`, unsub });
