@@ -5,7 +5,28 @@ HERO_CSS = """
 .hero{position:relative;background:#050505;overflow:hidden;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
 .hero-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 48px;padding-top:clamp(32px,4vw,48px)}
 .hero-top .h1{font-size:clamp(38px,4.6vw,64px);max-width:16ch}
-.hero-top .lede{max-width:460px;font-size:16px}
+.hero-top .lede{max-width:440px;font-size:17px;color:var(--ink)}
+.hero-head{gap:20px;flex:1 1 440px}
+.hero-side{gap:18px;flex:0 1 470px}
+.morse{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0}
+.morse .m-d,.morse .m-l{display:inline-block;height:6px;border-radius:3px;background:var(--ink)}
+.morse .m-d{width:6px}.morse .m-l{width:18px}
+.morse .m-l:nth-child(4){margin-left:6px}.morse .m-d:nth-child(7){margin-left:6px}
+.morse .m-t{flex-basis:100%;margin-top:10px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+.who-row{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.who-row a{display:inline-flex;align-items:center;gap:7px;padding:6px 11px 6px 9px;border:1px solid var(--line2);border-radius:999px;font-size:13px;color:var(--ink)}
+.who-row a:hover{border-color:var(--muted)}
+.who-row .tag{width:9px;height:9px}
+.hero-ship{color:var(--muted);margin:0}
+.features{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#070707}
+.features ul{list-style:none;margin:0 auto;padding:0;display:grid;grid-template-columns:repeat(6,1fr);max-width:1344px}
+.features li{display:flex;flex-direction:column;gap:10px;padding:26px clamp(14px,1.6vw,24px);border-left:1px solid var(--line)}
+.features li:first-child{border-left:0}
+.features svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.features b{font-size:14px;font-weight:600;color:var(--ink);line-height:1.3}
+.features span{font-size:13px;color:var(--muted);line-height:1.45}
+@media(max-width:1100px){.features ul{grid-template-columns:repeat(3,1fr)}.features li:nth-child(4){border-left:0}.features li:nth-child(n+4){border-top:1px solid var(--line)}}
+@media(max-width:620px){.features ul{grid-template-columns:repeat(2,1fr)}.features li{padding:20px 16px}.features li:nth-child(odd){border-left:0}.features li:nth-child(4){border-left:1px solid var(--line)}.features li:nth-child(n+3){border-top:1px solid var(--line)}.morse .m-t{letter-spacing:2px;font-size:11px}}
 .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .hero-trust{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:var(--muted)}
 .studio{position:relative;margin-top:clamp(20px,2.5vw,32px);background:radial-gradient(120% 90% at 50% 100%,#262626 0%,#121212 45%,#050505 100%)}
@@ -40,18 +61,21 @@ def hero_html(r="", art=None, bags=None, gbp=None):
     items = ""
     for s in order:
         b = bags[s]
-        items += f"""<a href="{r}bags/{s}.html" style="--h:{heights[s]}" aria-label="{b['name']}, {b['who']}, {gbp(b['price'])}"><span class="fig">{art(s)}<span class="mirror" aria-hidden="true">{art(s)}</span><span class="cap"><span class="nm"><span class="tag" style="background:{b['colour']}"></span>{b['name']}</span><span class="pr">{b['who']} · <span data-gbp="{b['price']}">{gbp(b['price'])}</span></span></span></span></a>"""
-    strip = "".join(f'<a href="{r}bags/{s2}.html"><span class="tag" style="background:{bags[s2]["colour"]}"></span><span class="nm">{bags[s2]["name"]}</span><span class="pr">{bags[s2]["who"]} · <span data-gbp="{bags[s2]["price"]}">{gbp(bags[s2]["price"])}</span></span></a>' for s2 in order)
+        items += f"""<a href="{r}bags/{s}.html" style="--h:{heights[s]}" aria-label="{b['name']}, {b['who']}"><span class="fig">{art(s)}<span class="mirror" aria-hidden="true">{art(s)}</span><span class="cap"><span class="nm"><span class="tag" style="background:{b['colour']}"></span>{b['name']}</span><span class="pr">{b['who']}</span></span></span></a>"""
+    strip = "".join(f'<a href="{r}bags/{s2}.html"><span class="tag" style="background:{bags[s2]["colour"]}"></span><span class="nm">{bags[s2]["name"]}</span><span class="pr">{bags[s2]["who"]}</span></a>' for s2 in order)
+    who = "".join(f'<li><a href="{r}bags/{s2}.html"><span class="tag" style="background:{bags[s2]["colour"]}"></span>{bags[s2]["name"]}</a></li>' for s2 in ["operator", "recruit", "cub", "unit", "scout"])
     return f"""
 <section class="hero" aria-label="Blackout SOS go bags">
 <div class="wrap hero-top">
-<div class="stack" style="gap:18px;flex:1 1 520px">
-<p class="eyebrow">Three dots · three dashes · three days</p>
+<div class="stack hero-head">
+<p class="morse" aria-label="S O S: three dots, three dashes, three days"><span class="m-d"></span><span class="m-d"></span><span class="m-d"></span><span class="m-l"></span><span class="m-l"></span><span class="m-l"></span><span class="m-d"></span><span class="m-d"></span><span class="m-d"></span><span class="m-t">Three dots · three dashes · three days</span></p>
 <h1 class="h1">A 72-hour go bag for every person in your house.</h1>
 </div>
-<div class="stack" style="gap:18px;flex:0 1 420px">
-<p class="lede">Five bags, one colour each, from <span data-gbp="8900">£89</span>. Packed in the UK with 15-year rations, waterproof, vegan and made without nuts. <span data-ship-line-hero>Free UK delivery, worldwide shipping, dispatched in three working days.</span></p>
-<div class="hero-ctas"><a class="pill solid" href="{r}bags/index.html">Shop the range</a><a class="pill" href="{r}bags/operator.html">The Operator,&nbsp;<span data-gbp="19900">£199</span></a></div>
+<div class="stack hero-side">
+<p class="lede">One bag for each of you: adult, child, baby, family and pet. Each has its own colour, so everyone grabs the right one in the dark.</p>
+<ul class="who-row" aria-label="The five bags">{who}</ul>
+<div class="hero-ctas"><a class="pill solid" href="{r}bags/index.html">Shop the range</a><a class="pill" href="{r}bags/index.html#compare">Which bags do I need?</a></div>
+<p class="p small hero-ship" data-ship-line-hero>Free UK delivery. Ships worldwide. Dispatched in three working days.</p>
 </div>
 </div>
 <div class="studio">

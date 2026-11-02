@@ -125,7 +125,7 @@ dict(slug="water-treating-storing-rationing", cat="Water and food", mins=7, titl
         ("How much", "to store", "Three days, per person, plus the extras", [
             "For drinking alone, an adult needs about 2.5 to 3 litres a day; the government's guidance calls 10 litres a day per person 'most comfortable' once cooking and washing are included. Three days for a family of four is 30 litres to drink, and far more to be comfortable.",
             "Store bottled water somewhere cool and dark, and rotate it: write the date on the bottles, and use the oldest for the garden when the year is up.",
-            "Add water for pets, and for a baby's formula if you use powder. Ready-to-feed formula needs none, which is why it's in the Cub.",
+            "Add water for pets, and for a baby's formula if you use powder. Ready-to-feed formula needs none, which is why the Cub has a sleeve for cartons of yours.",
             "The bag's 500 ml pouches are five-year, foil-sealed water for the first day on the move. They are not the store; they are the walk to it."]),
         ("When", "the taps stop", "Fill what you can, then treat what you must", [
             "The moment you hear of a problem, fill the kettle, every bottle and the bath. Bath water is for flushing and washing; the kettle and bottles are for drinking.",
@@ -151,7 +151,7 @@ dict(slug="leaving-the-house-with-a-baby", cat="Family", mins=7, title="Leaving 
     checked="Checked against NHS infant feeding guidance",
     sections=[
         ("Feeding", "without power", "Sterile until opened", [
-            "Ready-to-feed formula in cartons is sterile and needs no water, no kettle and no fridge until it is opened. Powdered formula is not sterile and must be made with water of at least 70 degrees, which you may not have. That is why the Cub carries cartons.",
+            "Ready-to-feed formula in cartons is sterile and needs no water, no kettle and no fridge until it is opened. Powdered formula is not sterile and must be made with water of at least 70 degrees, which you may not have. That is why the Cub has a sleeve for six to eight cartons of your baby's own ready-to-feed formula.",
             "Use a fresh sealed teat for each feed and throw it away. The one bottle is sterilised between feeds with a cold-water sterilising tablet in a bag of water: follow the tablet's instructions, and the NHS advice to leave equipment in solution for at least 30 minutes.",
             "An opened carton goes in the fridge if there is one and is used within 24 hours; with no fridge, finish it or bin it. Never keep a half-drunk feed for later.",
             "If you breastfeed, keep going; it is the safest feed there is. Drink the water in the Cub's olive pouch, eat, and rest when the baby does. The cartons are the backup you hope not to open."]),
@@ -167,7 +167,7 @@ dict(slug="leaving-the-house-with-a-baby", cat="Family", mins=7, title="Leaving 
             "Tell the rest centre or the relative you are coming with a baby. Ask for a quiet corner, somewhere to lie the mat, and water."])],
     never=("Never", "Never make up powdered formula with unboiled or cooled water in an emergency, and never water a feed down to make it last. A smaller sterile feed is safe; a diluted or unsterile one is not."),
     after=None,
-    frombag=[("#5c6a3a", "Olive pouch:", "formula cartons, bottle, sealed teats, sterilising tablets, water"), ("#2a2a2a", "Black pouch:", "nappies, wipes, bags, cream"), ("#6b6b6b", "Grey pouch:", "wrap carrier, blankets, hat and socks, muslins"), ("#2f7d4a", "Green pouch:", "thermometer, saline, your medicines pouch")],
+    frombag=[("#5c6a3a", "Olive pouch:", "your formula cartons, bottle, sealed teats, sterilising tablets, water"), ("#2a2a2a", "Black pouch:", "nappies, wipes, bags, cream"), ("#6b6b6b", "Grey pouch:", "wrap carrier, blankets, hat and socks, muslins"), ("#2f7d4a", "Green pouch:", "thermometer, saline, your medicines pouch")],
     numbers=[("Urgent health", "111"), ("Life at risk", "999"), ("Your health visitor", "on the feeding card"), ("Power cut", "105")],
     cta=("cub", "The Cub, £149", "Three days for a baby, in three stages. Clips onto a pram or an Operator."),
     next=["teaching-your-child-the-bag", "the-family-meeting-point", "power-cut-the-first-hour"],
@@ -324,7 +324,7 @@ dict(slug="the-72-hour-list-explained", cat="Planning", mins=8, title="The 72-ho
             "<strong>A battery or wind-up torch, and a battery or wind-up radio.</strong> The bag: the head torch with 10-year lithium cells, and the crank-and-solar radio in the lid. Nothing to buy.",
             "<strong>A portable power bank and spare batteries.</strong> The bag: 10,000 mAh in the Operator, 20,000 in the Unit, with cables. Charge them every three months; our reminder emails tell you when.",
             "<strong>A first aid kit, hand sanitiser and wet wipes.</strong> The bag: a BS 8599-1 kit, a trauma dressing, masks and gloves, sanitiser and wipes. The cupboard: your own regular medicines, see the medication guide.",
-            "<strong>Baby supplies and pet supplies.</strong> The Cub and the Scout exist because the list is right: ready-to-feed formula so you don't need to boil water, nappies, and three days of the animal's own food."]),
+            "<strong>Baby supplies and pet supplies.</strong> The Cub and the Scout exist because the list is right: room for your baby's own ready-to-feed formula so you don't need to boil water, nappies, and three days of the animal's own food."]),
         ("The gaps", "a bag can't fill", "What belongs in the house", [
             "Water in volume: the bag is the walk, the house is the store. Three days for four people is 30 litres to drink. Keep it under the stairs with the date written on.",
             "Warmth at home: blankets, a sleeping bag per person, and a way to heat one room safely. The bag's foil and bivvy are for outside.",
