@@ -42,6 +42,8 @@ h1,h2,h3,h4,p,ul,ol{margin:0}
 .light{background:var(--ink);color:var(--bg)}
 .light .eyebrow,.light .p,.light .muted{color:#555}
 .stack{display:flex;flex-direction:column;gap:12px}
+.stack>.field{flex:0 0 auto}
+[hidden]{display:none!important}
 .grid{display:flex;flex-wrap:wrap;gap:20px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:16px;min-width:0}
 .card.outline{background:transparent;border-color:var(--line2)}
@@ -124,6 +126,42 @@ article .never p{font-size:17px;line-height:1.55;font-weight:500}
 @media(max-width:760px){.nav-links{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:none}.nav-links::-webkit-scrollbar{display:none}.nav-right{margin-left:auto}.stat .n{font-size:52px}.bag-art svg{max-height:420px}}
 @media print{.banner,.nav,footer,.aside-card.light,.next{display:none}body{background:#fff;color:#000}article ol,article ul,.body{color:#000}}
 
+
+
+/* live warnings ticker */
+.ticker{display:flex;align-items:stretch;background:var(--ink);color:var(--bg);font-size:13px;font-weight:500;min-height:38px}
+.ticker.live.lvl-red{background:#8f1016;color:#fff}.ticker.live.lvl-amber{background:#b4660a;color:#fff}.ticker.live.lvl-yellow{background:#c9a30d;color:#111}
+.tk-view{flex:1 1 auto;overflow:hidden;display:flex;align-items:center;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent)}
+.tk-track{display:inline-flex;align-items:center;padding:0 16px}
+.tk-view.moving .tk-track{animation:tk var(--tk-dur,40s) linear infinite}
+.tk-view.moving:hover .tk-track{animation-play-state:paused}
+.tk-view:not(.moving){justify-content:center}
+.tk-view:not(.moving) .tk-track{white-space:normal;text-align:center;padding:8px 16px;display:block}
+.tk-view:not(.moving) .tk-item{display:inline;padding:0}
+.tk-view:not(.moving) .tk-dot{display:inline-block;vertical-align:middle;margin-right:7px}
+@media (max-width:640px){.tk-view:not(.moving) .tk-track{font-size:12px;padding:7px 12px}}
+@keyframes tk{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.tk-item{display:inline-flex;align-items:center;gap:8px;padding:9px 18px 9px 0;color:inherit}
+.tk-item+.tk-item::before{content:"";width:1px;height:14px;background:currentColor;opacity:.35;margin-right:18px}
+.tk-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:#9a9a9a}
+.tk-dot.red{background:#ff3b30}.tk-dot.amber{background:#ff9f0a}.tk-dot.yellow{background:#ffd60a}.tk-dot.info{background:#6ea8ff}.tk-dot.none{background:#2BA84A}
+.ticker.live .tk-dot.red,.ticker.live .tk-dot.amber{box-shadow:0 0 0 2px rgba(255,255,255,.45)}
+.tk-src{opacity:.75;font-weight:400}
+.tk-loc{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:0 16px;border:0;border-left:1px solid rgba(128,128,128,.35);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+.tk-loc:hover{background:rgba(128,128,128,.15)}
+@media (max-width:640px){.tk-loc{padding:0 12px;max-width:40vw;overflow:hidden;text-overflow:ellipsis}}
+.loc-dialog{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.loc-box{background:var(--surface);color:var(--ink);border:1px solid var(--line3);border-radius:16px;padding:22px;width:min(440px,100%)}
+.loc-box select{width:100%}
+.loc-box .field{flex:0 0 auto}
+.alert-card{display:block;border-left:4px solid #9a9a9a;color:inherit}
+.alert-card.red{border-left-color:#ff3b30}.alert-card.amber{border-left-color:#ff9f0a}.alert-card.yellow{border-left-color:#ffd60a}.alert-card.info{border-left-color:#6ea8ff}
+@media print{.ticker{display:none}}
+
+.ship-table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+.ship-table th,.ship-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.ship-table thead th{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.ship-table tbody th{font-weight:600}
 
 /* launch bar + live availability */
 .launch-bar{background:#161616;border-bottom:1px solid var(--line);color:var(--soft);font-size:13px;text-align:center;padding:10px 16px}

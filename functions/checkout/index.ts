@@ -2,6 +2,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { CORS, json, stripeHeaders } from "../_shared.ts";
+import { SHIP, quote } from "../_shipping.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -13,6 +14,8 @@ Deno.serve(async (req: Request) => {
   const base = typeof body.base === "string" && /^https:\/\/[^\s"']+\/$/.test(body.base) ? body.base : "https://blackoutsos.com/";
   if (!items.length) return json({ error: "Your basket is empty." }, 400);
 
+  const country = /^[A-Za-z]{2}$/.test(String(body.country || "")) ? String(body.country).toUpperCase() : "GB";
+  if ((SHIP.noShip as readonly string[]).includes(country)) return json({ error: "We can't deliver to that country yet. Email hello@blackoutsos.com and we will see what we can do." }, 400);
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const skus = [...new Set(items.map((i) => String(i.sku)))];
   const { data: products, error } = await supabase.from("bsos_products").select("sku,name,variant,price_pence,active,stock").in("sku", skus);
@@ -24,12 +27,25 @@ Deno.serve(async (req: Request) => {
   p.set("success_url", base + "checkout/success.html?session_id={CHECKOUT_SESSION_ID}");
   p.set("cancel_url", base + "checkout/cancel.html");
   p.set("currency", "gbp");
-  p.set("shipping_address_collection[allowed_countries][0]", "GB");
+  p.set("shipping_address_collection[allowed_countries][0]", country);
   p.set("phone_number_collection[enabled]", "true");
   p.set("billing_address_collection", "auto");
   p.set("customer_creation", "always");
   p.set("allow_promotion_codes", "true");
-  p.set("custom_text[submit][message]", "Assembled to order in the UK and dispatched within three working days. Free tracked delivery.");
+  // delivery: the rate for the destination chosen on the basket page, standard and express
+  const q = quote(country, items.map((i) => ({ sku: String(i.sku), qty: Math.max(1, Math.min(10, parseInt(i.qty) || 1)) })));
+  const opts = [[q.standard, country === "GB" ? "Free tracked delivery" : "Tracked delivery", q.days], [q.express, country === "GB" ? "Next working day" : "Express, tracked", q.express_days]];
+  opts.forEach(([amount, name, days], i) => {
+    p.set(`shipping_options[${i}][shipping_rate_data][type]`, "fixed_amount");
+    p.set(`shipping_options[${i}][shipping_rate_data][fixed_amount][amount]`, String(amount));
+    p.set(`shipping_options[${i}][shipping_rate_data][fixed_amount][currency]`, "gbp");
+    p.set(`shipping_options[${i}][shipping_rate_data][display_name]`, `${name} (${days})`);
+  });
+  p.set("custom_text[submit][message]", country === "GB"
+    ? "Assembled to order in the UK and dispatched within three working days."
+    : "Assembled to order in the UK and dispatched within three working days. Prices exclude any import duty or tax charged by your country; the courier collects these on delivery.");
+  p.set("metadata[country]", country);
+  p.set("metadata[ship_zone]", q.zone);
   let n = 0; const meta: string[] = []; let total = 0;
   for (const it of items) {
     const prod = by[String(it.sku)];

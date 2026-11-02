@@ -46,12 +46,13 @@ def head(title, desc, path, r, extra=""):
 """
 
 def nav(r):
-    return f"""<a class="banner" href="{r}guides/the-72-hour-list-explained.html">Be Ready: the Government advises every household to hold three days of supplies. Read the 72-hour checklist →</a>
+    return f"""<div class="ticker" data-ticker data-ready-href="{r}guides/the-72-hour-list-explained.html" aria-live="polite"><div class="tk-view"><div class="tk-track"><a class="tk-item" href="{r}guides/the-72-hour-list-explained.html"><span class="tk-dot none"></span>Be Ready: the Government advises every household to hold three days of supplies. <span class="tk-src">The 72-hour checklist →</span></a></div></div><a class="tk-loc" href="{r}alerts.html">Live warnings</a></div>
 <header class="nav">
 <a class="brand" href="{r}index.html" aria-label="Blackout SOS home"><span class="word">Blackout SOS</span>{morse()}</a>
 <nav class="nav-links" aria-label="Main">
 <a href="{r}bags/index.html">Bags</a>
 <a href="{r}guides/index.html">Guides</a>
+<a href="{r}alerts.html">Live warnings</a>
 <a href="{r}refills.html">Refills</a>
 <a href="{r}organisations.html">For organisations</a>
 <a href="{r}about.html">Our story</a>
@@ -69,13 +70,16 @@ def footer(r):
 <div class="foot">
 <div class="stack" style="max-width:320px"><span class="display" style="font-size:26px;letter-spacing:2px">Blackout SOS</span><p class="p small">Designed in London. Assembled in the UK. Three dots, three dashes, three days.</p></div>
 <div class="col"><span>Shop</span><a href="{r}bags/operator.html">Operator</a><a href="{r}bags/recruit.html">Recruit</a><a href="{r}bags/cub.html">Cub</a><a href="{r}bags/unit.html">Unit</a><a href="{r}bags/scout.html">Scout</a><a href="{r}refills.html">Refills</a></div>
-<div class="col"><span>Learn</span><a href="{r}guides/index.html">Guides</a><a href="{r}guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="{r}bags/operator.html#inside">What's in the bag</a><a href="{r}refills.html">Rotation dates</a></div>
+<div class="col"><span>Learn</span><a href="{r}guides/index.html">Guides</a><a href="{r}guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="{r}alerts.html">Live warnings</a><a href="{r}bags/operator.html#inside">What's in the bag</a><a href="{r}refills.html">Rotation dates</a></div>
 <div class="col"><span>Company</span><a href="{r}about.html">Our story</a><a href="{r}organisations.html">For organisations</a><a href="{r}delivery-returns.html">Delivery and returns</a><a href="{r}contact.html">Contact</a><a href="{r}privacy.html">Privacy</a><a href="{r}terms.html">Terms</a></div>
 </div>
-<p class="legal">© {YEAR} Blackout SOS. Blackout SOS is a trading name of Urban Carers Ltd, company number 15419139, registered in England and Wales. blackoutsos.com · In an emergency call 999. This site gives general preparedness advice, not emergency instructions from the authorities.</p>
+<p class="legal">© {YEAR} Blackout SOS, London. blackoutsos.com · Company details are on the <a href="{r}terms.html">terms page</a>. In an emergency call your local emergency number (999 in the UK, 911 in the US, 112 in Europe). This site gives general preparedness advice, not emergency instructions from the authorities.</p>
 </div>
 </footer>
+<script src="{r}assets/geo.js"></script>
+<script src="{r}assets/shipping.js"></script>
 <script src="{r}assets/site.js"></script>
+<script src="{r}assets/alerts.js" defer></script>
 </body>
 </html>
 """
@@ -153,7 +157,7 @@ def home():
     pouch_html = "".join(f'<div class="card" style="flex:1 1 240px;padding:24px;gap:14px"><div style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:14px;height:14px;background:{c};{"border:1px solid #3a3a3a" if c=="#2a2a2a" else ""}"></span><span class="eyebrow" style="letter-spacing:2px">{t}</span></div><p class="items" style="font-size:15px">{i}</p></div>' for c, t, i in pouches)
     chips = [("flooding-before-during-after", "Flooding"), ("storms-and-high-wind", "Storms and high wind"), ("cyber-outage-cards-cash-and-comms", "Cyber outage: cards, cash, comms"), ("water-treating-storing-rationing", "Water: treating, storing, rationing"), ("teaching-your-child-the-bag", "Teaching your child the bag"), ("pets-in-an-emergency", "Pets"), ("medication-and-medical-devices", "Medication and medical devices"), ("the-family-meeting-point", "The family meeting point")]
     chips_html = "".join(f'<a class="chip" href="guides/{s}.html">{t}</a>' for s, t in chips)
-    schema = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Blackout SOS", "url": SITE, "legalName": "Urban Carers Ltd", "description": "72-hour go bags assembled in the UK. One bag per person, one colour per bag.", "contactPoint": {"@type": "ContactPoint", "email": "hello@blackoutsos.com", "contactType": "customer service", "areaServed": "GB"}})
+    schema = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Blackout SOS", "url": SITE, "description": "72-hour go bags assembled in the UK. One bag per person, one colour per bag.", "contactPoint": {"@type": "ContactPoint", "email": "hello@blackoutsos.com", "contactType": "customer service", "areaServed": "GB"}})
     body = f"""
 {hero_html(r, art, BAGS, gbp)}
 <section class="strip"><span>Assembled in the UK</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Refills when it's time</span></section>
@@ -267,7 +271,7 @@ def product(slug):
 <div class="stack" style="flex:1 1 420px;gap:24px">
 <div class="stack" style="gap:10px"><div class="eyebrow" style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:10px;height:10px;background:{b['colour']}"></span>{b['who']} · {b['colour_name']} tag</div><h1 class="h1" style="font-size:clamp(56px,7vw,96px)">{b['name']}</h1><p class="lede" style="font-size:17px">{b['lede']}</p></div>
 <div class="muted small" style="display:flex;flex-wrap:wrap;gap:8px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0">{"".join(f"<span>{s}</span>" for s in b["specs"])}</div>
-<div style="display:flex;align-items:baseline;gap:14px"><span class="price">{gbp(b['price'])}</span><span class="muted small">inc. VAT · free UK delivery</span></div>
+<div style="display:flex;align-items:baseline;gap:14px"><span class="price">{gbp(b['price'])}</span><span class="muted small">inc. UK VAT · free UK delivery · ships worldwide</span></div>
 <form class="stack" style="gap:14px" data-product="{b['sku']}">
 {variants}
 <div data-avail="{b['sku']}" data-when="in" data-follow-variant hidden style="display:contents">
@@ -395,8 +399,11 @@ def basket():
 <div data-basket class="stack" style="gap:0;border-top:1px solid var(--line)"></div>
 <div data-basket-empty class="stack" style="gap:16px"><p class="lede">Your basket is empty.</p><a class="pill solid" href="bags/index.html" style="align-self:flex-start">Shop the range</a></div>
 <div data-basket-summary hidden class="stack" style="gap:20px;max-width:520px;margin-left:auto;width:100%">
-<div class="row" style="font-size:18px"><span>Total, inc. VAT</span><strong data-basket-total>£0</strong></div>
-<p class="p small">Free UK delivery. Assembled to order and dispatched within three working days. Payment is taken on Stripe's secure page: cards, Apple Pay and Google Pay.</p>
+<label class="field">Deliver to<select name="country" data-ship-country></select></label>
+<div class="row"><span>Bags</span><strong data-basket-sub>£0</strong></div>
+<div class="row"><span data-ship-label>Delivery</span><strong data-ship-cost>Free</strong></div>
+<div class="row" style="font-size:18px"><span>Total</span><strong data-basket-total>£0</strong></div>
+<p class="p small" data-ship-note>Free UK delivery. Assembled to order and dispatched within three working days. Payment is taken on Stripe's secure page: cards, Apple Pay and Google Pay.</p>
 <button type="button" class="pill solid" data-checkout style="height:58px;font-size:16px">Checkout</button>
 <p class="notice" data-checkout-msg hidden></p>
 <p class="p small">Buying for an organisation? <a href="organisations.html" style="border-bottom:1px solid var(--muted)">Ask for a quote and invoice terms</a>.</p>
@@ -480,7 +487,7 @@ def organisations():
 <div class="form-row"><label class="field">Type<select name="segment"><option>Children's home</option><option>Fostering agency</option><option>Council or resilience forum</option><option>Charity or foodbank</option><option>Animal rehoming</option><option>Workplace or housing</option><option>Retailer</option><option>Other</option></select></label><label class="field">How many bags, roughly<input name="bags" placeholder="e.g. 40 Recruits, 6 Units"></label></div>
 <label class="field">Anything else<textarea name="message" placeholder="Who the bags are for, when you need them, whether you'd like a sample."></textarea></label>
 <button type="submit" class="pill solid" style="align-self:flex-start">Request a quote</button>
-<p class="p small ok" data-done hidden>Received. Omar will reply within two working days.</p>
+<p class="p small ok" data-done hidden>Received. A person will reply within two working days.</p>
 </form>
 </div></section>
 """
@@ -490,8 +497,8 @@ def about():
     body = """
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <p class="eyebrow">Our story</p>
-<h1 class="h1" style="max-width:1000px">Built by a foster carer who kept a bag by the door.</h1>
-<p class="lede">Blackout SOS was started in London in 2026 by Omar Rahmat, a foster carer of seven years who runs supported accommodation for young people leaving care. In a house of five people and a cat, with children who had already lived through enough, the question was never whether to have a go bag. It was why the ones you could buy were so bad.</p>
+<h1 class="h1" style="max-width:1000px">Built by a family who kept a bag by the door.</h1>
+<p class="lede">Blackout SOS started in London in 2026, in a fostering household of five people and a cat. With children in the house who had already lived through enough, the question was never whether to have a go bag. It was why the ones you could buy were so bad.</p>
 </div></section>
 <section class="section band"><div class="wrap grid">
 <div class="card" style="flex:1 1 300px"><p class="eyebrow">The problem</p><p class="p">The kits on sale were a rucksack with things thrown in: a cheap torch, a foil blanket, a tin of biscuits with nuts in it, camouflage on the outside and nothing for a child, a baby or a dog. When the Government asked every household to hold three days of supplies, the answer on the shelf was a bag you'd be embarrassed to carry and couldn't find the plasters in.</p></div>
@@ -501,31 +508,44 @@ def about():
 <section class="section"><div class="wrap split">
 <div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How we make them</p><h2 class="h2">Designed in London. Assembled in the UK.</h2></div>
 <div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The bags are made to our drawings from the same TPU-laminated Cordura, taped seams and YKK AquaGuard zips as expedition packs. The contents are sourced from UK suppliers wherever one exists, checked against the claims on the box, and packed by hand in the UK into pouches with a place for everything. Every bag leaves with a rotation card, and we hold the dates so you don't have to.</p>
-<p class="body">The company behind the brand is Urban Carers Ltd, registered in England and Wales. If you want to talk to the person who packed your bag, <a href="contact.html" style="border-bottom:1px solid var(--muted)">write to us</a>: it will be a short conversation, because we are a small team, and a useful one.</p></div>
+<p class="body">If you want to talk to the person who packed your bag, <a href="contact.html" style="border-bottom:1px solid var(--muted)">write to us</a>: it will be a short conversation, because we are a small team, and a useful one.</p></div>
 </div></section>
 """
     page("about.html", "Our story — Blackout SOS", "Blackout SOS was started in London by a foster carer who couldn't find a go bag worth keeping by the door. One bag per person, one colour per bag.", body)
 
 def delivery():
-    body = """
-<section class="section top"><div class="wrap stack" style="gap:28px"><p class="eyebrow">Delivery and returns</p><h1 class="h1">Three working days, free, tracked.</h1>
-<p class="lede">Every bag is assembled to order in the UK and dispatched within three working days. UK delivery is free and tracked: Royal Mail Tracked 48 for the backpacks, a courier for the Unit. You get the tracking number by email when it leaves.</p></div></section>
-<section class="section band"><div class="wrap grid">
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">Delivery</p><p class="p">Free, tracked, to any UK address including Northern Ireland, the Highlands and the islands. Signed for on delivery for the Unit. International delivery is coming with our US and European launches; until then, email us and we'll quote.</p></div>
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">What's inside, and the post</p><p class="p">Bags contain lithium batteries and a power bank, which travel by ground under the carrier's rules, and no matches or lighters, which can't be posted at all. The multi-tool is UK-carry-legal: non-locking, blade under 7.62 cm.</p></div>
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">Returns</p><p class="p">Thirty days to return an unopened bag for a full refund: seals intact, contents unused. Under the Consumer Contracts Regulations you can cancel within 14 days of receiving your order for any reason; sealed hygiene and food items that have been unsealed can't be returned. Faulty items are replaced first, refunded second.</p></div>
+    from shipping import ZONES, RATES, BANDS
+    gb = lambda pence: "Free" if pence == 0 else f"£{pence/100:.2f}".replace(".00", "").replace(".95", ".95")
+    band_names = ["One bag (up to 4 kg)", "Two bags (up to 8 kg)", "Family set or the Unit (up to 14 kg)", "Larger orders (up to 30 kg)"]
+    rows = ""
+    for z, d in ZONES.items():
+        cells = "".join(f'<td>{gb(std)} <span class="muted small">/ {gb(exp)} express</span></td>' for std, exp in RATES[z])
+        rows += f'<tr><th scope="row">{d["name"]}<br><span class="muted small">{d["days"]} · express {d["express_days"]}</span></th>{cells}</tr>'
+    heads = "".join(f"<th>{b}</th>" for b in band_names)
+    body = f"""
+<section class="section top"><div class="wrap stack" style="gap:28px"><p class="eyebrow">Delivery and returns</p><h1 class="h1">Assembled in the UK. Delivered anywhere.</h1>
+<p class="lede">Every bag is assembled to order in the UK and dispatched within three working days, tracked, to almost any country in the world. UK delivery is free. For everywhere else the price depends on where you are and how much you order, and you see it on the basket page before you pay, in your own currency at checkout.</p></div></section>
+<section class="section band"><div class="wrap stack" style="gap:20px">
+<p class="eyebrow">Tracked delivery from the UK · standard / express</p>
+<div style="overflow-x:auto"><table class="ship-table"><thead><tr><th>Destination</th>{heads}</tr></thead><tbody>{rows}</tbody></table></div>
+<p class="p small">Working days from dispatch, not from order. Express is a courier service with a signature on delivery. We can't yet deliver to a small number of countries where no carrier serves us or sanctions apply; the basket page only lists the ones we can.</p>
 </div></section>
-<section class="section"><div class="wrap stack" style="gap:16px;max-width:760px"><h2 class="h3">How to return something</h2><p class="body">Email hello@blackoutsos.com with your order number and what's wrong. We send a prepaid label the same working day for faults, and a returns address for changes of mind. Refunds reach your card within five working days of the bag reaching us.</p></div></section>
+<section class="section"><div class="wrap grid">
+<div class="card" style="flex:1 1 300px"><p class="eyebrow">Outside the UK: duties and taxes</p><p class="p">Our prices include UK VAT and exclude any import duty, sales tax or VAT your own country charges on goods arriving from the UK. The courier collects anything due before delivery, sometimes with a handling fee. In the United States, duty is now charged on parcels of any value; in the EU, VAT is charged on the goods and the delivery. We can't predict the exact amount, and we don't mark parcels as gifts or understate values.</p></div>
+<div class="card" style="flex:1 1 300px"><p class="eyebrow">What's inside, and the post</p><p class="p">Bags contain a power bank and lithium batteries, which travel only on services approved for them, and no matches, lighters or fuel, which can't be posted at all. Food, water and medicines are packed sealed and labelled; where a country doesn't allow an item in by post we take it out, tell you before dispatch and refund its share. The multi-tool is UK-carry-legal: non-locking, blade under 7.62 cm.</p></div>
+<div class="card" style="flex:1 1 300px"><p class="eyebrow">Returns</p><p class="p">Thirty days to return an unopened bag for a full refund: seals intact, contents unused. UK and EU customers can cancel within 14 days of receiving an order for any reason; sealed hygiene and food items that have been unsealed can't be returned. Faulty items are replaced first and refunded if we can't. Outside the UK you pay the return postage unless the item is faulty.</p></div>
+</div></section>
+<section class="section band"><div class="wrap stack" style="gap:16px;max-width:760px"><h2 class="h3">How to return something</h2><p class="body">Email hello@blackoutsos.com with your order number and what's wrong. We send a prepaid label the same working day for faults in the UK, and a returns address for everything else. Refunds reach your card within five working days of the bag reaching us, in the currency you paid in.</p></div></section>
 """
-    page("delivery-returns.html", "Delivery and returns — Blackout SOS", "Free tracked UK delivery within three working days. Thirty-day returns on unopened bags. Faults replaced first.", body)
+    page("delivery-returns.html", "Delivery and returns — Blackout SOS", "Free tracked UK delivery within three working days; tracked delivery worldwide with prices shown before you pay. Thirty-day returns on unopened bags.", body)
 
 def contact():
     body = """
 <section class="section top"><div class="wrap split">
 <div class="stack" style="flex:1 1 360px;gap:20px"><p class="eyebrow">Contact</p><h1 class="h1">Talk to the people who packed it.</h1>
 <p class="lede">Questions, orders, complaints, press and partnerships all come to one inbox and get a human reply within one working day. Complaints are acknowledged within four working hours and resolved within 48.</p>
-<div class="rows"><div class="row"><span>Email</span><span>hello@blackoutsos.com</span></div><div class="row"><span>Organisations</span><span><a href="organisations.html">Request a quote</a></span></div><div class="row"><span>Company</span><span>Urban Carers Ltd, England and Wales, 15419139</span></div></div>
-<p class="p small">In an emergency, call 999. This inbox is not monitored around the clock and we are not the emergency services.</p></div>
+<div class="rows"><div class="row"><span>Email</span><span>hello@blackoutsos.com</span></div><div class="row"><span>Organisations</span><span><a href="organisations.html">Request a quote</a></span></div><div class="row"><span>Based in</span><span>London, United Kingdom</span></div></div>
+<p class="p small">In an emergency, call your local emergency number. This inbox is not monitored around the clock and we are not the emergency services.</p></div>
 <form class="stack" style="flex:1 1 420px;gap:14px" data-api="/enquiry">
 <input type="hidden" name="kind" value="contact">
 <div class="form-row"><label class="field">Your name<input name="name" required></label><label class="field">Email<input name="email" type="email" required></label></div>
@@ -541,7 +561,7 @@ def contact():
 def privacy():
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:20px;max-width:800px"><p class="eyebrow">Privacy</p><h1 class="h1">What we keep, and why.</h1>
-<p class="lede">Blackout SOS is a trading name of Urban Carers Ltd (company 15419139), the data controller for this site. We keep as little as a shop can.</p>
+<p class="lede">Blackout SOS, London, is the data controller for this site (company details on the terms page). We keep as little as a shop can.</p>
 <div class="stack body" style="gap:14px">
 <p><strong>When you buy.</strong> Your name, email, delivery address and what you bought are stored in our order system so we can assemble, dispatch and support your order, and for the six years tax law requires. Payment is taken by Stripe on its own secure page; we never see your card number. Stripe's privacy policy covers what it holds.</p>
 <p><strong>When you sign up for alerts or register a bag.</strong> Your email, which bag and when you bought it, so we can send the rotation reminders and Be Ready alerts you asked for. Every email has an unsubscribe link, and we delete the record when you use it.</p>
@@ -558,7 +578,7 @@ def terms():
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:20px;max-width:800px"><p class="eyebrow">Terms</p><h1 class="h1">The plain version.</h1>
 <div class="stack body" style="gap:14px">
-<p><strong>Who you are buying from.</strong> Urban Carers Ltd, trading as Blackout SOS, registered in England and Wales, company number 15419139. Email hello@blackoutsos.com.</p>
+<p><strong>Who you are buying from.</strong> Blackout SOS, London, United Kingdom. The registered company name, number and address will be shown here from the day the shop opens for orders. Email hello@blackoutsos.com.</p>
 <p><strong>Prices and payment.</strong> Prices are in pounds sterling and include VAT and UK delivery. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
 <p><strong>Delivery.</strong> Within three working days of your order, tracked, to UK addresses. Risk passes to you on delivery.</p>
 <p><strong>Cancelling and returning.</strong> You may cancel within 14 days of receiving your order for any reason and return it at your cost for a full refund, provided seals are intact; sealed food, hygiene and first-aid items that have been unsealed cannot be returned for hygiene reasons. We extend this to 30 days for unopened bags. Faulty goods are repaired, replaced or refunded as the Consumer Rights Act 2015 requires.</p>
@@ -576,12 +596,48 @@ def notfound():
 <section class="section top"><div class="wrap stack" style="gap:20px"><p class="eyebrow">404</p><h1 class="h1">That page isn't here.</h1><p class="lede">Three dots, three dashes, three days: try the <a href="index.html" style="border-bottom:1px solid var(--muted)">home page</a>, the <a href="bags/index.html" style="border-bottom:1px solid var(--muted)">bags</a> or the <a href="guides/index.html" style="border-bottom:1px solid var(--muted)">guides</a>.</p></div></section>
 """)
 
+def alerts():
+    body = f"""
+<section class="section top"><div class="wrap stack" style="gap:28px">
+<div class="stack" style="gap:12px"><p class="eyebrow">Live official warnings</p><h1 class="h1">Warnings in force for <span data-alerts-place>your area</span>.</h1>
+<p class="lede">Straight from the national services, checked every 15 minutes: the Met Office and Environment Agency for the UK, the National Weather Service for the United States, 37 national weather services across Europe through MeteoAlarm, and GDACS for major disasters anywhere in the world.</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><button type="button" class="pill" data-loc-open>Change area</button><span class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</span></div></div>
+<div class="stack" style="gap:28px" data-alerts-page><div class="card"><p class="p">Loading the latest warnings…</p></div></div>
+</div></section>
+<section class="section band" id="email"><div class="wrap split" style="gap:40px">
+<div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">Hear the moment a red or amber warning is issued for <span data-loc-name>your area</span>.</h2><p class="p">One email when a serious warning is issued where you live, with the three things to do in the first hour. No weather chat, no marketing in between. Change your area or stop at any time.</p></div>
+<form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe">
+<input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes">
+<label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label>
+<p class="p small">Area: <strong data-loc-name>your area</strong> · <a href="#" data-loc-open style="border-bottom:1px solid var(--line3)">change</a></p>
+<button type="submit" class="pill solid">Email me serious warnings</button>
+<p class="p small ok" data-done hidden>You're on the list. We'll only write when it matters.</p>
+</form>
+</div></section>
+<section class="section"><div class="wrap stack" style="gap:16px"><p class="eyebrow">Sources</p>
+<p class="p small">Contains public sector information licensed under the Open Government Licence v3.0 (Met Office, Environment Agency). US alerts: NOAA National Weather Service, public domain. European warnings: MeteoAlarm, CC BY 4.0, the national services remain the authority. Worldwide events: GDACS (European Commission Joint Research Centre), CC BY 4.0. This page is a convenience, not an official channel: in an emergency follow the instructions of your local authorities and emergency services.</p>
+</div></section>
+"""
+    page("alerts.html", "Live official warnings for your area — Blackout SOS", "Weather and flood warnings and major disaster alerts for your own region, from the national services, refreshed every 15 minutes.", body)
+
+def unsubscribe():
+    page("unsubscribe.html", "Unsubscribe — Blackout SOS", "Stop emails from Blackout SOS.", """
+<section class="section top"><div class="wrap stack" style="gap:20px;max-width:640px"><p class="eyebrow">Email</p><h1 class="h1" data-unsub-title>One moment…</h1><p class="lede" data-unsub-msg>We're taking you off the list.</p>
+<p class="p small">Changed your mind? You can sign up again on any page. Questions: <a href="mailto:hello@blackoutsos.com" style="border-bottom:1px solid var(--line3)">hello@blackoutsos.com</a>.</p></div></section>
+<script>(function(){var q=new URLSearchParams(location.search);var t=document.querySelector('[data-unsub-title]'),m=document.querySelector('[data-unsub-msg]');
+if(!q.get('e')||!q.get('t')){t.textContent='That link is incomplete.';m.textContent='Open the unsubscribe link from the email again, or write to hello@blackoutsos.com and we will remove you by hand.';return;}
+fetch('https://vbgustjtxjmjlgukzcfa.supabase.co/functions/v1/unsubscribe?e='+encodeURIComponent(q.get('e'))+'&t='+encodeURIComponent(q.get('t')),{method:'POST'}).then(function(r){return r.json();}).then(function(j){
+if(j&&j.ok){t.textContent="You're off the list.";m.textContent='No more emails from us to '+q.get('e')+'. Live warnings for your area stay free on the site whenever you want them.';}
+else{t.textContent="That link didn't work.";m.textContent=(j&&j.error)||'Write to hello@blackoutsos.com and we will remove you by hand.';}
+}).catch(function(){t.textContent="We couldn't reach the server.";m.textContent='Please try again in a minute, or write to hello@blackoutsos.com.';});})();</script>
+""")
+
 def meta_files():
-    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["refills.html", "organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
+    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "refills.html", "organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
     today = datetime.date.today().isoformat()
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("sitemap.xml", sm)
-    write("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /checkout/\nSitemap: {SITE}/sitemap.xml\n")
+    write("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /checkout/\nDisallow: /unsubscribe.html\nSitemap: {SITE}/sitemap.xml\n")
     write(".nojekyll", "")
 
 if __name__ == "__main__":
@@ -589,5 +645,5 @@ if __name__ == "__main__":
     for s in ORDER: product(s)
     guides_index()
     for g in GUIDES: guide_page(g)
-    basket(); checkout_pages(); refills(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()
+    basket(); checkout_pages(); alerts(); unsubscribe(); refills(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()
     print("built")

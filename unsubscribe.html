@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unsubscribe — Blackout SOS</title>
+<meta name="description" content="Stop emails from Blackout SOS.">
+<link rel="canonical" href="https://blackoutsos.com/unsubscribe.html">
+<meta property="og:title" content="Unsubscribe — Blackout SOS">
+<meta property="og:description" content="Stop emails from Blackout SOS.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://blackoutsos.com/unsubscribe.html">
+<meta property="og:site_name" content="Blackout SOS">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; viewBox=&#x27;0 0 64 64&#x27;&gt;&lt;rect width=&#x27;64&#x27; height=&#x27;64&#x27; rx=&#x27;14&#x27; fill=&#x27;#0a0a0a&#x27;/&gt;&lt;g fill=&#x27;#ededed&#x27;&gt;&lt;rect x=&#x27;10&#x27; y=&#x27;29&#x27; width=&#x27;5&#x27; height=&#x27;6&#x27; rx=&#x27;1&#x27;/&gt;&lt;rect x=&#x27;17&#x27; y=&#x27;29&#x27; width=&#x27;5&#x27; height=&#x27;6&#x27; rx=&#x27;1&#x27;/&gt;&lt;rect x=&#x27;24&#x27; y=&#x27;29&#x27; width=&#x27;5&#x27; height=&#x27;6&#x27; rx=&#x27;1&#x27;/&gt;&lt;rect x=&#x27;33&#x27; y=&#x27;29&#x27; width=&#x27;9&#x27; height=&#x27;6&#x27; rx=&#x27;1&#x27;/&gt;&lt;rect x=&#x27;44&#x27; y=&#x27;29&#x27; width=&#x27;9&#x27; height=&#x27;6&#x27; rx=&#x27;1&#x27;/&gt;&lt;/g&gt;&lt;/svg&gt;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+
+</head>
+<body>
+<div class="ticker" data-ticker data-ready-href="guides/the-72-hour-list-explained.html" aria-live="polite"><div class="tk-view"><div class="tk-track"><a class="tk-item" href="guides/the-72-hour-list-explained.html"><span class="tk-dot none"></span>Be Ready: the Government advises every household to hold three days of supplies. <span class="tk-src">The 72-hour checklist →</span></a></div></div><a class="tk-loc" href="alerts.html">Live warnings</a></div>
+<header class="nav">
+<a class="brand" href="index.html" aria-label="Blackout SOS home"><span class="word">Blackout SOS</span><span class="morse" aria-hidden="true"><i></i><i></i><i></i><b></b><i class="l"></i><i class="l"></i><i class="l"></i><b></b><i></i><i></i><i></i></span></a>
+<nav class="nav-links" aria-label="Main">
+<a href="bags/index.html">Bags</a>
+<a href="guides/index.html">Guides</a>
+<a href="alerts.html">Live warnings</a>
+<a href="refills.html">Refills</a>
+<a href="organisations.html">For organisations</a>
+<a href="about.html">Our story</a>
+</nav>
+<div class="nav-right"><a class="basket-link" href="basket.html" data-basket-count>Basket · 0</a></div>
+</header>
+<div class="launch-bar" data-launch-bar>First production run under way · <a href="bags/index.html">See the range</a> and join the list to be first to order</div>
+<main>
+
+<section class="section top"><div class="wrap stack" style="gap:20px;max-width:640px"><p class="eyebrow">Email</p><h1 class="h1" data-unsub-title>One moment…</h1><p class="lede" data-unsub-msg>We're taking you off the list.</p>
+<p class="p small">Changed your mind? You can sign up again on any page. Questions: <a href="mailto:hello@blackoutsos.com" style="border-bottom:1px solid var(--line3)">hello@blackoutsos.com</a>.</p></div></section>
+<script>(function(){var q=new URLSearchParams(location.search);var t=document.querySelector('[data-unsub-title]'),m=document.querySelector('[data-unsub-msg]');
+if(!q.get('e')||!q.get('t')){t.textContent='That link is incomplete.';m.textContent='Open the unsubscribe link from the email again, or write to hello@blackoutsos.com and we will remove you by hand.';return;}
+fetch('https://vbgustjtxjmjlgukzcfa.supabase.co/functions/v1/unsubscribe?e='+encodeURIComponent(q.get('e'))+'&t='+encodeURIComponent(q.get('t')),{method:'POST'}).then(function(r){return r.json();}).then(function(j){
+if(j&&j.ok){t.textContent="You're off the list.";m.textContent='No more emails from us to '+q.get('e')+'. Live warnings for your area stay free on the site whenever you want them.';}
+else{t.textContent="That link didn't work.";m.textContent=(j&&j.error)||'Write to hello@blackoutsos.com and we will remove you by hand.';}
+}).catch(function(){t.textContent="We couldn't reach the server.";m.textContent='Please try again in a minute, or write to hello@blackoutsos.com.';});})();</script>
+</main>
+<footer>
+<div class="wrap">
+<div class="foot">
+<div class="stack" style="max-width:320px"><span class="display" style="font-size:26px;letter-spacing:2px">Blackout SOS</span><p class="p small">Designed in London. Assembled in the UK. Three dots, three dashes, three days.</p></div>
+<div class="col"><span>Shop</span><a href="bags/operator.html">Operator</a><a href="bags/recruit.html">Recruit</a><a href="bags/cub.html">Cub</a><a href="bags/unit.html">Unit</a><a href="bags/scout.html">Scout</a><a href="refills.html">Refills</a></div>
+<div class="col"><span>Learn</span><a href="guides/index.html">Guides</a><a href="guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="alerts.html">Live warnings</a><a href="bags/operator.html#inside">What's in the bag</a><a href="refills.html">Rotation dates</a></div>
+<div class="col"><span>Company</span><a href="about.html">Our story</a><a href="organisations.html">For organisations</a><a href="delivery-returns.html">Delivery and returns</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
+</div>
+<p class="legal">© 2026 Blackout SOS, London. blackoutsos.com · Company details are on the <a href="terms.html">terms page</a>. In an emergency call your local emergency number (999 in the UK, 911 in the US, 112 in Europe). This site gives general preparedness advice, not emergency instructions from the authorities.</p>
+</div>
+</footer>
+<script src="assets/geo.js"></script>
+<script src="assets/shipping.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/alerts.js" defer></script>
+</body>
+</html>

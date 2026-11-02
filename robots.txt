@@ -2,4 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /checkout/
+Disallow: /unsubscribe.html
 Sitemap: https://blackoutsos.com/sitemap.xml
