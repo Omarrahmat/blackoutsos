@@ -163,7 +163,7 @@ def home():
     schema = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Blackout SOS", "url": SITE, "description": "72-hour go bags assembled in the UK. One bag per person, one colour per bag.", "contactPoint": {"@type": "ContactPoint", "email": "hello@blackoutsos.com", "contactType": "customer service", "areaServed": "GB"}})
     body = f"""
 {hero_html(r, art, BAGS, gbp)}
-<section class="strip"><span>Assembled in the UK</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Refills when it's time</span></section>
+<section class="strip"><span>Assembled in the UK · ships worldwide</span><span>Waterproof TPU Cordura</span><span>15-year rations</span><span>Vegan · made without nuts</span><span>One tag per person</span><span>Refills when it's time</span></section>
 <section class="section"><div class="wrap stack" style="gap:40px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
 <div class="stack" style="gap:10px"><p class="eyebrow">Shop the range</p><h2 class="h2">One bag per person. One colour per bag.</h2></div>
@@ -200,15 +200,15 @@ def home():
 <a href="guides/index.html" style="font-weight:600;font-size:15px;border-bottom:2px solid var(--bg);padding-bottom:2px">All guides →</a>
 </div>
 <div class="grid">
-<a class="card dark" href="guides/power-cut-the-first-hour.html" style="flex:2 1 420px;padding:32px;justify-content:space-between;gap:48px;min-height:320px"><span class="eyebrow">Featured · 6 min read</span><span class="stack"><span class="display" style="font-size:44px">Power cut: the first hour</span><span class="p" style="color:#b5b5b5">What to do in the first five minutes, the first thirty, and the first hour. When to call 105, what never to bring indoors, and which pouch to open first.</span></span></a>
-<a class="card" href="guides/the-72-hour-list-explained.html" style="flex:1 1 260px;justify-content:space-between;gap:32px"><span class="eyebrow">Checklist</span><span class="stack" style="gap:10px"><span class="display" style="font-size:30px">The Government's 72-hour list, explained</span><span class="p small">Line by line, with what's already in your bag and what you still need at home.</span></span></a>
+<a class="card dark" href="guides/power-cut-the-first-hour.html" style="flex:2 1 420px;padding:32px;justify-content:space-between;gap:48px;min-height:320px"><span class="eyebrow">Featured · 6 min read</span><span class="stack"><span class="display" style="font-size:44px">Power cut: the first hour</span><span class="p" style="color:#b5b5b5">What to do in the first five minutes, the first thirty, and the first hour. Who to call, what never to bring indoors, and which pouch to open first.</span></span></a>
+<a class="card" href="guides/the-72-hour-list-explained.html" style="flex:1 1 260px;justify-content:space-between;gap:32px"><span class="eyebrow">Checklist</span><span class="stack" style="gap:10px"><span class="display" style="font-size:30px">The 72-hour list, explained</span><span class="p small">Line by line, with what's already in your bag and what you still need at home.</span></span></a>
 <a class="card" href="guides/leaving-the-house-with-a-baby.html" style="flex:1 1 260px;justify-content:space-between;gap:32px"><span class="eyebrow">Family</span><span class="stack" style="gap:10px"><span class="display" style="font-size:30px">Leaving the house with a baby</span><span class="p small">Feeding without a kettle, the pram-or-wrap decision, and what goes on your back.</span></span></a>
 </div>
 <div class="chips">{chips_html}</div>
 </div></section>
 <section class="section"><div class="wrap grid">
 <div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Refills and rotation</p><h3 class="h3">Your bag tells you when it's time.</h3><p class="p">Every bag carries a rotation card and a QR code. Scan it once and we'll remind you when the water, the rations or the batteries are due, and when the power bank wants charging. Cub owners get a stage refill as their baby grows: Cub 1, Cub 2, Cub 3.</p><a href="refills.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">See refill packs</a></div>
-<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">For organisations</p><h3 class="h3">One bag per placement, per desk, per home.</h3><p class="p">Children's homes, fostering agencies, councils, schools and housing associations buy in tens and hundreds, with the policy wording written for them and a rotation schedule we manage.</p><a href="organisations.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">Request a quote</a></div>
+<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">For organisations</p><h3 class="h3">One bag per desk, per room, per person.</h3><p class="p">Workplaces, schools, hotels and property managers around the world buy in tens and hundreds, with volume pricing, invoice terms and a rotation schedule we run for them.</p><a href="organisations.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">Request a quote</a></div>
 </div></section>
 <section class="section tight" style="border-top:1px solid var(--line)"><div class="wrap" style="display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between">
 <div class="stack" style="flex:1 1 420px;gap:10px"><h3 class="h3">Be Ready alerts</h3><p class="p">When a storm, a cold snap or an official warning is coming, we send one short message with what to check. No marketing, no noise.</p></div>
@@ -335,12 +335,12 @@ def guides_index():
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <p class="eyebrow">Guides</p>
 <h1 class="h1" style="max-width:1000px">Know what to do before you need to.</h1>
-<p class="lede">Short, practical guides written for the UK, checked against official advice, and tied to what's in your bag. Read them once now; print the one-page versions for the lid pocket.</p>
+<p class="lede">Short, practical guides checked against official advice and tied to what's in your bag. These editions follow UK official advice; the steps work anywhere, and the box on every guide shows the numbers and warnings for where you are. Local editions: <a href="../us/index.html" style="border-bottom:1px solid var(--muted)">United States</a> · <a href="../world/index.html" style="border-bottom:1px solid var(--muted)">Europe and worldwide</a>.</p>
 </div></section>
 <section class="wrap grid" style="padding-bottom:clamp(56px,7vw,96px)">
-<a class="card" href="power-cut-the-first-hour.html" style="flex:2 1 480px;padding:40px;justify-content:space-between;gap:64px;min-height:380px"><span class="eyebrow" style="display:flex;justify-content:space-between"><span>Featured · Power</span><span>6 min read</span></span><span class="stack" style="gap:14px"><span class="display h2">Power cut: the first hour</span><span class="p" style="color:var(--soft);font-size:16px;max-width:560px">The first five minutes, the first thirty, the first hour. When to call 105, what never to bring indoors, and which pouch to open first.</span><span style="font-weight:600;font-size:15px">Read the guide →</span></span></a>
+<a class="card" href="power-cut-the-first-hour.html" style="flex:2 1 480px;padding:40px;justify-content:space-between;gap:64px;min-height:380px"><span class="eyebrow" style="display:flex;justify-content:space-between"><span>Featured · Power</span><span>6 min read</span></span><span class="stack" style="gap:14px"><span class="display h2">Power cut: the first hour</span><span class="p" style="color:var(--soft);font-size:16px;max-width:560px">The first five minutes, the first thirty, the first hour. Who to call, what never to bring indoors, and which pouch to open first.</span><span style="font-weight:600;font-size:15px">Read the guide →</span></span></a>
 <div class="stack" style="flex:1 1 320px;gap:20px">
-<a class="card light" href="the-72-hour-list-explained.html" style="flex:1;padding:32px;justify-content:space-between;gap:32px;border-color:var(--ink)"><span class="eyebrow">Official · Checklist</span><span class="stack" style="gap:10px"><span class="display" style="font-size:34px">The Government's 72-hour list, explained</span><span class="p small">Every line of the Be Ready advice, what's already in your bag, what you still need at home. Printable.</span></span></a>
+<a class="card light" href="the-72-hour-list-explained.html" style="flex:1;padding:32px;justify-content:space-between;gap:32px;border-color:var(--ink)"><span class="eyebrow">Official · Checklist</span><span class="stack" style="gap:10px"><span class="display" style="font-size:34px">The 72-hour list, explained</span><span class="p small">Every line of the official advice, what's already in your bag, what you still need at home. Printable.</span></span></a>
 <a class="card" href="leaving-the-house-with-a-baby.html" style="flex:1;padding:32px;justify-content:space-between;gap:32px"><span class="eyebrow">Family · 7 min</span><span class="stack" style="gap:10px"><span class="display" style="font-size:34px">Leaving the house with a baby</span><span class="p small">Feeding without a kettle, the pram-or-wrap decision, what goes on your back.</span></span></a>
 </div>
 </section>
@@ -385,8 +385,9 @@ def guide_page(g):
 <div class="stack" style="gap:10px;border-top:1px solid var(--line);padding-top:24px"><p class="eyebrow">Sources, checked {UPDATED}</p><ul style="gap:6px;font-size:14px">{sources}</ul></div>
 </article>
 <aside class="stack" style="flex:1 1 300px;gap:20px">
+<div class="aside-card" data-local-box hidden></div>
 <div class="aside-card"><p class="eyebrow">From your bag, in order</p><div class="stack" style="gap:10px;font-size:14px;line-height:1.5">{frombag}</div></div>
-<div class="aside-card"><p class="eyebrow">Numbers</p>{numbers}</div>
+<div class="aside-card" data-uk-numbers><p class="eyebrow">UK numbers</p>{numbers}</div>
 <a class="aside-card light" href="../bags/{cta_slug}.html" style="gap:8px"><span class="eyebrow">Don't have the bag yet?</span><span class="display" style="font-size:30px;line-height:1">{cta_title}</span><span class="p small">{cta_line}</span></a>
 <div class="stack next" style="gap:10px"><p class="eyebrow">Read next</p>{nxt}</div>
 </aside>
@@ -466,36 +467,42 @@ def refills():
     page("refills.html", "Refills and rotation — Blackout SOS", "Register your bag and we remind you when the water, rations, batteries and baby sizes are due. Refill packs with exactly what to swap.", body)
 
 def organisations():
-    segs = [("Children's homes", "A Recruit for every child and a Unit for every home, written into the home's emergency policy and the welcome pack. We supply the policy wording."),
-            ("Fostering agencies", "A Recruit per placement at agency pricing, with the carer guides. A line in the placement checklist, not another task."),
-            ("Councils and resilience forums", "Operators for vulnerable residents in flood-risk wards, grab bags for wardens and rest-centre teams. Pilots from 50."),
-            ("Charities and foodbanks", "A give-back scheme: one bag donated for every twenty sold, and co-branded Be Ready alerts for the people you support."),
-            ("Animal rehoming", "A Scout with every adoption, with a co-branded pet card. The dog or cat leaves with its own bag."),
-            ("Workplaces and housing", "A bag per desk or per flat, a rotation schedule we manage, and a yearly check-in so the kit is live when the building isn't.")]
-    seg_html = "".join(f'<div class="card" style="flex:1 1 300px"><h3 class="h4 sans" style="font-weight:600">{n}</h3><p class="p">{d}</p></div>' for n, d in segs)
+    segs = [("Offices and workplaces", "A bag at every desk or on every floor, written into your business-continuity and duty-of-care plans. When the building loses power, nobody has to improvise."),
+            ("Schools and universities", "Grab bags for classrooms and halls of residence, a Unit for every evacuation point, and refills scheduled around the academic year."),
+            ("Hotels and hospitality", "A discreet bag per room or per floor and a team bag at reception, so guests are looked after when the lights go out."),
+            ("Property and residential", "Bags for every apartment, concierge and building manager, with a rotation schedule we run so the kit is live when the building isn't."),
+            ("Care, health and support providers", "Bags for residents, clients and the staff who look after them, packed for the people you support, with the emergency-plan wording written for you."),
+            ("Charities and NGOs", "Volume pricing for the communities you serve, co-branded warning alerts, and one bag donated for every twenty sold."),
+            ("Animal rescue and rehoming", "A Scout with every adoption, so the dog or cat goes home with its own bag."),
+            ("Corporate gifting", "A gift that says you care whether your people get home safely. Custom name cards and a note from you in every bag.")]
+    seg_html = "".join(f'<div class="card" style="flex:1 1 280px"><h3 class="h4 sans" style="font-weight:600">{n}</h3><p class="p">{d}</p></div>' for n, d in segs)
+    offer = [("From 10 bags", "Volume pricing on every bag, mixed as you like across the range."), ("Invoice terms", "30-day terms for registered organisations, in your currency."), ("Delivered worldwide", "To one address or many, in one shipment or staggered, tracked from the UK."),
+             ("Your name on it", "Custom name cards, your logo on the inside label from 100 bags, and a note from you in every bag."), ("We run the rotation", "We hold the expiry dates, send the refills before they're due and send you a yearly readiness report."), ("Policy wording", "The paragraph for your emergency or business-continuity plan, written for your organisation.")]
+    offer_html = "".join(f'<div class="stack" style="flex:1 1 260px;gap:6px;border-top:1px solid var(--line2);padding-top:16px"><strong>{t}</strong><p class="p small">{d}</p></div>' for t, d in offer)
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <p class="eyebrow">For organisations</p>
-<h1 class="h1" style="max-width:1100px">One bag per placement, per desk, per home.</h1>
-<p class="lede">Children's homes, fostering agencies, councils, charities, rehoming centres and workplaces buy in tens and hundreds. Volume pricing from ten bags, invoice terms for public bodies and charities, the emergency-policy wording written for you, and a rotation schedule we manage so the bags are live when they're needed.</p>
+<h1 class="h1" style="max-width:1100px">Every person you're responsible for, ready for three days.</h1>
+<p class="lede" style="max-width:860px">Power cuts, storms, floods, heat and network outages don't wait for office hours. Organisations around the world use Blackout SOS to look after their people: one bag per person, packed for who's carrying it, kept in date by us.</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="#quote">Request a quote</a><a class="pill" href="bags/index.html">See the range</a></div>
 </div></section>
 <section class="section band"><div class="wrap stack" style="gap:28px"><h2 class="h2">Who we work with</h2><div class="grid">{seg_html}</div></div></section>
-<section class="section"><div class="wrap split">
-<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How it works</p><h2 class="h2">Ask, and we'll write the policy with you.</h2>
-<ol class="body" style="padding-left:22px;display:flex;flex-direction:column;gap:10px"><li>Tell us who the bags are for and how many.</li><li>We send a quote, a sample bag if you want one, and the policy wording for your emergency plan.</li><li>Bags arrive assembled, with write-on name cards, in one delivery or staggered.</li><li>We hold the rotation dates and send the refills when they're due, invoiced the same way.</li></ol></div>
+<section class="section"><div class="wrap stack" style="gap:28px"><div class="stack" style="gap:10px"><p class="eyebrow">What you get</p><h2 class="h2">Bought once. Looked after for years.</h2></div><div class="grid" style="gap:24px">{offer_html}</div></div></section>
+<section class="section band" id="quote"><div class="wrap split">
+<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How it works</p><h2 class="h2">Tell us who the bags are for.</h2>
+<ol class="body" style="padding-left:22px;display:flex;flex-direction:column;gap:10px"><li>Tell us how many people, where they are, and who they are: staff, guests, residents, students.</li><li>We send a quote in your currency, a sample bag if you'd like one, and the wording for your plan.</li><li>Bags arrive assembled and labelled, in one delivery or staggered across sites.</li><li>We keep the dates and send refills before anything expires, invoiced the same way.</li></ol></div>
 <form class="stack" style="flex:1 1 420px;gap:14px" data-api="/enquiry">
 <input type="hidden" name="kind" value="organisation">
 <div class="form-row"><label class="field">Organisation<input name="org" required></label><label class="field">Your name<input name="name" required></label></div>
 <div class="form-row"><label class="field">Email<input name="email" type="email" required></label><label class="field">Phone<input name="phone" type="tel"></label></div>
-<div class="form-row"><label class="field">Type<select name="segment"><option>Children's home</option><option>Fostering agency</option><option>Council or resilience forum</option><option>Charity or foodbank</option><option>Animal rehoming</option><option>Workplace or housing</option><option>Retailer</option><option>Other</option></select></label><label class="field">How many bags, roughly<input name="bags" placeholder="e.g. 40 Recruits, 6 Units"></label></div>
-<label class="field">Anything else<textarea name="message" placeholder="Who the bags are for, when you need them, whether you'd like a sample."></textarea></label>
+<div class="form-row"><label class="field">Type<select name="segment"><option>Office or workplace</option><option>School or university</option><option>Hotel or hospitality</option><option>Property or residential</option><option>Care or health provider</option><option>Charity or NGO</option><option>Animal rescue</option><option>Corporate gifting</option><option>Retailer or distributor</option><option>Other</option></select></label><label class="field">How many bags, roughly<input name="bags" placeholder="e.g. 120 Operators, 10 Units"></label></div>
+<label class="field">Anything else<textarea name="message" placeholder="Where the bags are going, when you need them, whether you'd like a sample."></textarea></label>
 <button type="submit" class="pill solid" style="align-self:flex-start">Request a quote</button>
-<p class="p small ok" data-done hidden>Received. A person will reply within two working days.</p>
+<p class="p small ok" data-done hidden>Received. A person will reply within one working day.</p>
 </form>
 </div></section>
 """
-    page("organisations.html", "For organisations — Blackout SOS", "Go bags for children's homes, fostering agencies, councils, charities, rehoming centres and workplaces. Volume pricing, invoice terms, policy wording, managed rotation.", body)
-
+    page("organisations.html", "Go bags for organisations, offices and schools — Blackout SOS", "Emergency go bags for workplaces, schools, hotels, property managers, care providers and charities worldwide. Volume pricing, invoice terms, custom name cards and managed rotation.", body)
 def about():
     body = """
 <section class="section top"><div class="wrap stack" style="gap:28px">
@@ -514,7 +521,7 @@ def about():
 <div class="grid">
 <div class="card" style="flex:1 1 280px"><p class="eyebrow">One bag per person</p><p class="p">An emergency doesn't happen to households, it happens to people. So there's a bag for an adult, a child, a baby, the family and the pet, each packed for who's carrying it.</p></div>
 <div class="card" style="flex:1 1 280px"><p class="eyebrow">One colour per bag</p><p class="p">Blue, red, yellow, green, orange. A seven-year-old grabs the right one in the dark, and the first aid is in the same pouch it was last time.</p></div>
-<div class="card" style="flex:1 1 280px"><p class="eyebrow">Matte black outside</p><p class="p">No camouflage, no slogans. A bag you'd carry on the Tube or the subway, that doesn't announce what's inside it.</p></div>
+<div class="card" style="flex:1 1 280px"><p class="eyebrow">Matte black outside</p><p class="p">No camouflage, no slogans. A bag you'd carry on the train or the subway, that doesn't announce what's inside it.</p></div>
 <div class="card" style="flex:1 1 280px"><p class="eyebrow">We don't sell fear</p><p class="p">We point to the emergency services and the official advice first, show the live warnings for where you are, and never make a claim the label can't back.</p></div>
 </div></div></section>
 <section class="section band"><div class="wrap split">
@@ -592,8 +599,8 @@ def terms():
 <section class="section top"><div class="wrap stack" style="gap:20px;max-width:800px"><p class="eyebrow">Terms</p><h1 class="h1">The plain version.</h1>
 <div class="stack body" style="gap:14px">
 <p><strong>Who you are buying from.</strong> Blackout SOS, London, United Kingdom. The registered company name, number and address will be shown here from the day the shop opens for orders. Email hello@blackoutsos.com.</p>
-<p><strong>Prices and payment.</strong> Prices are in pounds sterling and include VAT and UK delivery. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
-<p><strong>Delivery.</strong> Within three working days of your order, tracked, to UK addresses. Risk passes to you on delivery.</p>
+<p><strong>Prices and payment.</strong> Prices are in pounds sterling and include UK VAT; UK delivery is free and delivery elsewhere is shown before you pay. Your card is charged in your own currency at Stripe's rate. Orders outside the UK may attract import duty or tax in the destination country, collected by the courier. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
+<p><strong>Delivery.</strong> Dispatched within three working days of your order, tracked, to the UK and to most countries worldwide; delivery times are on the delivery page. Risk passes to you on delivery.</p>
 <p><strong>Cancelling and returning.</strong> You may cancel within 14 days of receiving your order for any reason and return it at your cost for a full refund, provided seals are intact; sealed food, hygiene and first-aid items that have been unsealed cannot be returned for hygiene reasons. We extend this to 30 days for unopened bags. Faulty goods are repaired, replaced or refunded as the Consumer Rights Act 2015 requires.</p>
 <p><strong>What the bag is, and isn't.</strong> Our bags and guides are general preparedness products and advice. They are not a substitute for the emergency services or official instructions, and we don't guarantee any outcome in an emergency. You are responsible for checking the contents against your own medical, dietary and legal needs, keeping the rotation dates, and adding your own medication and documents.</p>
 <p><strong>Allergens and diet.</strong> Rations and comfort items are labelled vegan and gluten-free and are made without nut ingredients; the Cub's infant formula is dairy-based. Always read the label on the item itself, which is the legally binding one.</p>

@@ -173,6 +173,22 @@
     } catch (e) {}
   }
 
+
+  // ---- guides: a box with the visitor's own emergency number and local warnings page ----
+  var EMERGENCY = { GB: '999', US: '911', CA: '911', MX: '911', AU: '000', NZ: '111', IN: '112', JP: '110 police · 119 fire and ambulance', CN: '110 police · 120 ambulance · 119 fire', KR: '112 police · 119 fire and ambulance', ZA: '10111 police · 10177 ambulance', BR: '190 police · 192 ambulance · 193 fire', HK: '999', SG: '999 police · 995 ambulance and fire', AE: '999 police · 998 ambulance', SA: '911', IL: '100 police · 101 ambulance', PH: '911', CH: '112', NO: '112', IS: '112', TR: '112' };
+  var EU112 = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE'];
+  var WORLD_PAGES = ['IE','FR','DE','ES','IT','NL','BE','PT','GR','PL','SE','NO','CH','AT','CA','AU','NZ'];
+  function localBox(loc) {
+    var box = document.querySelector('[data-local-box]'); if (!box || loc.country === 'GB') return;
+    var r = (box.closest('[data-root]') || document.body).getAttribute('data-root') || '../';
+    var num = EMERGENCY[loc.country] || (EU112.indexOf(loc.country) >= 0 ? '112' : '');
+    var page = loc.country === 'US' ? (loc.region ? 'us/' + (placeName(loc).toLowerCase().replace(/ /g, '-')) + '.html' : 'us/index.html') : (WORLD_PAGES.indexOf(loc.country) >= 0 ? 'world/' + loc.country.toLowerCase() + '.html' : 'alerts.html');
+    box.innerHTML = '<p class="eyebrow">Where you are · ' + esc(placeName(loc)) + '</p><p class="p small">This guide follows UK official advice. The steps work anywhere; the numbers and the authorities are different where you are.</p>' +
+      (num ? '<div class="kv"><span>Emergency</span><strong>' + esc(num) + '</strong></div>' : '<p class="p small">Use your local emergency number.</p>') +
+      '<a href="' + r + page + '" style="font-weight:600;border-bottom:1px solid var(--line3);align-self:flex-start">Live warnings and advice for ' + esc(placeName(loc)) + ' →</a>';
+    box.hidden = false;
+  }
+
   function run(loc) {
     stampForms(loc);
     load(loc.country).then(function (rows) { renderTicker(loc, rows); renderPage(loc, rows); });
@@ -182,7 +198,7 @@
     e.preventDefault(); openSelector(getLoc(), run);
   });
   document.addEventListener('DOMContentLoaded', function () {
-    locate().then(function () { run(getLoc()); beacon(getLoc(true)); });
+    locate().then(function () { run(getLoc()); localBox(getLoc(true)); beacon(getLoc(true)); });
     // keep the ticker fresh on long-open pages
     setInterval(function () { cache = {}; run(getLoc()); }, 15 * 60 * 1000);
   });
