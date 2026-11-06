@@ -5,6 +5,7 @@ import os, json, datetime, html as H
 from content_bags import BAGS, ORDER
 from content_guides import GUIDES, CATS
 from hero import hero_html, HERO_CSS
+from standard import build_standard, write_redirects, SI_CSS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://blackoutsos.com"
@@ -51,7 +52,7 @@ def nav(r):
 <header class="nav">
 <a class="brand" href="{r}index.html" aria-label="Blackout SOS home"><span class="word">Blackout SOS</span>{morse()}</a>
 <nav class="nav-links" aria-label="Main">
-<a href="{r}bags/index.html">Bags</a>
+<a href="{r}bags/standard-issue.html">The bag</a>
 <a href="{r}guides/index.html">Guides</a>
 <a href="{r}alerts.html">Live warnings</a>
 <a href="{r}organisations.html">For organisations</a>
@@ -59,7 +60,7 @@ def nav(r):
 </nav>
 <div class="nav-right"><a class="basket-link" href="{r}basket.html" data-basket-count>Basket · 0</a></div>
 </header>
-<div class="launch-bar" data-launch-bar>First production run under way · <a href="{r}bags/index.html">See the range</a> and join the list to be first to order</div>
+<div class="launch-bar" data-launch-bar>Now shipping: the <a href="{r}bags/standard-issue.html">Standard Issue</a> 72-hour go bag · Free UK delivery</div>
 <main>
 """
 
@@ -69,7 +70,7 @@ def footer(r):
 <div class="wrap">
 <div class="foot">
 <div class="stack" style="max-width:320px"><span class="display" style="font-size:26px;letter-spacing:2px">Blackout SOS</span><p class="p small">Designed in London. Assembled in the UK. Three dots, three dashes, three days.</p></div>
-<div class="col"><span>Shop</span><a href="{r}bags/operator.html">Operator</a><a href="{r}bags/recruit.html">Recruit</a><a href="{r}bags/cub.html">Cub</a><a href="{r}bags/unit.html">Unit</a><a href="{r}bags/scout.html">Scout</a></div>
+<div class="col"><span>Shop</span><a href="{r}bags/standard-issue.html">Standard Issue</a><a href="{r}bags/standard-issue.html#inside">What's inside</a><a href="{r}delivery-returns.html">Delivery</a></div>
 <div class="col"><span>Learn</span><a href="{r}guides/index.html">Guides</a><a href="{r}guides/the-72-hour-list-explained.html">72-hour checklist</a><a href="{r}alerts.html">Live warnings</a><a href="{r}bags/operator.html#inside">What's in the bag</a></div>
 <div class="col"><span>Where you are</span><a href="{r}us/index.html">United States</a><a href="{r}world/index.html">Europe and worldwide</a><a href="{r}alerts.html">Live warnings</a><a href="{r}delivery-returns.html">Delivery to your country</a></div>
 <div class="col"><span>Company</span><a href="{r}about.html">Our story</a><a href="{r}organisations.html">For organisations</a><a href="{r}delivery-returns.html">Delivery and returns</a><a href="{r}contact.html">Contact</a><a href="{r}privacy.html">Privacy</a><a href="{r}terms.html">Terms</a></div>
@@ -403,7 +404,7 @@ def basket():
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <h1 class="h1">Basket</h1>
 <div data-basket class="stack" style="gap:0;border-top:1px solid var(--line)"></div>
-<div data-basket-empty class="stack" style="gap:16px"><p class="lede">Your basket is empty.</p><a class="pill solid" href="bags/index.html" style="align-self:flex-start">Shop the range</a></div>
+<div data-basket-empty class="stack" style="gap:16px"><p class="lede">Your basket is empty.</p><a class="pill solid" href="bags/standard-issue.html" style="align-self:flex-start">See the Standard Issue</a></div>
 <div data-basket-summary hidden class="stack" style="gap:20px;max-width:520px;margin-left:auto;width:100%">
 <label class="field">Deliver to<select name="country" data-ship-country></select></label>
 <div class="row"><span>Bags</span><strong data-basket-sub>£0</strong></div>
@@ -470,23 +471,22 @@ def refills():
 
 def organisations():
     segs = [("Offices and workplaces", "A bag at every desk or on every floor, written into your business-continuity and duty-of-care plans. When the building loses power, nobody has to improvise."),
-            ("Schools and universities", "Grab bags for classrooms and halls of residence, a Unit for every evacuation point, and expiry reminders timed around the academic year."),
+            ("Schools and universities", "Grab bags for classrooms, halls of residence and evacuation points, with expiry reminders timed around the academic year."),
             ("Hotels and hospitality", "A discreet bag per room or per floor and a team bag at reception, so guests are looked after when the lights go out."),
             ("Property and residential", "Bags for every apartment, concierge and building manager, with a rotation schedule we run so the kit is live when the building isn't."),
             ("Care, health and support providers", "Bags for residents, clients and the staff who look after them, packed for the people you support, with the emergency-plan wording written for you."),
             ("Charities and NGOs", "Volume pricing for the communities you serve, and one bag donated for every twenty sold."),
-            ("Animal rescue and rehoming", "A Scout with every adoption, so the dog or cat goes home with its own bag."),
             ("Corporate gifting", "A gift that says you care whether your people get home safely, sent to one address or straight to each person's door.")]
     seg_html = "".join(f'<div class="card" style="flex:1 1 280px"><h3 class="h4 sans" style="font-weight:600">{n}</h3><p class="p">{d}</p></div>' for n, d in segs)
-    offer = [("From 10 bags", "Volume pricing on every bag, mixed as you like across the range."), ("Invoice terms", "30-day terms for registered organisations, in your currency."), ("Delivered worldwide", "To one address or many, in one shipment or staggered, tracked from the UK."),
+    offer = [("From 10 bags", "Volume pricing on the Standard Issue, from ten bags up."), ("Invoice terms", "30-day terms for registered organisations, in your currency."), ("Delivered worldwide", "To one address or many, in one shipment or staggered, tracked from the UK."),
              ("Ready to go", "The same standard bags we sell to families, each with a write-on name card, so there is nothing to wait for."), ("We run the rotation", "We hold the expiry dates, remind you before anything is due and send you a yearly readiness report."), ("Policy wording", "The paragraph for your emergency or business-continuity plan, written for your organisation.")]
     offer_html = "".join(f'<div class="stack" style="flex:1 1 260px;gap:6px;border-top:1px solid var(--line2);padding-top:16px"><strong>{t}</strong><p class="p small">{d}</p></div>' for t, d in offer)
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:28px">
 <p class="eyebrow">For organisations</p>
 <h1 class="h1" style="max-width:1100px">Every person you're responsible for, ready for three days.</h1>
-<p class="lede" style="max-width:860px">Power cuts, storms, floods, heat and network outages don't wait for office hours. Organisations around the world use Blackout SOS to look after their people: one bag per person, packed for who's carrying it, kept in date by us.</p>
-<div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="#quote">Request a quote</a><a class="pill" href="bags/index.html">See the range</a></div>
+<p class="lede" style="max-width:860px">Power cuts, storms, floods, heat and network outages don't wait for office hours. Organisations around the world use Blackout SOS to look after their people: one Standard Issue per person, kept in date by us.</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="#quote">Request a quote</a><a class="pill" href="bags/standard-issue.html">See the Standard Issue</a></div>
 </div></section>
 <section class="section band"><div class="wrap stack" style="gap:28px"><h2 class="h2">Who we work with</h2><div class="grid">{seg_html}</div></div></section>
 <section class="section"><div class="wrap stack" style="gap:28px"><div class="stack" style="gap:10px"><p class="eyebrow">What you get</p><h2 class="h2">Bought once. Looked after for years.</h2></div><div class="grid" style="gap:24px">{offer_html}</div></div></section>
@@ -552,7 +552,7 @@ def delivery():
 <p class="p small">Working days from dispatch, not from order. Express is a courier service with a signature on delivery. We can't yet deliver to a small number of countries where no carrier serves us or sanctions apply; the basket page only lists the ones we can.</p>
 </div></section>
 <section class="section"><div class="wrap grid">
-<div class="card" style="flex:1 1 300px"><p class="eyebrow">Outside the UK: duties and taxes</p><p class="p">Our prices include UK VAT and exclude any import duty, sales tax or VAT your own country charges on goods arriving from the UK. The courier collects anything due before delivery, sometimes with a handling fee. In the United States, duty is now charged on parcels of any value; in the EU, VAT is charged on the goods and the delivery. We can't predict the exact amount, and we don't mark parcels as gifts or understate values.</p></div>
+<div class="card" style="flex:1 1 300px"><p class="eyebrow">Outside the UK: duties and taxes</p><p class="p">Our prices exclude any import duty, sales tax or VAT your own country charges on goods arriving from the UK. The courier collects anything due before delivery, sometimes with a handling fee. In the United States, duty is now charged on parcels of any value; in the EU, VAT is charged on the goods and the delivery. We can't predict the exact amount, and we don't mark parcels as gifts or understate values.</p></div>
 <div class="card" style="flex:1 1 300px"><p class="eyebrow">What's inside, and the post</p><p class="p">Bags contain a power bank and lithium batteries, which travel only on services approved for them, and no matches, lighters or fuel, which can't be posted at all. Food, water and medicines are packed sealed and labelled; where a country doesn't allow an item in by post we take it out, tell you before dispatch and refund its share. The multi-tool is UK-carry-legal: non-locking, blade under 7.62 cm.</p></div>
 <div class="card" style="flex:1 1 300px"><p class="eyebrow">Returns</p><p class="p">Thirty days to return an unopened bag for a full refund: seals intact, contents unused. UK and EU customers can cancel within 14 days of receiving an order for any reason; sealed hygiene and food items that have been unsealed can't be returned. Faulty items are replaced first and refunded if we can't. Outside the UK you pay the return postage unless the item is faulty.</p></div>
 </div></section>
@@ -601,7 +601,7 @@ def terms():
 <section class="section top"><div class="wrap stack" style="gap:20px;max-width:800px"><p class="eyebrow">Terms</p><h1 class="h1">The plain version.</h1>
 <div class="stack body" style="gap:14px">
 <p><strong>Who you are buying from.</strong> Blackout SOS, London, United Kingdom. The registered company name, number and address will be shown here from the day the shop opens for orders. Email hello@blackoutsos.com.</p>
-<p><strong>Prices and payment.</strong> Prices are shown and charged in your local currency for most countries (otherwise in US dollars), converted from our pound-sterling prices at the day's exchange rate, and include UK VAT for UK orders. UK delivery is free and delivery elsewhere is shown before you pay. Orders outside the UK may attract import duty or tax in the destination country, collected by the courier. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
+<p><strong>Prices and payment.</strong> Prices are shown and charged in your local currency for most countries (otherwise in US dollars), converted from our pound-sterling prices at the day's exchange rate. UK delivery is free and delivery elsewhere is shown before you pay. Orders outside the UK may attract import duty or tax in the destination country, collected by the courier. Payment is taken in full at checkout by Stripe. A contract is formed when we email to confirm dispatch; until then we can cancel and refund if, for example, an item is out of stock or a price was shown wrongly.</p>
 <p><strong>Delivery.</strong> Dispatched within three working days of your order, tracked, to the UK and to most countries worldwide; delivery times are on the delivery page. Risk passes to you on delivery.</p>
 <p><strong>Cancelling and returning.</strong> You may cancel within 14 days of receiving your order for any reason and return it at your cost for a full refund, provided seals are intact; sealed food, hygiene and first-aid items that have been unsealed cannot be returned for hygiene reasons. We extend this to 30 days for unopened bags. Faulty goods are repaired, replaced or refunded as the Consumer Rights Act 2015 requires.</p>
 <p><strong>What the bag is, and isn't.</strong> Our bags and guides are general preparedness products and advice. They are not a substitute for the emergency services or official instructions, and we don't guarantee any outcome in an emergency. You are responsible for checking the contents against your own medical, dietary and legal needs, keeping the rotation dates, and adding your own medication and documents.</p>
@@ -670,7 +670,7 @@ def us_hub():
     body = f"""
 <section class="section top"><div class="wrap stack" style="gap:20px"><p class="eyebrow">United States</p><h1 class="h1">Be ready for three days, wherever you live in the US.</h1>
 <p class="lede">FEMA and Ready.gov ask every household to be able to look after itself for at least 72 hours after a disaster. Here is what that means where you live, the official warnings in force for your state right now, and a go bag for each person, shipped to you from the UK.</p>
-<div style="display:flex;flex-wrap:wrap;gap:12px"><a class="pill solid" href="#states">Find your state</a><a class="pill" href="../bags/index.html">See the bags</a></div></div></section>
+<div style="display:flex;flex-wrap:wrap;gap:12px"><a class="pill solid" href="#states">Find your state</a><a class="pill" href="../bags/standard-issue.html">See the bags</a></div></div></section>
 <section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · National Weather Service</p><h2 class="h2">Serious warnings in force in <span data-alerts-place>the United States</span></h2><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div><a class="pill" href="../alerts.html" style="align-self:flex-start">All warnings, any state</a></div></section>
 <section class="section"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">The 72-hour kit, US version</p><h2 class="h2">What the official checklist asks for.</h2><p class="p">From Ready.gov's basic disaster supplies kit, with what our bags already carry. In an emergency call 911; for official alerts keep Wireless Emergency Alerts switched on and follow your state and county emergency management.</p></div><div class="stack" style="flex:2 1 520px;gap:0;border-top:1px solid var(--line2)">{kit}</div></div></section>
 <section class="section band" id="states"><div class="wrap stack" style="gap:20px"><p class="eyebrow">By state</p><h2 class="h2">Your state's hazards and live warnings.</h2><div class="grid" style="gap:12px">{states}</div></div></section>
@@ -691,7 +691,7 @@ def us_state(code, name, hazards):
 <section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · National Weather Service</p><h2 class="h2">Warnings in force in <span data-alerts-place>{name}</span></h2><p class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</p><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div></div></section>
 <section class="section"><div class="wrap split" style="gap:40px">
 <div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">What {name} plans for</p><h2 class="h2">The main hazards.</h2><ul class="body" style="margin:0;padding-left:20px">{hz}</ul><p class="p small">Your county's emergency management office and <a href="{fema}" style="border-bottom:1px solid var(--line3)">FEMA's page for {name}</a> have the local plans, shelters and evacuation zones.</p></div>
-<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Ready.gov's basics: one gallon of water per person per day for at least three days, three days of food that needs no cooking, a flashlight and battery or hand-crank weather radio, first aid, a week of medicines, copies of documents, cash, and a plan for the family and pets. Our bags carry everything that travels with you, one bag per person, one colour per bag.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/operator.html">The Operator, adult</a><a class="pill" href="../bags/index.html">The whole range</a></div><p class="p small">Shipped tracked from the UK: 5–9 working days. US import duty is collected on delivery. <a href="../delivery-returns.html" style="border-bottom:1px solid var(--line3)">Delivery and duties</a></p></div>
+<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Ready.gov's basics: one gallon of water per person per day for at least three days, three days of food that needs no cooking, a flashlight and battery or hand-crank weather radio, first aid, a week of medicines, copies of documents, cash, and a plan for the family and pets. The Standard Issue carries everything that travels with one adult.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/standard-issue.html">The Standard Issue</a><a class="pill" href="../bags/index.html">The whole range</a></div><p class="p small">Shipped tracked from the UK: 5–9 working days. US import duty is collected on delivery. <a href="../delivery-returns.html" style="border-bottom:1px solid var(--line3)">Delivery and duties</a></p></div>
 </div></section>
 <section class="section band" id="email"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">One email when a serious warning is issued for {name}.</h2><p class="p">Red and amber only, with the three things to do in the first hour. No marketing in between.</p></div>
 <form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe"><input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes"><label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label><button type="submit" class="pill solid">Email me {name} warnings</button><p class="p small ok" data-done hidden>You're on the list for {name}.</p></form></div></section>
@@ -720,7 +720,7 @@ def world_country(c, n, num, wname, wurl, hazards):
 <section class="section band"><div class="wrap stack" style="gap:20px"><p class="eyebrow">Live · {wname}</p><h2 class="h2">Warnings in force in <span data-alerts-place>{n}</span></h2><p class="muted small" data-alerts-updated>Live feed · refreshed every 15 minutes</p><div class="stack" style="gap:14px" data-alerts-posts></div><div class="stack" style="gap:20px" data-alerts-page><div class="card"><p class="p">Loading…</p></div></div><p class="p small">The national service is the authority: <a href="{wurl}" target="_blank" rel="noopener" style="border-bottom:1px solid var(--line3)">{wname}</a>.</p></div></section>
 <section class="section"><div class="wrap split" style="gap:40px">
 <div class="stack" style="flex:1 1 320px;gap:12px"><p class="eyebrow">What {n} plans for</p><h2 class="h2">The main hazards.</h2><ul class="body" style="margin:0;padding-left:20px">{hz}</ul></div>
-<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Three days of water (about 3 litres per person per day for drinking, more for washing), food that needs no cooking, light, warmth, first aid, a week of medicines, copies of documents, some cash and a plan for the family and pets. Our bags carry what travels with you: one bag per person, one colour per bag.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/index.html">See the bags</a><a class="pill" href="../delivery-returns.html">Delivery to {n}</a></div><p class="p small">Prices are shown in your own currency. Any import tax is collected on delivery.</p></div>
+<div class="stack" style="flex:1 1 420px;gap:14px"><p class="eyebrow">Your 72 hours</p><p class="body">Three days of water (about 3 litres per person per day for drinking, more for washing), food that needs no cooking, light, warmth, first aid, a week of medicines, copies of documents, some cash and a plan for the family and pets. The Standard Issue carries what travels with one adult.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill solid" href="../bags/standard-issue.html">The Standard Issue</a><a class="pill" href="../delivery-returns.html">Delivery to {n}</a></div><p class="p small">Prices are shown in your own currency. Any import tax is collected on delivery.</p></div>
 </div></section>
 <section class="section band" id="email"><div class="wrap split" style="gap:40px"><div class="stack" style="flex:1 1 360px;gap:12px"><p class="eyebrow">Warnings by email</p><h2 class="h2">One email when a serious warning is issued in {n}.</h2></div>
 <form class="stack" style="flex:1 1 380px;gap:14px" data-api="/subscribe"><input type="hidden" name="source" value="alerts"><input type="hidden" name="alerts" value="yes"><label class="field">Email<input name="email" type="email" required placeholder="you@example.com"></label><button type="submit" class="pill solid">Email me serious warnings</button><p class="p small ok" data-done hidden>You're on the list.</p></form></div></section>
@@ -728,7 +728,7 @@ def world_country(c, n, num, wname, wurl, hazards):
     page(f"world/{c.lower()}.html", f"{n}: emergency kit, go bags and live weather warnings — Blackout SOS", f"Live official warnings for {n} from {wname}, the hazards {n} plans for, the emergency number ({num}) and go bags delivered from the UK.", body, lang=lang, loc=(c, ""))
 
 def meta_files():
-    urls = ["", "bags/", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "us/", "world/"] + [f"us/{state_slug(n)}.html" for c, n, h in US_STATES] + [f"world/{c[0].lower()}.html" for c in COUNTRIES] + ["organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
+    urls = ["", "bags/standard-issue.html", "guides/"] + [f"guides/{g['slug']}.html" for g in GUIDES] + ["alerts.html", "us/", "world/"] + [f"us/{state_slug(n)}.html" for c, n, h in US_STATES] + [f"world/{c[0].lower()}.html" for c in COUNTRIES] + ["organisations.html", "about.html", "delivery-returns.html", "contact.html", "privacy.html", "terms.html"]
     today = datetime.date.today().isoformat()
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("sitemap.xml", sm)
@@ -736,8 +736,8 @@ def meta_files():
     write(".nojekyll", "")
 
 if __name__ == "__main__":
-    home(); range_page()
-    for s in ORDER: product(s)
+    build_standard(page, px, gbp, SITE, subscribe_form)
+    write_redirects(write, SITE)
     guides_index()
     for g in GUIDES: guide_page(g)
     basket(); checkout_pages(); alerts(); us_hub(); [us_state(*x) for x in US_STATES]; world_hub(); [world_country(*x) for x in COUNTRIES]; unsubscribe(); organisations(); about(); delivery(); contact(); privacy(); terms(); notfound(); meta_files()

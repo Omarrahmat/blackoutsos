@@ -49,8 +49,8 @@ Deno.serve(async (req: Request) => {
     p.set(`shipping_options[${i}][shipping_rate_data][display_name]`, `${name} (${days})`);
   });
   p.set("custom_text[submit][message]", country === "GB"
-    ? "Assembled to order in the UK and dispatched within three working days."
-    : "Assembled to order in the UK and dispatched within three working days. Prices exclude any import duty or tax charged by your country; the courier collects these on delivery.");
+    ? "Packed by hand in the UK and dispatched within three working days."
+    : "Packed by hand in the UK and dispatched within three working days. Prices exclude any import duty or tax charged by your country; the courier collects these on delivery.");
   p.set("metadata[country]", country);
   p.set("metadata[ship_zone]", q.zone);
   p.set("metadata[currency]", cur); p.set("metadata[fx_per_gbp]", String(rate));

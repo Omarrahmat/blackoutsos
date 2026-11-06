@@ -6,14 +6,7 @@
 
   // Display catalogue. Prices are checked again on the server at checkout.
   var CATALOGUE = {
-    'operator':   { name: 'Operator', variant: 'Adult', price: 19900, colour: '#1F5FBF', url: 'bags/operator.html' },
-    'recruit':    { name: 'Recruit', variant: 'Child, 3 to 12', price: 8900, colour: '#D0202E', url: 'bags/recruit.html' },
-    'cub-1':      { name: 'Cub 1', variant: '0 to 6 months', price: 14900, colour: '#F5C518', url: 'bags/cub.html' },
-    'cub-2':      { name: 'Cub 2', variant: '6 to 12 months', price: 14900, colour: '#F5C518', url: 'bags/cub.html' },
-    'cub-3':      { name: 'Cub 3', variant: '12 months to 3 years', price: 14900, colour: '#F5C518', url: 'bags/cub.html' },
-    'unit':       { name: 'Unit', variant: 'Family of four', price: 44900, colour: '#2BA84A', url: 'bags/unit.html' },
-    'scout-dog':  { name: 'Scout', variant: 'Dog', price: 9900, colour: '#F28C28', url: 'bags/scout.html' },
-    'scout-cat':  { name: 'Scout', variant: 'Cat', price: 9900, colour: '#F28C28', url: 'bags/scout.html' }
+    'standard-issue': { name: 'Standard Issue', variant: 'One adult, 72 hours', price: 13900, colour: '#111111', url: 'bags/standard-issue.html' }
   };
 
   // Live availability: the database says which bags can be bought right now. Default markup shows "coming soon";
@@ -137,9 +130,9 @@
     shipLines.last = cc;
     var S = window.BSOS_SHIP, G = window.BSOS_GEO; if (!S || !G || !cc) return;
     var name = G.names[cc] || cc; var line, hero;
-    if (S.noShip.indexOf(cc) >= 0) { line = 'inc. UK VAT · we can\'t deliver to ' + name + ' yet'; hero = 'Assembled in the UK. We can\'t deliver to ' + name + ' yet — email us.'; }
-    else if (cc === 'GB') { line = 'inc. VAT · free UK delivery in 2 to 3 working days'; hero = 'Free UK delivery, dispatched in three working days.'; }
-    else { var q = shipQuote(cc, { operator: 1 }); var art = /^(United|Netherlands|Philippines|Czech|Dominican|Bahamas|Gambia|Maldives)/.test(name) ? 'the ' : '';
+    if (S.noShip.indexOf(cc) >= 0) { line = 'We can\'t deliver to ' + name + ' yet'; hero = 'Assembled in the UK. We can\'t deliver to ' + name + ' yet — email us.'; }
+    else if (cc === 'GB') { line = 'Free UK delivery in 2 to 3 working days'; hero = 'Free UK delivery, dispatched in three working days.'; }
+    else { var q = shipQuote(cc, { 'standard-issue': 1 }); var art = /^(United|Netherlands|Philippines|Czech|Dominican|Bahamas|Gambia|Maldives)/.test(name) ? 'the ' : '';
       line = 'Delivered to ' + art + name + ' in ' + q.days + ' · from ' + gbp(q.standard) + ' · any import tax collected on delivery';
       hero = 'Delivered to ' + art + name + ' in ' + q.days + ', tracked from the UK. Your card pays in your own currency.'; }
     document.querySelectorAll('[data-ship-line]').forEach(function (el) { el.textContent = line; });

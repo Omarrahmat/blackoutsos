@@ -4,7 +4,7 @@ Rates are tracked, in pence, by zone and packed-weight band. CONFIRM against the
 import json
 
 # Packed weight per SKU in grams (bag + contents + box)
-WEIGHTS = {"operator": 3500, "recruit": 1800, "cub-1": 2800, "cub-2": 2800, "cub-3": 2800, "unit": 9000, "scout-dog": 2000, "scout-cat": 2000}
+WEIGHTS = {"standard-issue": 5500, "operator": 3500, "recruit": 1800, "cub-1": 2800, "cub-2": 2800, "cub-3": 2800, "unit": 9000, "scout-dog": 2000, "scout-cat": 2000}
 
 EU = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE"]
 EUROPE_OTHER = ["CH", "NO", "IS", "LI", "MC", "AD", "SM", "VA", "GI", "JE", "GG", "IM", "FO", "AL", "BA", "ME", "MK", "RS", "XK", "MD", "UA", "TR", "GE", "AM", "AZ"]
