@@ -14,6 +14,11 @@ UPDATED = datetime.date.today().strftime("%B %Y")
 
 FAVICON = "data:image/svg+xml," + H.escape("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='#0a0a0a'/><g fill='#ededed'><rect x='10' y='29' width='5' height='6' rx='1'/><rect x='17' y='29' width='5' height='6' rx='1'/><rect x='24' y='29' width='5' height='6' rx='1'/><rect x='33' y='29' width='9' height='6' rx='1'/><rect x='44' y='29' width='9' height='6' rx='1'/></g></svg>", quote=True)
 
+import hashlib as _h, os as _os
+def _v(name):
+    p=_os.path.join(_os.path.dirname(_os.path.abspath(__file__)),'..','assets',name)
+    try: return _h.md5(open(p,'rb').read()).hexdigest()[:8]
+    except Exception: return '1'
 def gbp(p): return "£" + (f"{p/100:.2f}" if p % 100 else f"{p//100}")
 def px(p): return f'<span data-gbp="{p}">{gbp(p)}</span>'
 
@@ -41,7 +46,7 @@ def head(title, desc, path, r, extra="", lang="en-GB"):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Inter:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="{r}assets/site.css">
+<link rel="stylesheet" href="{r}assets/site.css?v={_v("site.css")}">
 {extra}
 </head>
 <body>
@@ -78,12 +83,12 @@ def footer(r):
 <p class="legal">© {YEAR} Blackout SOS, London. blackoutsos.com · Company details are on the <a href="{r}terms.html">terms page</a>. In an emergency call your local emergency number (999 in the UK, 911 in the US, 112 in Europe). This site gives general preparedness advice, not emergency instructions from the authorities.</p>
 </div>
 </footer>
-<script src="{r}assets/geo.js"></script>
-<script src="{r}assets/shipping.js"></script>
+<script src="{r}assets/geo.js?v={_v("geo.js")}"></script>
+<script src="{r}assets/shipping.js?v={_v("shipping.js")}"></script>
 <script>window.BSOS_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3VzdGp0eGptamxndWt6Y2ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMzI1MjcsImV4cCI6MjEwODcwODUyN30.Y_gKh0rs7HVI6rf3z8mmCAh-LcT-cTqJypqawbkdw7w"</script>
-<script src="{r}assets/currency.js"></script>
-<script src="{r}assets/site.js"></script>
-<script src="{r}assets/alerts.js" defer></script>
+<script src="{r}assets/currency.js?v={_v("currency.js")}"></script>
+<script src="{r}assets/site.js?v={_v("site.js")}"></script>
+<script src="{r}assets/alerts.js?v={_v("alerts.js")}" defer></script>
 </body>
 </html>
 """
