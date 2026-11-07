@@ -608,7 +608,7 @@ def terms():
 <p><strong>Delivery.</strong> Dispatched within three working days of your order, tracked, to the UK and to most countries worldwide; delivery times are on the delivery page. Risk passes to you on delivery.</p>
 <p><strong>Cancelling and returning.</strong> You may cancel within 14 days of receiving your order for any reason and return it at your cost for a full refund, provided seals are intact; sealed food, hygiene and first-aid items that have been unsealed cannot be returned for hygiene reasons. We extend this to 30 days for unopened bags. Faulty goods are repaired, replaced or refunded as the Consumer Rights Act 2015 requires.</p>
 <p><strong>What the bag is, and isn't.</strong> Our bags and guides are general preparedness products and advice. They are not a substitute for the emergency services or official instructions, and we don't guarantee any outcome in an emergency. You are responsible for checking the contents against your own medical, dietary and legal needs, keeping the rotation dates, and adding your own medication and documents.</p>
-<p><strong>Allergens and diet.</strong> The food rations and other items are bought in from their makers. We make no vegan, gluten-free or allergen claims of our own: always read the label on the item itself, which is the legally binding one. We do not supply infant formula or medicines.</p>
+<p><strong>Allergens and diet.</strong> The food ration and other items are bought in from their makers. We make no vegan, gluten-free or allergen claims of our own: always read the label on the item itself, which is the legally binding one. We do not supply infant formula or medicines.</p>
 <p><strong>Liability.</strong> Nothing in these terms limits liability for death or personal injury caused by negligence, or anything else the law doesn't let us limit. Otherwise our liability for an order is limited to the price you paid for it.</p>
 <p><strong>Law.</strong> These terms are governed by the law of England and Wales and the courts of England and Wales.</p>
 <p class="p small">Last updated {UPDATED}.</p>
@@ -661,7 +661,7 @@ else{t.textContent="That link didn't work.";m.textContent=(j&&j.error)||'Write t
 # ---------- LOCALISED: United States and countries ----------
 from content_local import US_STATES, COUNTRIES, state_slug
 US_KIT = [("Water","One gallon per person per day, for at least three days, for drinking and sanitation (Ready.gov). The Standard Issue carries water pouches and purification tablets; store the gallons at home."),
-  ("Food","Three days of food that needs no cooking or fridge. The Standard Issue carries two 500 g emergency food rations (5,000 kcal in total) with a five-year shelf life."),
+  ("Food","Three days of food that needs no cooking or fridge. The Standard Issue carries one 500 g emergency food ration (2,500 kcal) with a five-year shelf life."),
   ("Light and power","Flashlight, spare batteries, a power bank, a hand-crank or battery NOAA Weather Radio at home."),
   ("First aid and medicines","A first-aid kit, and a week of prescription medicines with a copy of each prescription."),
   ("Documents","Copies of IDs, insurance policies and bank records in a waterproof sleeve, plus some cash in small bills."),

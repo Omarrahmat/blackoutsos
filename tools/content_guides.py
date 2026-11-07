@@ -111,7 +111,7 @@ dict(slug="cyber-outage-cards-cash-and-comms", cat="Planning", mins=6, title="Cy
             "Top the cash back up. Put the contacts card back in the document pouch. Done."])],
     never=("Never", "Never give a one-time code, a PIN or a password to anyone who calls you, however urgent they sound and whatever number they appear to call from. Hang up, wait five minutes, and call the number on the back of your card."),
     after=None,
-    frombag=[('Radio:', 'wind-up radio for the national picture'), ('Water and food:', "water pouches and three days of food rations so you don't need the shop"), ('You add:', 'cash, a contacts card and a paper map, in the document pouch')],
+    frombag=[('Radio:', 'wind-up radio for the national picture'), ('Water and food:', "water pouches and a 72-hour food ration so you don't need the shop"), ('You add:', 'cash, a contacts card and a paper map, in the document pouch')],
     numbers=[("Life at risk, any network", "999"), ("Non-emergency police", "101"), ("Your bank", "on the back of your card"), ("Scam advice", "ncsc.gov.uk")],
     cta=("standard-issue", "The Standard Issue, £139", "A radio, water and food for the days the tills are down."),
     next=["the-family-meeting-point", "power-cut-the-first-hour", "the-72-hour-list-explained"],
@@ -320,7 +320,7 @@ dict(slug="the-72-hour-list-explained", cat="Planning", mins=8, title="The 72-ho
     sections=[
         ("The list", "line by line", "What the Government says, and where it is", [
             "<strong>Bottled water.</strong> About 2.5 to 3 litres a person a day to drink; 10 litres a day is 'most comfortable' with cooking and washing. The bag: the first day's pouches and tablets to treat more. The cupboard: the rest. See the water guide.",
-            "<strong>Non-perishable food for three days, and a tin opener.</strong> The bag: two 500 g Seven Oceans emergency food rations, 5,000 kcal in total (about 1,650 kcal a day for three days), with a five-year date. The cupboard: tins and dried food you already eat, rotated, and a tin opener.",
+            "<strong>Non-perishable food for three days, and a tin opener.</strong> The bag: a 500 g Seven Oceans emergency food ration, 2,500 kcal, made to the survival standard for one person for 72 hours, with a five-year date. The cupboard: tins and dried food you already eat, rotated, and a tin opener.",
             "<strong>A battery or wind-up torch, and a battery or wind-up radio.</strong> The bag: a head torch with batteries fitted, and a wind-up and solar radio with its own torch. Nothing to buy.",
             "<strong>A portable power bank and spare batteries.</strong> The bag: the radio has a built-in USB power bank you can charge by hand or sun. Add your own phone cable and a charged power bank if you have one.",
             "<strong>A first aid kit, hand sanitiser and wet wipes.</strong> The bag: a compact first aid kit, masks and gloves, sanitiser and wipes. The cupboard: your own regular medicines, see the medication guide.",
@@ -337,7 +337,7 @@ dict(slug="the-72-hour-list-explained", cat="Planning", mins=8, title="The 72-ho
             "A date in the diary when the clocks change: check the batteries, the water dates, the medicines, the phone numbers. Our reminder emails do the remembering."])],
     never=None,
     after=("The honest line", "A go bag is not a stockpile. It is the first day, carried, and the means to make the next two safe. The cupboard is the rest, and the plan on the card is the part that matters most. Buy the bag for the walk; fill the cupboard for the wait."),
-    frombag=[('Water and food:', 'water pouches, purification tablets, two 500 g food rations'), ('Light and power:', 'head torch, wind-up radio, power bank'), ('First aid:', 'first aid kit, masks, gloves, sanitiser, wipes'), ('You add:', 'medicines, document copies, cash, contacts')],
+    frombag=[('Water and food:', 'water pouches, purification tablets, a 500 g food ration'), ('Light and power:', 'head torch, wind-up radio, power bank'), ('First aid:', 'first aid kit, masks, gloves, sanitiser, wipes'), ('You add:', 'medicines, document copies, cash, contacts')],
     numbers=[("Life at risk", "999"), ("Power cut", "105"), ("Floodline", "0345 988 1188"), ("Emergency Alerts", "gov.uk/alerts")],
     cta=("standard-issue", "The Standard Issue, £139", "The Government's list for one adult, packed in one plain rucksack."),
     next=["water-treating-storing-rationing", "the-family-meeting-point", "medication-and-medical-devices"],

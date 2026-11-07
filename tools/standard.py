@@ -6,9 +6,9 @@ import json
 SI = dict(
     name="Standard Issue", sku="standard-issue", price=13900, who="One adult, 72 hours",
     lede="Everything one adult needs for the first 72 hours of a power cut, flood, storm or evacuation, packed by hand in the UK into a plain black waterproof 30-litre rucksack. Pick it up and go.",
-    specs=["72 hours", "1 adult", "30 L", "About 5.5 kg packed", "Waterproof bag", "Packed in the UK"],
+    specs=["72 hours", "1 adult", "30 L", "About 5 kg packed", "Waterproof bag", "Packed in the UK"],
     groups=[
-        ("#2f7d4a", "Water and food", ["3 × 500 ml emergency water pouches, 5-year", "Water purification tablets", "750 ml water bottle", "2 Seven Oceans emergency food rations, 500 g each: 5,000 kcal in total in 18 wrapped bars, about 1,650 kcal a day for 3 days, 5-year", "Spork"]),
+        ("#2f7d4a", "Water and food", ["3 × 500 ml emergency water pouches, 5-year", "Water purification tablets", "750 ml water bottle", "Seven Oceans 500 g emergency food ration: 2,500 kcal in 9 wrapped bars, enough for one adult for 72 hours, 5-year", "Spork"]),
         ("#2a2a2a", "Warmth and shelter", ["Reusable emergency bivvy bag", "2 foil blankets", "Reusable rain poncho", "4 hand warmers", "Beanie and gloves"]),
         ("#c0392b", "First aid and hygiene", ["Compact first aid kit", "2 FFP2 masks, 2 pairs of nitrile gloves", "Wet wipes and hand sanitiser", "Tissues, toothbrush and paste", "Sanitary pads, bin bags and zip bags"]),
         ("#bfbfbf", "Light, power and signal", ["Wind-up and solar radio with torch and USB power bank", "Head torch, batteries fitted", "Whistle", "2 glow sticks"]),
@@ -16,14 +16,14 @@ SI = dict(
     ],
     you_add="What you add: your medicines, copies of important documents, some cash, a phone charger cable, a change of clothes and anything you can't be without for three days.",
     bag_rows=[("Bag", "Plain black waterproof 30-litre rucksack"), ("Straps", "Padded, adjustable, with grab handle"), ("Pockets", "Main compartment, front zip pocket, side mesh pockets"),
-              ("Inside", "One open main compartment, no internal organiser"), ("Packed weight", "About 5.5 kg"), ("Packed", "By hand in the UK, each bag checked against its contents card")],
-    rotation=[("Water pouches", "5 years; we email you"), ("Food rations", "5 years; we email you"), ("Batteries", "Check every year; we remind you"), ("Hand warmers and glow sticks", "Replace every 3 to 4 years"), ("First aid kit", "Check dates every year")],
+              ("Inside", "One open main compartment, no internal organiser"), ("Packed weight", "About 5 kg"), ("Packed", "By hand in the UK, each bag checked against its contents card")],
+    rotation=[("Water pouches", "5 years; we email you"), ("Food ration", "5 years; we email you"), ("Batteries", "Check every year; we remind you"), ("Hand warmers and glow sticks", "Replace every 3 to 4 years"), ("First aid kit", "Check dates every year")],
     faq=[
         ("Is the bag waterproof?", "Yes. The rucksack itself is waterproof, so rain stays out and the kit inside stays dry. It isn't made to be submerged, so don't wade with it under water."),
         ("Who is it for?", "One adult for 72 hours. Buy one per adult in the house. Bags for children, babies, families and pets are coming in 2027."),
         ("Is there a range of bags?", "Not yet. The Standard Issue is our only bag for now: a plain rucksack packed with a complete 72-hour kit. Our own purpose-built range is planned for 2027; join the list on the homepage to hear first."),
-        ("How long does it last?", "The water and the food rations keep for five years. Sign up when you order and we email you when anything is due to be replaced."),
-        ("Is there enough food?", "Yes. Two 500 g Seven Oceans emergency rations give 5,000 kcal in 18 individually wrapped bars: about 1,650 kcal a day for three days. That's survival food, more than the 1,200 kcal a day of a standard 72-hour ration, so keep normal food at home too."),
+        ("How long does it last?", "The water and the food ration keep for five years. Sign up when you order and we email you when anything is due to be replaced."),
+        ("Is there enough food?", "Yes, for survival. The Seven Oceans 500 g ration gives 2,500 kcal in 9 individually wrapped bars and is made to the international standard for one person's emergency food (10,000 kJ). It's survival food, not full meals, so keep normal food at home too."),
         ("Is there enough water?", "No bag can carry three days of water for drinking and washing: that's about 9 litres. The Standard Issue carries 1.5 litres plus a bottle and purification tablets so you can make more safe water as you go."),
         ("When will it arrive?", "Packed and dispatched within three working days. UK delivery is free and tracked."),
     ],
@@ -99,7 +99,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 <div class="grid" style="border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:32px 0">
 <div class="stat"><span class="n">72</span><span class="l">hours covered</span></div>
 <div class="stat"><span class="n">{count}</span><span class="l">items, packed and checked</span></div>
-<div class="stat"><span class="n">5.5 kg</span><span class="l">packed, about</span></div>
+<div class="stat"><span class="n">5 kg</span><span class="l">packed, about</span></div>
 <div class="stat"><span class="n">5 yrs</span><span class="l">water and food shelf life</span></div>
 </div>
 <div class="split">
