@@ -5,23 +5,23 @@ import json
 
 SI = dict(
     name="Standard Issue", sku="standard-issue", price=13900, who="One adult, 72 hours",
-    lede="Everything one adult needs for the first 72 hours of a power cut, flood, storm or evacuation, packed by hand in the UK into a plain black 30-litre rucksack. A roll-top liner and three colour-coded dry bags inside keep the kit dry in the rain. Pick it up and go.",
-    specs=["72 hours", "1 adult", "30 L", "About 5.5 kg packed", "Contents stay dry", "Packed in the UK"],
+    lede="Everything one adult needs for the first 72 hours of a power cut, flood, storm or evacuation, packed by hand in the UK into a plain black 30-litre rucksack. Pick it up and go.",
+    specs=["72 hours", "1 adult", "30 L", "About 5.5 kg packed", "Packed in the UK"],
     groups=[
-        ("#2f7d4a", "Green dry bag · water and food", ["3 × 500 ml emergency water pouches, 5-year", "Water purification tablets", "750 ml water bottle, in the side pocket", "2 emergency ration bars, about 2,400 kcal each, 5-year", "Spork"]),
-        ("#2a2a2a", "Black dry bag · warmth and shelter", ["Reusable emergency bivvy bag", "2 foil blankets", "Reusable rain poncho", "4 hand warmers", "Beanie and gloves"]),
-        ("#c0392b", "Red dry bag · first aid and hygiene", ["Compact first aid kit", "2 FFP2 masks, 2 pairs of nitrile gloves", "Wet wipes and hand sanitiser", "Tissues, toothbrush and paste", "Sanitary pads, bin bags and zip bags"]),
-        ("#bfbfbf", "Top of the bag · light, power, signal", ["Wind-up and solar radio with torch and USB power bank", "Head torch, batteries fitted", "Whistle", "2 glow sticks"]),
-        ("#7a7a7a", "Front pocket · tools and documents", ["Multi-tool, UK-legal non-locking blade", "Mini duct tape, 10 m paracord, cable ties", "Waterproof document pouch, pen and notepad", "Contents card and first-hour card"]),
+        ("#2f7d4a", "Water and food", ["3 × 500 ml emergency water pouches, 5-year", "Water purification tablets", "750 ml water bottle", "2 emergency ration bars, about 2,400 kcal each, 5-year", "Spork"]),
+        ("#2a2a2a", "Warmth and shelter", ["Reusable emergency bivvy bag", "2 foil blankets", "Reusable rain poncho", "4 hand warmers", "Beanie and gloves"]),
+        ("#c0392b", "First aid and hygiene", ["Compact first aid kit", "2 FFP2 masks, 2 pairs of nitrile gloves", "Wet wipes and hand sanitiser", "Tissues, toothbrush and paste", "Sanitary pads, bin bags and zip bags"]),
+        ("#bfbfbf", "Light, power and signal", ["Wind-up and solar radio with torch and USB power bank", "Head torch, batteries fitted", "Whistle", "2 glow sticks"]),
+        ("#7a7a7a", "Tools and documents", ["Multi-tool, UK-legal non-locking blade", "Mini duct tape, 10 m paracord, cable ties", "Document pouch, pen and notepad", "Contents card and first-hour card"]),
     ],
     you_add="What you add: your medicines, copies of important documents, some cash, a phone charger cable, a change of clothes and anything you can't be without for three days.",
     bag_rows=[("Bag", "Plain black 30-litre rucksack"), ("Straps", "Padded, adjustable, with grab handle"), ("Pockets", "Main compartment, front zip pocket, side mesh pockets"),
-              ("Keeping dry", "Roll-top liner inside, plus three roll-top dry bags"), ("Packed weight", "About 5.5 kg"), ("Packed", "By hand in the UK, each bag checked against its contents card")],
+              ("Inside", "One open main compartment, no internal organiser"), ("Packed weight", "About 5.5 kg"), ("Packed", "By hand in the UK, each bag checked against its contents card")],
     rotation=[("Water pouches", "5 years; we email you"), ("Ration bars", "5 years; we email you"), ("Batteries", "Check every year; we remind you"), ("Hand warmers and glow sticks", "Replace every 3 to 4 years"), ("First aid kit", "Check dates every year")],
     faq=[
-        ("Is the bag waterproof?", "The kit stays dry. The rucksack fabric sheds rain, and inside it everything sits in a roll-top waterproof liner, with the food, warmth and first aid each in their own roll-top dry bag. Don't submerge it."),
+        ("Is the bag waterproof?", "No. It's a standard rucksack, not a waterproof bag, and there is no waterproof liner inside. Keep it indoors by the door, and in heavy rain line it with one of the bin bags from the kit or keep it under a coat."),
         ("Who is it for?", "One adult for 72 hours. Buy one per adult in the house. Bags for children, babies, families and pets are coming in 2027."),
-        ("How is this different from the Operator range?", "The Standard Issue is our launch bag: a plain rucksack packed with a complete 72-hour kit. The Operator range, coming in 2027, adds our own purpose-built bags, colour-coded per person, that clip together."),
+        ("Is there a range of bags?", "Not yet. The Standard Issue is our only bag for now: a plain rucksack packed with a complete 72-hour kit. Our own purpose-built range is planned for 2027; join the list on the homepage to hear first."),
         ("How long does it last?", "The water and the ration bars keep for five years. Sign up when you order and we email you when anything is due to be replaced."),
         ("Is there enough water?", "No bag can carry three days of water for drinking and washing: that's about 9 litres. The Standard Issue carries 1.5 litres plus a bottle and purification tablets so you can make more safe water as you go."),
         ("When will it arrive?", "Packed and dispatched within three working days. UK delivery is free and tracked."),
@@ -55,12 +55,12 @@ def si_card(r):
 def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
     """Writes the homepage, the Standard Issue product page and redirect stubs for the range pages."""
     b = SI
-    groups = "".join(f'<div class="card" style="flex:1 1 240px;padding:24px;gap:14px"><div style="display:flex;align-items:center;gap:10px"><span class="tag" style="width:14px;height:14px;background:{c};{"border:1px solid #3a3a3a" if c=="#2a2a2a" else ""}"></span><span class="eyebrow" style="letter-spacing:2px">{t}</span></div><p class="items" style="font-size:15px">{"<br>".join(i)}</p></div>' for c, t, i in b["groups"])
+    groups = "".join(f'<div class="card" style="flex:1 1 240px;padding:24px;gap:14px"><div style="display:flex;align-items:center;gap:10px"><span class="eyebrow" style="letter-spacing:2px">{t}</span></div><p class="items" style="font-size:15px">{"<br>".join(i)}</p></div>' for c, t, i in b["groups"])
     count = sum(len(i) for _, _, i in b["groups"])
     rows = lambda rs: "".join(f'<div class="row"><span>{k}</span><span>{v}</span></div>' for k, v in rs)
     faq = "".join(f'<div class="faq"><p>{q}</p><p class="p small">{a}</p></div>' for q, a in b["faq"])
     features = [("<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z\"/>", "Packed in the UK", "By hand, checked item by item"),
-                ("<path d=\"M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z\"/><path d=\"M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5\"/>", "Contents stay dry", "Roll-top liner and dry bags"),
+                ("<path d=\"M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z\"/><path d=\"M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5\"/>", "Ready by the door", "One bag, grab and go"),
                 ("<circle cx=\"12\" cy=\"13\" r=\"8\"/><path d=\"M12 9v4l2.5 2.5M9 2h6\"/>", "Food and water", "5-year shelf life"),
                 ("<path d=\"M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5V16h8v-2.5A6 6 0 0 0 12 3z\"/>", "Light, radio, power", "Wind-up, no mains needed"),
                 ("<path d=\"M12 4v16M4 12h16\"/><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"3\"/>", "First aid included", "Plus hygiene and tools"),
@@ -78,7 +78,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 <div class="stack si-copy">
 <p class="morse" aria-label="S O S: three dots, three dashes, three days"><span class="m-d"></span><span class="m-d"></span><span class="m-d"></span><span class="m-l"></span><span class="m-l"></span><span class="m-l"></span><span class="m-d"></span><span class="m-d"></span><span class="m-d"></span><span class="m-t">Three dots · three dashes · three days</span></p>
 <h1 class="h1">Standard Issue.<br>72 hours, packed and ready.</h1>
-<p class="lede">One plain black rucksack with everything an adult needs to get through a power cut, flood or evacuation: water, food, warmth, first aid, light and a radio. Kept dry inside, packed by hand in the UK.</p>
+<p class="lede">One plain black rucksack with everything an adult needs to get through a power cut, flood or evacuation: water, food, warmth, first aid, light and a radio. Packed by hand in the UK.</p>
 <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span class="price">{px(b['price'])}</span><span class="muted small" data-ship-line-hero>Free UK delivery. Dispatched in three working days.</span></div>
 <div class="hero-ctas">{si_card(r)}<a class="pill" href="bags/standard-issue.html#inside">What's inside</a></div>
 </div>
@@ -89,7 +89,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 <section id="inside" class="section"><div class="wrap stack" style="gap:40px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
 <div class="stack" style="gap:10px"><p class="eyebrow">What's inside</p><h2 class="h2">{count} items. Nothing to think about.</h2></div>
-<p class="p" style="max-width:440px">Three colour-coded dry bags inside a roll-top liner: green for water and food, black for warmth, red for first aid. Light, radio and tools on top, where your hand finds them.</p>
+<p class="p" style="max-width:440px">A complete 72-hour kit, bought in, checked item by item and packed into one plain rucksack.</p>
 </div>
 <div class="grid">{groups}</div>
 <p class="p" style="max-width:760px">{b['you_add']}</p>
@@ -118,7 +118,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 </div>
 </div></section>
 <section class="section"><div class="wrap grid">
-<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Coming 2027</p><h3 class="h3">A bag for every person in your house.</h3><p class="p">Our own purpose-built range is on its way: bags for adults, children, babies, families and pets, colour-coded per person, with the smaller bags clipping onto the adult's. Join the list to hear first.</p>
+<div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">Coming 2027</p><h3 class="h3">A bag for every person in your house.</h3><p class="p">Our own purpose-built range is planned for 2027: bags for adults, children, babies, families and pets, colour-coded per person, with the smaller bags clipping onto the adult's. Join the list to hear first.</p>
 <form class="form-row" data-api="/subscribe"><input type="hidden" name="source" value="range-2027"><label class="sr" for="email-range">Email address</label><input id="email-range" name="email" type="email" required placeholder="you@example.com" style="flex:1 1 220px"><button type="submit" class="pill solid">Join the list</button><p class="p small ok" data-done hidden style="flex:1 1 100%">You're on the list. We'll email you when the range launches.</p></form></div>
 <div class="card" style="flex:1 1 420px;padding:40px;gap:18px"><p class="eyebrow">For organisations</p><h3 class="h3">One bag per desk, per room, per person.</h3><p class="p">Workplaces, schools, hotels and property managers buy the Standard Issue in tens and hundreds, with volume pricing, invoice terms and reminders when contents are due.</p><a href="organisations.html" style="align-self:flex-start;font-weight:600;font-size:15px;border-bottom:1px solid var(--ink);padding-bottom:2px">Request a quote</a></div>
 </div></section>
@@ -144,7 +144,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 <form class="stack" style="gap:14px" data-product="{b['sku']}">
 <div data-avail="{b['sku']}" data-when="in" hidden style="display:contents">
 <button type="submit" class="pill solid" style="height:58px;font-size:16px">Add to basket &nbsp;—&nbsp;{px(b['price'])}</button>
-<p class="p small">Packed by hand and dispatched within three working days. Write-on name card included.</p>
+<p class="p small">Packed by hand and dispatched within three working days.</p>
 </div>
 </form>
 <div id="notify" data-avail="{b['sku']}" data-when="out" class="card stack" style="gap:12px;padding:22px">
@@ -161,7 +161,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 <p class="p" style="max-width:760px">{b['you_add']}</p>
 </div></section>
 <section id="build" class="section"><div class="wrap split">
-<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">The bag</p><h2 class="h2">Plain on the outside. Dry on the inside.</h2><p class="p">A plain black rucksack that doesn't look like an emergency kit, with a roll-top waterproof liner inside and the kit split into three roll-top dry bags, so rain and spills stay out.</p></div>
+<div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">The bag</p><h2 class="h2">A plain rucksack. Nothing fancy.</h2><p class="p">An unbranded black 30-litre rucksack that doesn't look like an emergency kit. One open main compartment, a front pocket and side pockets. It isn't waterproof, so keep it indoors, by the door.</p></div>
 <div class="rows" style="flex:2 1 520px">{rows(b['bag_rows'])}</div>
 </div></section>
 <section id="rotation" class="section band"><div class="wrap split">
@@ -173,7 +173,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
 <div style="flex:2 1 560px;display:flex;flex-direction:column">{faq}</div>
 </div></section>
 """
-    page("bags/standard-issue.html", "Standard Issue 72-hour go bag — Blackout SOS", "Everything one adult needs for 72 hours, packed in a plain black 30-litre rucksack with the contents kept dry. £139, free UK delivery.", pbody, f'<script type="application/ld+json">{product_schema}</script>')
+    page("bags/standard-issue.html", "Standard Issue 72-hour go bag — Blackout SOS", "Everything one adult needs for 72 hours, packed in a plain black 30-litre rucksack. £139, free UK delivery.", pbody, f'<script type="application/ld+json">{product_schema}</script>')
 
 def write_redirects(write, SITE):
     for p in ["bags/index.html", "bags/operator.html", "bags/recruit.html", "bags/cub.html", "bags/unit.html", "bags/scout.html", "refills.html"]:
