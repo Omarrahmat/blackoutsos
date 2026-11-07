@@ -73,7 +73,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
     r = ""
     hero = f"""
 <section class="si-hero" aria-label="The Standard Issue go bag">
-<img class="si-bg" src="assets/standard-issue.jpg?v=2" srcset="assets/standard-issue-1000.jpg?v=2 1000w, assets/standard-issue.jpg?v=2 1536w" sizes="100vw" width="1536" height="1024" alt="The Blackout SOS Standard Issue: a plain black waterproof rucksack with its 23 items laid out beside it" fetchpriority="high">
+<img class="si-bg" src="assets/standard-issue.jpg?v=3" srcset="assets/standard-issue-1000.jpg?v=3 1000w, assets/standard-issue.jpg?v=3 1536w" sizes="100vw" width="1536" height="1024" alt="The Blackout SOS Standard Issue: a plain black waterproof rucksack with its 23 items laid out beside it" fetchpriority="high">
 <div class="wrap si-hero-in">
 <div class="stack si-copy">
 <p class="morse" aria-label="S O S: three dots, three dashes, three days"><span class="m-d"></span><span class="m-d"></span><span class="m-d"></span><span class="m-l"></span><span class="m-l"></span><span class="m-l"></span><span class="m-d"></span><span class="m-d"></span><span class="m-d"></span><span class="m-t">Three dots · three dashes · three days</span></p>
@@ -136,7 +136,7 @@ def build_standard(page, px, gbp, SITE, subscribe_form, hero_extra=""):
     pbody = f"""
 <div class="wrap crumbs" style="padding-top:24px"><a href="../index.html">Home</a><span>/</span><span class="here">Standard Issue</span></div>
 <section class="wrap split" style="padding-top:32px;padding-bottom:clamp(56px,7vw,96px)">
-<div class="stack" style="flex:1 1 520px;gap:14px"><img class="si-product" src="../assets/standard-issue.jpg?v=2" srcset="../assets/standard-issue-1000.jpg?v=2 1000w, ../assets/standard-issue.jpg?v=2 1536w" sizes="(max-width:760px) 100vw, 55vw" width="1536" height="1024" alt="The Blackout SOS Standard Issue go bag with its contents laid out beside it"></div>
+<div class="stack" style="flex:1 1 520px;gap:14px"><img class="si-product" src="../assets/standard-issue.jpg?v=3" srcset="../assets/standard-issue-1000.jpg?v=3 1000w, ../assets/standard-issue.jpg?v=3 1536w" sizes="(max-width:760px) 100vw, 55vw" width="1536" height="1024" alt="The Blackout SOS Standard Issue go bag with its contents laid out beside it"></div>
 <div class="stack" style="flex:1 1 420px;gap:24px">
 <div class="stack" style="gap:10px"><div class="eyebrow">{b['who']}</div><h1 class="h1" style="font-size:clamp(52px,6.5vw,88px)">Standard Issue</h1><p class="lede" style="font-size:17px">{b['lede']}</p></div>
 <div class="muted small" style="display:flex;flex-wrap:wrap;gap:8px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0">{"".join(f"<span>{s}</span>" for s in b["specs"])}</div>
