@@ -531,7 +531,7 @@ def about():
 </div></div></section>
 <section class="section band"><div class="wrap split">
 <div class="stack" style="flex:1 1 360px;gap:14px"><p class="eyebrow">How we pack them</p><h2 class="h2">Packed by hand in the UK. Sent anywhere.</h2></div>
-<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The Standard Issue is a plain, unbranded black 30-litre rucksack. We buy in every item from trusted suppliers, check it against its label and dates, and pack each bag by hand in the UK against its contents card. We keep the dates and email you when anything is due, so you don't have to.</p>
+<div class="stack" style="flex:2 1 520px;gap:16px"><p class="body">The Standard Issue is a plain, unbranded, waterproof black 30-litre rucksack. We buy in every item from trusted suppliers, check it against its label and dates, and pack each bag by hand in the UK against its contents card. We keep the dates and email you when anything is due, so you don't have to.</p>
 <p class="body">Questions go to a real inbox and get a real answer. <a href="contact.html" style="border-bottom:1px solid var(--muted)">Write to us</a>.</p></div>
 </div></section>
 """
